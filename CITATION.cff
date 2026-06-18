@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "moderndive: Python companion for ModernDive"
+abstract: >-
+  A Python companion package for ModernDive (Statistical Inference via Data
+  Science), providing a tidy simulation-inference grammar, regression helpers,
+  and datasets, built on polars, plotnine, and statsmodels.
+type: software
+authors:
+  - family-names: Ismay
+    given-names: Chester
+  - family-names: Kim
+    given-names: Albert Y.
+  - family-names: Valdivia
+    given-names: Arturo
+license: MIT
+repository-code: "https://github.com/moderndive/moderndive-python"
+url: "https://moderndive.com"
+version: "0.1.0"

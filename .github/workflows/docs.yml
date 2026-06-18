@@ -22,9 +22,6 @@ jobs:
       - name: Install (with docs deps)
         run: uv sync --extra doc
       - name: Build Sphinx docs (warnings as errors)
+        # Build only to verify it succeeds; ReadTheDocs hosts the published docs,
+        # so we don't upload an artifact (that consumes Actions storage).
         run: uv run sphinx-build -W -b html doc doc/_build/html
-      - name: Upload docs artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: html-docs
-          path: doc/_build/html

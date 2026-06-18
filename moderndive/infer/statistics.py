@@ -81,11 +81,13 @@ def compute_statistic(
     order: tuple[object, object] | None = None,
     mu: float | None = None,
     p: float | None = None,
+    sigma: float | None = None,
 ) -> float:
     """Compute a single statistic from response (+ optional explanatory) arrays.
 
     ``stat`` may also be a callable taking ``(response, explanatory)`` and
-    returning a float (infer's custom-statistic feature).
+    returning a float (infer's custom-statistic feature). ``sigma`` is the known
+    population SD for a one-sample ``z`` statistic on a mean.
     """
     if callable(stat):
         return float(stat(response, explanatory))
@@ -111,6 +113,10 @@ def compute_statistic(
         s = np.std(response, ddof=1)
         return float((np.mean(response) - mu) / (s / np.sqrt(n)))
     if stat == "z" and explanatory is None:
+        if sigma is not None:  # one-sample z on a mean with known population SD
+            if mu is None:
+                raise ValueError("stat 'z' on a mean requires hypothesize(mu=..., sigma=...)")
+            return float((np.mean(response) - mu) / (sigma / np.sqrt(n)))
         if p is None:
             raise ValueError("stat 'z' (one proportion) requires hypothesize(p=...)")
         phat = _prop(response == success)

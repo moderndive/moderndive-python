@@ -16,7 +16,12 @@ import re
 import numpy as np
 import polars as pl
 
-__all__ = ["get_regression_table", "get_regression_points", "tidy_summary"]
+__all__ = [
+    "get_regression_table",
+    "get_regression_points",
+    "get_regression_summaries",
+    "tidy_summary",
+]
 
 
 def _to_pandas(data):
@@ -89,6 +94,36 @@ def get_regression_points(model, digits: int = 3) -> pl.DataFrame:
     round_cols = [endog_name, f"{endog_name}_hat", "residual"]
     round_cols = [c for c in round_cols if df.schema[c].is_numeric()]
     return df.with_columns(pl.col(round_cols).round(digits))
+
+
+def get_regression_summaries(model, digits: int = 3) -> pl.DataFrame:
+    """Model-fit summaries as a tidy 1-row frame (~ ``moderndive::get_regression_summaries``).
+
+    Columns: ``r_squared``, ``adj_r_squared``, ``mse``, ``rmse``, ``sigma``,
+    ``statistic`` (overall F), ``p_value``, ``df`` (model degrees of freedom),
+    ``nobs``. ``model`` is a fitted ``statsmodels`` results object.
+
+    ``mse`` is the mean squared residual using ``n`` in the denominator (so
+    ``rmse = sqrt(mse)``), while ``sigma`` is the residual standard error using
+    ``n - p`` — matching the R package.
+    """
+    nobs = int(model.nobs)
+    mse = float(model.ssr) / nobs
+    table = pl.DataFrame(
+        {
+            "r_squared": [float(model.rsquared)],
+            "adj_r_squared": [float(model.rsquared_adj)],
+            "mse": [mse],
+            "rmse": [float(np.sqrt(mse))],
+            "sigma": [float(np.sqrt(model.mse_resid))],
+            "statistic": [float(model.fvalue)],
+            "p_value": [float(model.f_pvalue)],
+            "df": [int(model.df_model)],
+            "nobs": [nobs],
+        }
+    )
+    float_cols = [c for c, dt in table.schema.items() if dt.is_float()]
+    return table.with_columns(pl.col(float_cols).round(digits))
 
 
 def tidy_summary(data, columns: list[str] | None = None, digits: int = 3) -> pl.DataFrame:

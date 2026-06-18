@@ -78,11 +78,16 @@ class Specification:
         return f"{self.response} ~ {self.explanatory}"
 
     def hypothesize(
-        self, null: str, *, mu: float | None = None, p: float | None = None
+        self,
+        null: str,
+        *,
+        mu: float | None = None,
+        p: float | None = None,
+        sigma: float | None = None,
     ) -> Hypothesis:
         if null not in ("point", "independence", "paired independence"):
             raise ValueError("null must be 'point', 'independence', or 'paired independence'")
-        return Hypothesis(spec=self, null=null, mu=mu, p=p)
+        return Hypothesis(spec=self, null=null, mu=mu, p=p, sigma=sigma)
 
     def generate(
         self, reps: int, type: str = "bootstrap", *, seed: int | None = None
@@ -96,6 +101,7 @@ class Specification:
         order: tuple[object, object] | None = None,
         mu: float | None = None,
         p: float | None = None,
+        sigma: float | None = None,
     ) -> ObservedStatistic:
         """Compute the observed statistic (no resampling)."""
         value = _stats.compute_statistic(
@@ -106,6 +112,7 @@ class Specification:
             order=order,
             mu=mu,
             p=p,
+            sigma=sigma,
         )
         label = stat if isinstance(stat, str) else "stat"
         return ObservedStatistic(value=value, stat=label)
@@ -117,8 +124,8 @@ class Specification:
         return _assume(distribution, df=df)
 
     # British-spelling alias (infer parity).
-    def hypothesise(self, null: str, *, mu=None, p=None):
-        return self.hypothesize(null, mu=mu, p=p)
+    def hypothesise(self, null: str, *, mu=None, p=None, sigma=None):
+        return self.hypothesize(null, mu=mu, p=p, sigma=sigma)
 
     def fit(self) -> FitResult:
         """Fit the observed regression (ordinary least squares) for the formula."""
@@ -138,6 +145,7 @@ class Hypothesis:
     null: str
     mu: float | None = None
     p: float | None = None
+    sigma: float | None = None
 
     def generate(
         self, reps: int, type: str | None = None, *, seed: int | None = None
@@ -153,7 +161,7 @@ class Hypothesis:
         order: tuple[object, object] | None = None,
     ) -> ObservedStatistic:
         """Observed statistic that needs the hypothesized value (e.g. stat='t'/'z')."""
-        return self.spec.calculate(stat, order=order, mu=self.mu, p=self.p)
+        return self.spec.calculate(stat, order=order, mu=self.mu, p=self.p, sigma=self.sigma)
 
 
 @dataclass(frozen=True)
@@ -173,6 +181,7 @@ class GeneratedReplicates:
     shifted_response: np.ndarray | None = field(default=None, repr=False)
     hyp_mu: float | None = None
     hyp_p: float | None = None
+    hyp_sigma: float | None = None
 
     # --- single-variable / two-group statistics ---------------------------
     def calculate(self, stat, *, order: tuple[object, object] | None = None) -> Distribution:
@@ -206,6 +215,7 @@ class GeneratedReplicates:
                     order=order,
                     mu=self.hyp_mu,
                     p=self.hyp_p,
+                    sigma=self.hyp_sigma,
                 )
             )
         df = pl.DataFrame(
@@ -259,13 +269,16 @@ def _generate(
     type: str,
     seed: int | None,
 ) -> GeneratedReplicates:
+    if type == "simulate":  # infer accepts "simulate" as an alias for "draw"
+        type = "draw"
     if type not in ("bootstrap", "permute", "draw"):
-        raise ValueError("type must be 'bootstrap', 'permute', or 'draw'")
+        raise ValueError("type must be 'bootstrap', 'permute', 'draw', or 'simulate'")
     rng = _resample.make_rng(seed)
     n = spec.data.height
     null = None if hypothesis is None else hypothesis.null
     hyp_mu = None if hypothesis is None else hypothesis.mu
     hyp_p = None if hypothesis is None else hypothesis.p
+    hyp_sigma = None if hypothesis is None else hypothesis.sigma
     shifted = None
     plans: list[np.ndarray] = []
 
@@ -303,6 +316,7 @@ def _generate(
         shifted_response=shifted,
         hyp_mu=hyp_mu,
         hyp_p=hyp_p,
+        hyp_sigma=hyp_sigma,
     )
 
 
@@ -408,10 +422,10 @@ class FitResult:
 
         return get_fit_p_value(self, obs_stat=obs_stat, direction=direction)
 
-    def visualize(self, bins: int = 20):
+    def visualize(self, bins: int = 20, *, engine: str = "plotly"):
         from .viz import visualize_fit
 
-        return visualize_fit(self, bins=bins)
+        return visualize_fit(self, bins=bins, engine=engine)
 
 
 def specify(
@@ -469,6 +483,7 @@ def observe(
     null: str | None = None,
     mu: float | None = None,
     p: float | None = None,
+    sigma: float | None = None,
 ) -> ObservedStatistic:
     """Shortcut for ``specify() |> [hypothesize()] |> calculate()``.
 
@@ -478,5 +493,5 @@ def observe(
         data, response=response, explanatory=explanatory, formula=formula, success=success
     )
     if null is not None:
-        return spec.hypothesize(null=null, mu=mu, p=p).calculate(stat, order=order)
-    return spec.calculate(stat, order=order, mu=mu, p=p)
+        return spec.hypothesize(null=null, mu=mu, p=p, sigma=sigma).calculate(stat, order=order)
+    return spec.calculate(stat, order=order, mu=mu, p=p, sigma=sigma)

@@ -20,6 +20,7 @@ keywords = [
     "regression",
     "education",
     "polars",
+    "plotly",
     "plotnine",
 ]
 classifiers = [
@@ -39,6 +40,7 @@ classifiers = [
 dependencies = [
     "polars>=1.0",
     "numpy>=1.26",
+    "plotly>=5.20",
     "plotnine>=0.13",
     "seaborn>=0.13",
     "statsmodels>=0.14",
@@ -49,6 +51,10 @@ dependencies = [
 
 [project.optional-dependencies]
 test = ["pytest>=8.0", "pytest-cov>=5.0"]
+# Static raster export of plotly figures (fig.write_image / .save to .png).
+# NOT a core dependency: kaleido ships a compiled Chromium and is unavailable
+# under Pyodide, so the package stays installable in-browser without it.
+image = ["kaleido>=0.2"]
 doc = [
     "sphinx>=7.0",
     "furo>=2024.1",

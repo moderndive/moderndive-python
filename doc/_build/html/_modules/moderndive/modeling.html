@@ -245,7 +245,12 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;get_regression_table&quot;</span><span class="p">,</span> <span class="s2">&quot;get_regression_points&quot;</span><span class="p">,</span> <span class="s2">&quot;tidy_summary&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;get_regression_table&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_regression_points&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_regression_summaries&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tidy_summary&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_to_pandas</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -309,7 +314,10 @@
     <span class="n">exog_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog_names</span> <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="s2">&quot;Intercept&quot;</span><span class="p">]</span>
     <span class="n">frame</span> <span class="o">=</span> <span class="n">_to_pandas</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ID&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span> <span class="n">endog_name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">endog_name</span><span class="p">])}</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;ID&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="n">endog_name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">endog_name</span><span class="p">]),</span>
+    <span class="p">}</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">exog_names</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="n">out</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
@@ -320,6 +328,39 @@
     <span class="n">round_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">endog_name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endog_name</span><span class="si">}</span><span class="s2">_hat&quot;</span><span class="p">,</span> <span class="s2">&quot;residual&quot;</span><span class="p">]</span>
     <span class="n">round_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">round_cols</span> <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">schema</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="o">.</span><span class="n">is_numeric</span><span class="p">()]</span>
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">round_cols</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">digits</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="get_regression_summaries">
+<a class="viewcode-back" href="../../api.html#moderndive.get_regression_summaries">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_regression_summaries</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Model-fit summaries as a tidy 1-row frame (~ ``moderndive::get_regression_summaries``).</span>
+
+<span class="sd">    Columns: ``r_squared``, ``adj_r_squared``, ``mse``, ``rmse``, ``sigma``,</span>
+<span class="sd">    ``statistic`` (overall F), ``p_value``, ``df`` (model degrees of freedom),</span>
+<span class="sd">    ``nobs``. ``model`` is a fitted ``statsmodels`` results object.</span>
+
+<span class="sd">    ``mse`` is the mean squared residual using ``n`` in the denominator (so</span>
+<span class="sd">    ``rmse = sqrt(mse)``), while ``sigma`` is the residual standard error using</span>
+<span class="sd">    ``n - p`` — matching the R package.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nobs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">nobs</span><span class="p">)</span>
+    <span class="n">mse</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">ssr</span><span class="p">)</span> <span class="o">/</span> <span class="n">nobs</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;r_squared&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">rsquared</span><span class="p">)],</span>
+            <span class="s2">&quot;adj_r_squared&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">rsquared_adj</span><span class="p">)],</span>
+            <span class="s2">&quot;mse&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">mse</span><span class="p">],</span>
+            <span class="s2">&quot;rmse&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mse</span><span class="p">))],</span>
+            <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">mse_resid</span><span class="p">))],</span>
+            <span class="s2">&quot;statistic&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">fvalue</span><span class="p">)],</span>
+            <span class="s2">&quot;p_value&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">f_pvalue</span><span class="p">)],</span>
+            <span class="s2">&quot;df&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">df_model</span><span class="p">)],</span>
+            <span class="s2">&quot;nobs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">nobs</span><span class="p">],</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">float_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">is_float</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">table</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">float_cols</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">digits</span><span class="p">))</span></div>
 
 
 

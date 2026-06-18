@@ -55,6 +55,37 @@ _REGISTRY: dict[str, str] = {
     "age_at_marriage": "Ages at first marriage (one-mean example).",
     "zinc_tidy": "Paired zinc concentrations (surface vs. bottom).",
     "cle_sac": "Personal incomes in Cleveland vs. Sacramento.",
+    # --- Full parity with the R packages (Workstream 5) ---------------------
+    # Flights / weather
+    "alaska_flights": "Alaska Airlines flights from NYC in 2013 (nycflights13).",
+    "early_january_weather": "Hourly NYC weather, Jan 1-15 2013 (nycflights13).",
+    # Sampling: bowl and pennies activities
+    "bowl_sample_1": "A single tactile sample of 50 balls from the bowl.",
+    "bowl_samples": "Ten tactile samples of balls by group (red/white/green counts).",
+    "pennies": "Years and ages of 800 pennies (sampling population).",
+    "pennies_sample": "A sample of 50 pennies with their mint years.",
+    "orig_pennies_sample": "An original sample of 40 pennies and their ages in 2011.",
+    "pennies_resamples": "Bootstrap resamples of the 50-penny sample.",
+    # Hypothesis testing examples
+    "promotions": "Resume gender-bias promotion experiment (48 resumes).",
+    "promotions_shuffled": "Promotions data with gender shuffled (permutation example).",
+    "spotify_52_original": "52 Spotify tracks (metal vs. deep-house) for testing.",
+    "spotify_52_shuffled": "spotify_52_original with genre labels shuffled.",
+    "gss": "General Social Survey subset, 500 respondents (infer).",
+    # Regression and modeling
+    "evals": "UT Austin teaching evaluations with instructor beauty scores.",
+    "MA_schools": "Massachusetts high schools: SAT math, size, and disadvantage.",
+    "amazon_books": "325 books with Amazon and list prices and physical traits.",
+    "mario_kart_auction": "143 eBay auctions of Mario Kart for the Wii.",
+    "babies": "Child Health and Development birth-weight study (1236 births).",
+    "coffee_ratings": "Coffee Quality Institute ratings with sensory scores.",
+    "ev_charging": "Electric-vehicle charging sessions with energy and time.",
+    "ipf_lifts": "International Powerlifting Federation meet results.",
+    "avocados": "Weekly US Hass avocado prices and volumes by region.",
+    # Traffic and demographics
+    "DD_vs_SB": "Dunkin' Donuts vs. Starbucks shop counts by US county.",
+    "ma_traffic_2020_vs_2019": "Massachusetts traffic change, 2020 vs. 2019.",
+    "mass_traffic_2020": "Massachusetts traffic-volume and crash counts, 2020.",
 }
 
 # Derived datasets (computed from a bundled one rather than stored as Parquet).

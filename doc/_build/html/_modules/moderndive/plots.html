@@ -227,36 +227,65 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for moderndive.plots</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Small plotting helpers that don&#39;t fit plotnine&#39;s grammar cleanly.</span>
+<span></span><span class="sd">&quot;&quot;&quot;Plotting helpers (dual-engine: plotly by default, plotnine/seaborn optional).</span>
 
-<span class="sd">`pairplot` is a thin wrapper over seaborn&#39;s pairplot — the closest analog to R&#39;s</span>
-<span class="sd">GGally `ggpairs` scatterplot matrix — accepting a polars DataFrame.</span>
+<span class="sd">- :func:`pairplot` — scatterplot matrix (~ GGally::ggpairs)</span>
+<span class="sd">- :func:`gg_parallel_slopes` / :func:`geom_parallel_slopes` — parallel-slopes model</span>
+<span class="sd">- :func:`gg_categorical_model` — regression with one categorical predictor</span>
+
+<span class="sd">Every public plotting function takes ``engine=&quot;plotly&quot;|&quot;plotnine&quot;`` defaulting to</span>
+<span class="sd">``&quot;plotly&quot;`` (the book&#39;s default engine).</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pairplot&quot;</span><span class="p">]</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">geom_parallel_slopes</span><span class="p">,</span> <span class="n">gg_categorical_model</span><span class="p">,</span> <span class="n">gg_parallel_slopes</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;pairplot&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gg_parallel_slopes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;geom_parallel_slopes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;gg_categorical_model&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
 <div class="viewcode-block" id="pairplot">
 <a class="viewcode-back" href="../../api.html#moderndive.pairplot">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">pairplot</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scatterplot matrix of the numeric columns (a seaborn PairGrid).</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">pairplot</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hue</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plotly&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scatterplot matrix of the numeric columns (the analog of ``GGally::ggpairs``).</span>
 
-<span class="sd">    The analog of R&#39;s ``GGally::ggpairs``: pairwise scatterplots off the diagonal</span>
-<span class="sd">    and per-variable histograms on the diagonal. ``hue`` colors points by a</span>
-<span class="sd">    categorical column. Returns the matplotlib ``Figure`` so it displays directly</span>
-<span class="sd">    in notebooks and Quarto.</span>
+<span class="sd">    ``engine=&quot;plotly&quot;`` (default) returns a plotly ``go.Figure`` from</span>
+<span class="sd">    ``plotly.express.scatter_matrix``. ``engine=&quot;plotnine&quot;`` (alias ``&quot;seaborn&quot;``)</span>
+<span class="sd">    returns the matplotlib ``Figure`` from ``seaborn.pairplot`` — the non-plotly</span>
+<span class="sd">    backend here is seaborn-backed, since plotnine has no first-class SPLOM.</span>
+<span class="sd">    ``hue`` colors points by a categorical column.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">engine</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;plotly&quot;</span><span class="p">,</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">,</span> <span class="s2">&quot;seaborn&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;engine must be &#39;plotly&#39;, &#39;plotnine&#39;, or &#39;seaborn&#39;&quot;</span><span class="p">)</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">columns</span> <span class="ow">or</span> <span class="p">[</span>
+        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dtypes</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">is_numeric</span><span class="p">()</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;plotly&quot;</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.express</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">px</span>
+
+        <span class="n">keep</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">+</span> <span class="p">([</span><span class="n">hue</span><span class="p">]</span> <span class="k">if</span> <span class="n">hue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">hue</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">else</span> <span class="p">[])</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">scatter_matrix</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(),</span> <span class="n">dimensions</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">hue</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">template</span><span class="o">=</span><span class="s2">&quot;plotly_white&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">update_traces</span><span class="p">(</span><span class="n">diagonal_visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span>
+
     <span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
 
     <span class="n">pdf</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="n">columns</span> <span class="ow">or</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span> <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">is_numeric</span><span class="p">()]</span>
-    <span class="n">keep</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">hue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">hue</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">keep</span><span class="p">:</span>
-        <span class="n">keep</span> <span class="o">=</span> <span class="n">keep</span> <span class="o">+</span> <span class="p">[</span><span class="n">hue</span><span class="p">]</span>
+    <span class="n">keep</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span> <span class="o">+</span> <span class="p">([</span><span class="n">hue</span><span class="p">]</span> <span class="k">if</span> <span class="n">hue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">hue</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">else</span> <span class="p">[])</span>
     <span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">pdf</span><span class="p">[</span><span class="n">keep</span><span class="p">],</span> <span class="nb">vars</span><span class="o">=</span><span class="n">cols</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="n">hue</span><span class="p">,</span> <span class="n">corner</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s2">&quot;hist&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">grid</span><span class="o">.</span><span class="n">figure</span></div>
 

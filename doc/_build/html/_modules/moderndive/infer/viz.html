@@ -227,137 +227,228 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for moderndive.infer.viz</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;plotnine-based visualization of simulated distributions (infer&#39;s visualize()).</span>
+<span></span><span class="sd">&quot;&quot;&quot;Dual-engine visualization for the infer grammar (plotly default, plotnine optional).</span>
 
-<span class="sd">``visualize()`` returns a plotnine ``ggplot`` (a histogram of the ``stat``</span>
-<span class="sd">column), so it composes with ``+`` exactly like ggplot layers — preserving the</span>
-<span class="sd">grammar-of-graphics muscle memory from Chapter 2:</span>
+<span class="sd">Every plotting function takes ``engine=&quot;plotly&quot;|&quot;plotnine&quot;`` and defaults to</span>
+<span class="sd">``&quot;plotly&quot;`` (the book&#39;s default engine); pass ``engine=&quot;plotnine&quot;`` to get the</span>
+<span class="sd">grammar-of-graphics objects instead.</span>
 
-<span class="sd">    visualize(null_distribution, bins=25) + shade_p_value(obs_diff, direction=&quot;right&quot;)</span>
-<span class="sd">    visualize(bootstrap_means) + shade_confidence_interval(endpoints=percentile_ci)</span>
+<span class="sd">``visualize()`` returns an :class:`InferPlot` wrapper that composes with shading</span>
+<span class="sd">via ``+`` for *both* engines::</span>
+
+<span class="sd">    visualize(null_dist, bins=25) + shade_p_value(obs_diff, direction=&quot;right&quot;)</span>
+<span class="sd">    visualize(boot_means) + shade_confidence_interval(endpoints=percentile_ci)</span>
+
+<span class="sd">``shade_p_value()`` / ``shade_confidence_interval()`` return an engine-neutral</span>
+<span class="sd">:class:`ShadeSpec`; ``InferPlot.__add__`` turns it into plotnine layers or applies</span>
+<span class="sd">plotly shapes as appropriate. A keyword form is also supported and is the most</span>
+<span class="sd">ergonomic path for plotly::</span>
+
+<span class="sd">    visualize(null_dist, shade_pvalue={&quot;obs_stat&quot;: obs, &quot;direction&quot;: &quot;right&quot;})</span>
+<span class="sd">    visualize(boot_means, shade_ci=percentile_ci)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">plotnine</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">aes</span><span class="p">,</span>
-    <span class="n">annotate</span><span class="p">,</span>
-    <span class="n">facet_wrap</span><span class="p">,</span>
-    <span class="n">geom_histogram</span><span class="p">,</span>
-    <span class="n">geom_vline</span><span class="p">,</span>
-    <span class="n">ggplot</span><span class="p">,</span>
-    <span class="n">labs</span><span class="p">,</span>
-    <span class="n">theme_light</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Distribution</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_common</span> <span class="k">as</span> <span class="n">C</span>
 
-<span class="n">_OBS_COLOR</span> <span class="o">=</span> <span class="s2">&quot;#d62728&quot;</span>
-<span class="n">_SHADE_COLOR</span> <span class="o">=</span> <span class="s2">&quot;#1f77b4&quot;</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;InferPlot&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ShadeSpec&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;visualize&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;visualize_fit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;visualize_theoretical&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;shade_p_value&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;shade_confidence_interval&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_stat_label</span><span class="p">(</span><span class="n">stat</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="k">return</span> <span class="s2">&quot;stat&quot;</span> <span class="k">if</span> <span class="n">stat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">stat</span>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShadeSpec</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Engine-neutral description of a shading layer (p-value tail or CI).&quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &quot;p_value&quot; | &quot;confidence_interval&quot;</span>
+    <span class="n">obs_stat</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">lower</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">upper</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">InferPlot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A plot plus its engine, composable with :class:`ShadeSpec` (and, for the</span>
+<span class="sd">    plotnine engine, any plotnine layer) via ``+``.</span>
+
+<span class="sd">    Access the wrapped figure with :attr:`figure`; for the plotnine engine, the</span>
+<span class="sd">    raw ``ggplot`` is also available via :attr:`gg`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figure</span><span class="p">,</span> <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">=</span> <span class="n">figure</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">engine</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_plotnine</span> <span class="k">as</span> <span class="n">P</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ShadeSpec</span><span class="p">):</span>
+                <span class="n">layers</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">P</span><span class="o">.</span><span class="n">shade_pvalue_layers</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">other</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;p_value&quot;</span>
+                    <span class="k">else</span> <span class="n">P</span><span class="o">.</span><span class="n">shade_ci_layers</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">InferPlot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">+</span> <span class="n">layers</span><span class="p">,</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">)</span>
+            <span class="c1"># Any other plotnine object/layer/list.</span>
+            <span class="k">return</span> <span class="n">InferPlot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span> <span class="o">+</span> <span class="n">other</span><span class="p">,</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">)</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_plotly</span> <span class="k">as</span> <span class="n">PX</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ShadeSpec</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">InferPlot</span><span class="p">(</span><span class="n">PX</span><span class="o">.</span><span class="n">apply_shade_px</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="s2">&quot;plotly&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="s2">&quot;Only a ShadeSpec (from shade_p_value/shade_confidence_interval) can be &quot;</span>
+            <span class="s2">&quot;added to a plotly InferPlot.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The underlying plotnine ``ggplot`` (only when ``engine=&#39;plotnine&#39;``).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">!=</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;`.gg` is only available when engine=&#39;plotnine&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the figure (delegates to the underlying figure).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save the figure. plotnine forwards to ``ggplot.save``; plotly writes an</span>
+<span class="sd">        HTML file for ``.html`` paths and a static image otherwise (the latter</span>
+<span class="sd">        needs the optional ``kaleido`` dependency — install ``moderndive[image]``).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">path_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path_str</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">path_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">path_str</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">figure</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="s2">&quot;_repr_html_&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_coerce_pvalue_spec</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShadeSpec</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ShadeSpec</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">shade_p_value</span><span class="p">(</span><span class="o">**</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;shade_pvalue must be a ShadeSpec or a dict of shade_p_value() kwargs.&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_coerce_ci_spec</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShadeSpec</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ShadeSpec</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">shade_confidence_interval</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="visualize">
 <a class="viewcode-back" href="../../../api.html#moderndive.visualize">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">visualize</span><span class="p">(</span><span class="n">distribution</span><span class="p">:</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Histogram of the simulated statistics (a plotnine ggplot).&quot;&quot;&quot;</span>
-    <span class="n">pdf</span> <span class="o">=</span> <span class="n">distribution</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;stat&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Simulation-Based Null Distribution&quot;</span>
-        <span class="k">if</span> <span class="n">distribution</span><span class="o">.</span><span class="n">null</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">else</span> <span class="s2">&quot;Simulation-Based Bootstrap Distribution&quot;</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">ggplot</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;stat&quot;</span><span class="p">))</span>
-        <span class="o">+</span> <span class="n">geom_histogram</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="s2">&quot;#7f7f7f&quot;</span><span class="p">)</span>
-        <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">_stat_label</span><span class="p">(</span><span class="n">distribution</span><span class="o">.</span><span class="n">stat</span><span class="p">),</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
-        <span class="o">+</span> <span class="n">theme_light</span><span class="p">()</span>
-    <span class="p">)</span></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">visualize</span><span class="p">(</span>
+    <span class="n">distribution</span><span class="p">,</span>
+    <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plotly&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;simulation&quot;</span><span class="p">,</span>
+    <span class="n">shade_pvalue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">shade_ci</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InferPlot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Histogram of the simulated statistics, as an :class:`InferPlot`.</span>
+
+<span class="sd">    ``method`` is ``&quot;simulation&quot;`` (histogram, default), ``&quot;theoretical&quot;`` (a</span>
+<span class="sd">    normal-approximation density curve), or ``&quot;both&quot;`` (histogram in density units</span>
+<span class="sd">    overlaid with the normal curve), mirroring R ``infer``&#39;s ``visualize(method=)``.</span>
+<span class="sd">    Pass ``shade_pvalue=``/``shade_ci=`` to shade in one call, or compose with ``+``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">resolve_engine</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">method</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_plotnine</span> <span class="k">as</span> <span class="n">P</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">visualize_gg</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_plotly</span> <span class="k">as</span> <span class="n">PX</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">PX</span><span class="o">.</span><span class="n">visualize_px</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+
+    <span class="n">plot</span> <span class="o">=</span> <span class="n">InferPlot</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">engine</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">shade_pvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plot</span> <span class="o">=</span> <span class="n">plot</span> <span class="o">+</span> <span class="n">_coerce_pvalue_spec</span><span class="p">(</span><span class="n">shade_pvalue</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">shade_ci</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plot</span> <span class="o">=</span> <span class="n">plot</span> <span class="o">+</span> <span class="n">_coerce_ci_spec</span><span class="p">(</span><span class="n">shade_ci</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">plot</span></div>
 
 
 
-<span class="n">_INF</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">visualize_fit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">visualize_fit</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plotly&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InferPlot</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Faceted histogram of a regression fit distribution, one panel per term.&quot;&quot;&quot;</span>
-    <span class="n">pdf</span> <span class="o">=</span> <span class="n">fit</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;term&quot;</span><span class="p">,</span> <span class="s2">&quot;estimate&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;Simulation-Based Null Distribution&quot;</span>
-        <span class="k">if</span> <span class="n">fit</span><span class="o">.</span><span class="n">null</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">else</span> <span class="s2">&quot;Simulation-Based Bootstrap Distribution&quot;</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">ggplot</span><span class="p">(</span><span class="n">pdf</span><span class="p">,</span> <span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;estimate&quot;</span><span class="p">))</span>
-        <span class="o">+</span> <span class="n">geom_histogram</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="s2">&quot;#7f7f7f&quot;</span><span class="p">)</span>
-        <span class="o">+</span> <span class="n">facet_wrap</span><span class="p">(</span><span class="s2">&quot;term&quot;</span><span class="p">,</span> <span class="n">scales</span><span class="o">=</span><span class="s2">&quot;free&quot;</span><span class="p">)</span>
-        <span class="o">+</span> <span class="n">labs</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s2">&quot;estimate&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
-        <span class="o">+</span> <span class="n">theme_light</span><span class="p">()</span>
-    <span class="p">)</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">resolve_engine</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_plotnine</span> <span class="k">as</span> <span class="n">P</span>
+
+        <span class="k">return</span> <span class="n">InferPlot</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">visualize_fit_gg</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span><span class="p">),</span> <span class="n">engine</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_plotly</span> <span class="k">as</span> <span class="n">PX</span>
+
+    <span class="k">return</span> <span class="n">InferPlot</span><span class="p">(</span><span class="n">PX</span><span class="o">.</span><span class="n">visualize_fit_px</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span><span class="p">),</span> <span class="n">engine</span><span class="p">)</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_full_height_rect</span><span class="p">(</span><span class="n">xmin</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">xmax</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">fill</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A translucent rectangle spanning the full panel height between xmin and xmax.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">annotate</span><span class="p">(</span>
-        <span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="o">=-</span><span class="n">_INF</span><span class="p">,</span> <span class="n">ymax</span><span class="o">=</span><span class="n">_INF</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">fill</span>
-    <span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">visualize_theoretical</span><span class="p">(</span><span class="n">theoretical</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plotly&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">InferPlot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Density curve for a :class:`~moderndive.infer.TheoreticalDistribution`.&quot;&quot;&quot;</span>
+    <span class="n">engine</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">resolve_engine</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">theoretical</span><span class="o">.</span><span class="n">_dist</span><span class="p">()</span>
+    <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.001</span><span class="p">),</span> <span class="n">dist</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.999</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Theoretical </span><span class="si">{</span><span class="n">theoretical</span><span class="o">.</span><span class="n">distribution</span><span class="si">}</span><span class="s2"> distribution&quot;</span>
+    <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;plotnine&quot;</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_plotnine</span> <span class="k">as</span> <span class="n">P</span>
+
+        <span class="k">return</span> <span class="n">InferPlot</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">density_curve_gg</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">title</span><span class="p">),</span> <span class="n">engine</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_plotly</span> <span class="k">as</span> <span class="n">PX</span>
+
+    <span class="k">return</span> <span class="n">InferPlot</span><span class="p">(</span><span class="n">PX</span><span class="o">.</span><span class="n">density_curve_px</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">density</span><span class="p">,</span> <span class="n">title</span><span class="p">),</span> <span class="n">engine</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="shade_p_value">
 <a class="viewcode-back" href="../../../api.html#moderndive.shade_p_value">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shade the p-value tail(s) and mark the observed statistic.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShadeSpec</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A p-value shading spec; add it to a ``visualize()`` plot with ``+``.</span>
 
-<span class="sd">    Returns a list of plotnine layers (add it to a ``visualize()`` plot with ``+``).</span>
 <span class="sd">    ``direction`` ∈ {right/greater, left/less, two-sided}.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">obs</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">obs_stat</span><span class="p">)</span>
-    <span class="n">direction</span> <span class="o">=</span> <span class="n">direction</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-
-    <span class="n">layers</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom_vline</span><span class="p">(</span><span class="n">xintercept</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_OBS_COLOR</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)]</span>
-    <span class="k">if</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;greater&quot;</span><span class="p">}:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_full_height_rect</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">_INF</span><span class="p">,</span> <span class="n">_OBS_COLOR</span><span class="p">))</span>
-    <span class="k">elif</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;less&quot;</span><span class="p">}:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_full_height_rect</span><span class="p">(</span><span class="o">-</span><span class="n">_INF</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">_OBS_COLOR</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>  <span class="c1"># two-sided: mirror about 0 (null statistics center on 0)</span>
-        <span class="n">mirror</span> <span class="o">=</span> <span class="o">-</span><span class="n">obs</span>
-        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">((</span><span class="n">obs</span><span class="p">,</span> <span class="n">mirror</span><span class="p">))</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">geom_vline</span><span class="p">(</span><span class="n">xintercept</span><span class="o">=</span><span class="n">mirror</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">_OBS_COLOR</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">linetype</span><span class="o">=</span><span class="s2">&quot;dashed&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_full_height_rect</span><span class="p">(</span><span class="o">-</span><span class="n">_INF</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">_OBS_COLOR</span><span class="p">))</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_full_height_rect</span><span class="p">(</span><span class="n">hi</span><span class="p">,</span> <span class="n">_INF</span><span class="p">,</span> <span class="n">_OBS_COLOR</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">layers</span></div>
+    <span class="k">return</span> <span class="n">ShadeSpec</span><span class="p">(</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;p_value&quot;</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">obs_stat</span><span class="p">),</span> <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span>
+    <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="shade_confidence_interval">
 <a class="viewcode-back" href="../../../api.html#moderndive.shade_confidence_interval">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">shade_confidence_interval</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_SHADE_COLOR</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shade the confidence interval between its endpoints.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shade_confidence_interval</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ShadeSpec</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A confidence-interval shading spec; add it to a ``visualize()`` plot with ``+``.</span>
 
-<span class="sd">    Returns a list of plotnine layers. ``endpoints`` may be a polars DataFrame</span>
-<span class="sd">    with ``lower_ci``/``upper_ci`` columns (the output of</span>
-<span class="sd">    :func:`get_confidence_interval`) or a 2-tuple ``(lower, upper)``.</span>
+<span class="sd">    ``endpoints`` is a CI DataFrame (``lower_ci``/``upper_ci``) or a ``(lower, upper)`` tuple.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">endpoints</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-        <span class="n">lower</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">endpoints</span><span class="p">[</span><span class="s2">&quot;lower_ci&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">upper</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">endpoints</span><span class="p">[</span><span class="s2">&quot;upper_ci&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">endpoints</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="p">[</span>
-        <span class="n">_full_height_rect</span><span class="p">(</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="p">,</span> <span class="n">color</span><span class="p">),</span>
-        <span class="n">geom_vline</span><span class="p">(</span><span class="n">xintercept</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
-        <span class="n">geom_vline</span><span class="p">(</span><span class="n">xintercept</span><span class="o">=</span><span class="n">upper</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
-    <span class="p">]</span></div>
+    <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">ci_endpoints</span><span class="p">(</span><span class="n">endpoints</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ShadeSpec</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;confidence_interval&quot;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="n">lower</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="n">upper</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

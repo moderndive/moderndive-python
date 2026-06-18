@@ -47,15 +47,23 @@
 ```{eval-rst}
 .. autofunction:: moderndive.get_regression_table
 .. autofunction:: moderndive.get_regression_points
+.. autofunction:: moderndive.get_regression_summaries
+.. autofunction:: moderndive.get_correlation
+.. autofunction:: moderndive.pop_sd
 .. autofunction:: moderndive.tidy_summary
 ```
 
 ## Sampling and plots
 
+All plotting helpers accept ``engine="plotly"`` (default) or ``engine="plotnine"``.
+
 ```{eval-rst}
 .. autofunction:: moderndive.rep_slice_sample
 .. autofunction:: moderndive.rep_sample_n
 .. autofunction:: moderndive.pairplot
+.. autofunction:: moderndive.gg_parallel_slopes
+.. autofunction:: moderndive.geom_parallel_slopes
+.. autofunction:: moderndive.gg_categorical_model
 ```
 
 ## Datasets

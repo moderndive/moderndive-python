@@ -102,10 +102,12 @@ def test_assume_visualize_builds():
     import matplotlib
 
     matplotlib.use("Agg")
-    p = assume("z").visualize()
+    # plotly default returns a go.Figure-wrapping InferPlot; plotnine returns a ggplot.
+    import plotly.graph_objects as go
     from plotnine import ggplot
 
-    assert isinstance(p, ggplot)
+    assert isinstance(assume("z").visualize().figure, go.Figure)
+    assert isinstance(assume("z").visualize(engine="plotnine").gg, ggplot)
 
 
 # --- wrappers -------------------------------------------------------------

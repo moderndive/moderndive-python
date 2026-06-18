@@ -265,7 +265,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.observe">
-<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">observe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanatory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/core.html#observe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.observe" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">observe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanatory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/core.html#observe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.observe" title="Link to this definition">¶</a></dt>
 <dd><p>Shortcut for <code class="docutils literal notranslate"><span class="pre">specify()</span> <span class="pre">|&gt;</span> <span class="pre">[hypothesize()]</span> <span class="pre">|&gt;</span> <span class="pre">calculate()</span></code>.</p>
 <p>Mirrors R <code class="docutils literal notranslate"><span class="pre">infer::observe()</span></code> — compute an observed statistic in one call.</p>
 <dl class="field-list simple">
@@ -284,6 +284,7 @@
 <li><p><strong>null</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -325,7 +326,7 @@
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="moderndive.infer.core.Specification.calculate">
-<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stat</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/core.html#Specification.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.infer.core.Specification.calculate" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calculate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stat</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/core.html#Specification.calculate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.infer.core.Specification.calculate" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the observed statistic (no resampling).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -336,6 +337,7 @@
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -370,7 +372,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="moderndive.infer.core.Hypothesis">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">moderndive.infer.core.</span></span><span class="sig-name descname"><span class="pre">Hypothesis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/core.html#Hypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.infer.core.Hypothesis" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">moderndive.infer.core.</span></span><span class="sig-name descname"><span class="pre">Hypothesis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/core.html#Hypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.infer.core.Hypothesis" title="Link to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -378,6 +380,7 @@
 <li><p><strong>null</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
 <li><p><strong>mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -399,7 +402,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="moderndive.infer.core.GeneratedReplicates">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">moderndive.infer.core.</span></span><span class="sig-name descname"><span class="pre">GeneratedReplicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plans</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shifted_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyp_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyp_p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/core.html#GeneratedReplicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.infer.core.GeneratedReplicates" title="Link to this definition">¶</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">moderndive.infer.core.</span></span><span class="sig-name descname"><span class="pre">GeneratedReplicates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">null</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plans</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shifted_response</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyp_mu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyp_p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyp_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/core.html#GeneratedReplicates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.infer.core.GeneratedReplicates" title="Link to this definition">¶</a></dt>
 <dd><p>Materialized resampling plan; supports both <code class="docutils literal notranslate"><span class="pre">calculate()</span></code> and <code class="docutils literal notranslate"><span class="pre">fit()</span></code>.</p>
 <p><code class="docutils literal notranslate"><span class="pre">plans</span></code> holds one numpy array per replicate:
 - bootstrap: row indices (with replacement) into the data,
@@ -415,6 +418,7 @@
 <li><p><strong>shifted_response</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>hyp_mu</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>hyp_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>hyp_sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -491,11 +495,14 @@ them across replicates (<code class="docutils literal notranslate"><span class="
 
 <dl class="py method">
 <dt class="sig sig-object py" id="moderndive.infer.theoretical.TheoreticalDistribution.visualize">
-<span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/theoretical.html#TheoreticalDistribution.visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.infer.theoretical.TheoreticalDistribution.visualize" title="Link to this definition">¶</a></dt>
-<dd><p>Plot the theoretical density curve (a plotnine ggplot).</p>
+<span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plotly'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/theoretical.html#TheoreticalDistribution.visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.infer.theoretical.TheoreticalDistribution.visualize" title="Link to this definition">¶</a></dt>
+<dd><p>Plot the theoretical density curve (plotly by default; engine=”plotnine”).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>engine</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -552,13 +559,21 @@ bootstrap distribution (requires <code class="docutils literal notranslate"><spa
 
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.visualize">
-<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/viz.html#visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.visualize" title="Link to this definition">¶</a></dt>
-<dd><p>Histogram of the simulated statistics (a plotnine ggplot).</p>
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plotly'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'simulation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shade_pvalue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shade_ci</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/viz.html#visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.visualize" title="Link to this definition">¶</a></dt>
+<dd><p>Histogram of the simulated statistics, as an <code class="xref py py-class docutils literal notranslate"><span class="pre">InferPlot</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">method</span></code> is <code class="docutils literal notranslate"><span class="pre">&quot;simulation&quot;</span></code> (histogram, default), <code class="docutils literal notranslate"><span class="pre">&quot;theoretical&quot;</span></code> (a
+normal-approximation density curve), or <code class="docutils literal notranslate"><span class="pre">&quot;both&quot;</span></code> (histogram in density units
+overlaid with the normal curve), mirroring R <code class="docutils literal notranslate"><span class="pre">infer</span></code>’s <code class="docutils literal notranslate"><span class="pre">visualize(method=)</span></code>.
+Pass <code class="docutils literal notranslate"><span class="pre">shade_pvalue=</span></code>/<code class="docutils literal notranslate"><span class="pre">shade_ci=</span></code> to shade in one call, or compose with <code class="docutils literal notranslate"><span class="pre">+</span></code>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>distribution</strong> (<a class="reference internal" href="#moderndive.infer.core.Distribution" title="moderndive.infer.core.Distribution"><em>Distribution</em></a>)</p></li>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">InferPlot</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><strong>bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>engine</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -566,33 +581,33 @@ bootstrap distribution (requires <code class="docutils literal notranslate"><spa
 
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.shade_p_value">
-<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">shade_p_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_stat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/viz.html#shade_p_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.shade_p_value" title="Link to this definition">¶</a></dt>
-<dd><p>Shade the p-value tail(s) and mark the observed statistic.</p>
-<p>Returns a list of plotnine layers (add it to a <code class="docutils literal notranslate"><span class="pre">visualize()</span></code> plot with <code class="docutils literal notranslate"><span class="pre">+</span></code>).
-<code class="docutils literal notranslate"><span class="pre">direction</span></code> ∈ {right/greater, left/less, two-sided}.</p>
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">shade_p_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_stat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/viz.html#shade_p_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.shade_p_value" title="Link to this definition">¶</a></dt>
+<dd><p>A p-value shading spec; add it to a <code class="docutils literal notranslate"><span class="pre">visualize()</span></code> plot with <code class="docutils literal notranslate"><span class="pre">+</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">direction</span></code> ∈ {right/greater, left/less, two-sided}.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShadeSpec</span></code></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>direction</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.shade_confidence_interval">
-<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">shade_confidence_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#1f77b4'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/viz.html#shade_confidence_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.shade_confidence_interval" title="Link to this definition">¶</a></dt>
-<dd><p>Shade the confidence interval between its endpoints.</p>
-<p>Returns a list of plotnine layers. <code class="docutils literal notranslate"><span class="pre">endpoints</span></code> may be a polars DataFrame
-with <code class="docutils literal notranslate"><span class="pre">lower_ci</span></code>/<code class="docutils literal notranslate"><span class="pre">upper_ci</span></code> columns (the output of
-<a class="reference internal" href="#moderndive.get_confidence_interval" title="moderndive.get_confidence_interval"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_confidence_interval()</span></code></a>) or a 2-tuple <code class="docutils literal notranslate"><span class="pre">(lower,</span> <span class="pre">upper)</span></code>.</p>
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">shade_confidence_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/viz.html#shade_confidence_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.shade_confidence_interval" title="Link to this definition">¶</a></dt>
+<dd><p>A confidence-interval shading spec; add it to a <code class="docutils literal notranslate"><span class="pre">visualize()</span></code> plot with <code class="docutils literal notranslate"><span class="pre">+</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">endpoints</span></code> is a CI DataFrame (<code class="docutils literal notranslate"><span class="pre">lower_ci</span></code>/<code class="docutils literal notranslate"><span class="pre">upper_ci</span></code>) or a <code class="docutils literal notranslate"><span class="pre">(lower,</span> <span class="pre">upper)</span></code> tuple.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShadeSpec</span></code></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+<dd class="field-even"><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -804,6 +819,60 @@ so the chapters can draw the simulation-vs-theory comparison.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="moderndive.get_regression_summaries">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_regression_summaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/modeling.html#get_regression_summaries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_regression_summaries" title="Link to this definition">¶</a></dt>
+<dd><p>Model-fit summaries as a tidy 1-row frame (~ <code class="docutils literal notranslate"><span class="pre">moderndive::get_regression_summaries</span></code>).</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">r_squared</span></code>, <code class="docutils literal notranslate"><span class="pre">adj_r_squared</span></code>, <code class="docutils literal notranslate"><span class="pre">mse</span></code>, <code class="docutils literal notranslate"><span class="pre">rmse</span></code>, <code class="docutils literal notranslate"><span class="pre">sigma</span></code>,
+<code class="docutils literal notranslate"><span class="pre">statistic</span></code> (overall F), <code class="docutils literal notranslate"><span class="pre">p_value</span></code>, <code class="docutils literal notranslate"><span class="pre">df</span></code> (model degrees of freedom),
+<code class="docutils literal notranslate"><span class="pre">nobs</span></code>. <code class="docutils literal notranslate"><span class="pre">model</span></code> is a fitted <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> results object.</p>
+<p><code class="docutils literal notranslate"><span class="pre">mse</span></code> is the mean squared residual using <code class="docutils literal notranslate"><span class="pre">n</span></code> in the denominator (so
+<code class="docutils literal notranslate"><span class="pre">rmse</span> <span class="pre">=</span> <span class="pre">sqrt(mse)</span></code>), while <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is the residual standard error using
+<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">-</span> <span class="pre">p</span></code> — matching the R package.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>digits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.get_correlation">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/correlation.html#get_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_correlation" title="Link to this definition">¶</a></dt>
+<dd><p>Pearson correlation as a tidy 1-row frame with a <code class="docutils literal notranslate"><span class="pre">cor</span></code> column.</p>
+<p>Mirrors <code class="docutils literal notranslate"><span class="pre">moderndive::get_correlation(data,</span> <span class="pre">y</span> <span class="pre">~</span> <span class="pre">x)</span></code>. Specify the variable
+pair either as a formula string (<code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">x&quot;</span></code>) or via the <code class="docutils literal notranslate"><span class="pre">x=</span></code> and <code class="docutils literal notranslate"><span class="pre">y=</span></code>
+keyword arguments. Rows with a null in either column are dropped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.pop_sd">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">pop_sd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/correlation.html#pop_sd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.pop_sd" title="Link to this definition">¶</a></dt>
+<dd><p>Population standard deviation (divides by <code class="docutils literal notranslate"><span class="pre">n</span></code>, not <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">-</span> <span class="pre">1</span></code>).</p>
+<p>Mirrors <code class="docutils literal notranslate"><span class="pre">moderndive::pop_sd</span></code>. Accepts a polars Series, list, numpy array,
+or any sequence; nulls/NaNs are dropped before computing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="moderndive.tidy_summary">
 <span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">tidy_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/modeling.html#tidy_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.tidy_summary" title="Link to this definition">¶</a></dt>
 <dd><p>Per-variable summary statistics for the selected columns.</p>
@@ -827,6 +896,7 @@ report <code class="docutils literal notranslate"><span class="pre">n</span></co
 </section>
 <section id="sampling-and-plots">
 <h2>Sampling and plots<a class="headerlink" href="#sampling-and-plots" title="Link to this heading">¶</a></h2>
+<p>All plotting helpers accept <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code>.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.rep_slice_sample">
 <span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">rep_slice_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/sampling.html#rep_slice_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.rep_slice_sample" title="Link to this definition">¶</a></dt>
@@ -872,18 +942,73 @@ replacement (e.g. bootstrap-style). Pass <code class="docutils literal notransla
 
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.pairplot">
-<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">pairplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/plots.html#pairplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.pairplot" title="Link to this definition">¶</a></dt>
-<dd><p>Scatterplot matrix of the numeric columns (a seaborn PairGrid).</p>
-<p>The analog of R’s <code class="docutils literal notranslate"><span class="pre">GGally::ggpairs</span></code>: pairwise scatterplots off the diagonal
-and per-variable histograms on the diagonal. <code class="docutils literal notranslate"><span class="pre">hue</span></code> colors points by a
-categorical column. Returns the matplotlib <code class="docutils literal notranslate"><span class="pre">Figure</span></code> so it displays directly
-in notebooks and Quarto.</p>
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">pairplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plotly'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/plots.html#pairplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.pairplot" title="Link to this definition">¶</a></dt>
+<dd><p>Scatterplot matrix of the numeric columns (the analog of <code class="docutils literal notranslate"><span class="pre">GGally::ggpairs</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code> (default) returns a plotly <code class="docutils literal notranslate"><span class="pre">go.Figure</span></code> from
+<code class="docutils literal notranslate"><span class="pre">plotly.express.scatter_matrix</span></code>. <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> (alias <code class="docutils literal notranslate"><span class="pre">&quot;seaborn&quot;</span></code>)
+returns the matplotlib <code class="docutils literal notranslate"><span class="pre">Figure</span></code> from <code class="docutils literal notranslate"><span class="pre">seaborn.pairplot</span></code> — the non-plotly
+backend here is seaborn-backed, since plotnine has no first-class SPLOM.
+<code class="docutils literal notranslate"><span class="pre">hue</span></code> colors points by a categorical column.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>DataFrame</em>)</p></li>
 <li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>hue</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>engine</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.gg_parallel_slopes">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">gg_parallel_slopes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanatory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">by</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plotly'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/plots/models.html#gg_parallel_slopes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.gg_parallel_slopes" title="Link to this definition">¶</a></dt>
+<dd><p>Scatterplot with a parallel-slopes regression model overlaid.</p>
+<p>Fits <code class="docutils literal notranslate"><span class="pre">response</span> <span class="pre">~</span> <span class="pre">explanatory</span> <span class="pre">+</span> <span class="pre">C(by)</span></code> (one common slope, a separate intercept
+per level of <code class="docutils literal notranslate"><span class="pre">by</span></code>) and draws one fitted line per group over the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>explanatory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>engine</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.geom_parallel_slopes">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">geom_parallel_slopes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanatory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">by</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/plots/models.html#geom_parallel_slopes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.geom_parallel_slopes" title="Link to this definition">¶</a></dt>
+<dd><p>plotnine layer(s) drawing the parallel-slopes fitted lines.</p>
+<p>Add to a <code class="docutils literal notranslate"><span class="pre">ggplot</span></code> with <code class="docutils literal notranslate"><span class="pre">+</span></code> (plotnine-only; for a plotly version call
+<a class="reference internal" href="#moderndive.gg_parallel_slopes" title="moderndive.gg_parallel_slopes"><code class="xref py py-func docutils literal notranslate"><span class="pre">gg_parallel_slopes()</span></code></a> with <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>explanatory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>by</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.gg_categorical_model">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">gg_categorical_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanatory</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plotly'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/plots/models.html#gg_categorical_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.gg_categorical_model" title="Link to this definition">¶</a></dt>
+<dd><p>Regression with one categorical predictor (~ <code class="docutils literal notranslate"><span class="pre">geom_categorical_model</span></code>).</p>
+<p>Fits <code class="docutils literal notranslate"><span class="pre">response</span> <span class="pre">~</span> <span class="pre">C(explanatory)</span></code>; each category’s fitted value is its group
+mean, drawn as a horizontal marker over the (jittered) data points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>explanatory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>engine</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1021,6 +1146,9 @@ full list.</p>
 <li><a class="reference internal" href="#regression-helpers">Regression helpers</a><ul>
 <li><a class="reference internal" href="#moderndive.get_regression_table"><code class="docutils literal notranslate"><span class="pre">get_regression_table()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.get_regression_points"><code class="docutils literal notranslate"><span class="pre">get_regression_points()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.get_regression_summaries"><code class="docutils literal notranslate"><span class="pre">get_regression_summaries()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.get_correlation"><code class="docutils literal notranslate"><span class="pre">get_correlation()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.pop_sd"><code class="docutils literal notranslate"><span class="pre">pop_sd()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.tidy_summary"><code class="docutils literal notranslate"><span class="pre">tidy_summary()</span></code></a></li>
 </ul>
 </li>
@@ -1028,6 +1156,9 @@ full list.</p>
 <li><a class="reference internal" href="#moderndive.rep_slice_sample"><code class="docutils literal notranslate"><span class="pre">rep_slice_sample()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.rep_sample_n"><code class="docutils literal notranslate"><span class="pre">rep_sample_n()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.pairplot"><code class="docutils literal notranslate"><span class="pre">pairplot()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.gg_parallel_slopes"><code class="docutils literal notranslate"><span class="pre">gg_parallel_slopes()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.geom_parallel_slopes"><code class="docutils literal notranslate"><span class="pre">geom_parallel_slopes()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.gg_categorical_model"><code class="docutils literal notranslate"><span class="pre">gg_categorical_model()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#datasets">Datasets</a><ul>

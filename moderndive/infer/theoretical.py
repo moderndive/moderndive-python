@@ -9,7 +9,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import numpy as np
 import polars as pl
 
 _RIGHT = {"right", "greater"}
@@ -58,23 +57,11 @@ class TheoreticalDistribution:
             raise ValueError("direction must be right/greater, left/less, or two-sided")
         return pl.DataFrame({"p_value": [min(p, 1.0)]})
 
-    def visualize(self, bins: int = 100):
-        """Plot the theoretical density curve (a plotnine ggplot)."""
-        import pandas as pd
-        from plotnine import aes, geom_line, ggplot, labs, theme_light
+    def visualize(self, bins: int = 100, *, engine: str = "plotly"):
+        """Plot the theoretical density curve (plotly by default; engine="plotnine")."""
+        from .viz import visualize_theoretical
 
-        dist = self._dist()
-        lo, hi = dist.ppf(0.001), dist.ppf(0.999)
-        x = np.linspace(lo, hi, 400)
-        pdf = pd.DataFrame({"x": x, "density": dist.pdf(x)})
-        return (
-            ggplot(pdf, aes(x="x", y="density"))
-            + geom_line()
-            + labs(
-                x="statistic", y="density", title=f"Theoretical {self.distribution} distribution"
-            )
-            + theme_light()
-        )
+        return visualize_theoretical(self, bins=bins, engine=engine)
 
 
 def assume(distribution: str, df: object | None = None) -> TheoreticalDistribution:

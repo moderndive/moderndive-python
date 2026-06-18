@@ -108,7 +108,7 @@ def test_distribution_aliases():
     assert "lower_ci" in boot.get_ci(level=0.9).columns
     # get_pvalue alias + visualise alias
     assert "p_value" in boot.get_pvalue(obs_stat=10.0, direction="two-sided").columns
-    assert isinstance(boot.visualise(), ggplot)
+    assert isinstance(boot.visualise(engine="plotnine").gg, ggplot)
 
 
 def test_fitresult_display_and_helpers():
@@ -124,7 +124,7 @@ def test_fitresult_display_and_helpers():
         .fit()
     )
     assert boot.is_distribution
-    assert isinstance(boot.visualize(), ggplot)
+    assert isinstance(boot.visualize(engine="plotnine").gg, ggplot)
 
 
 def test_calculate_with_callable_labels_stat():
@@ -290,7 +290,7 @@ def test_assume_errors_and_visualize():
         assume("weibull").get_p_value(1.0, "right")
     with pytest.raises(ValueError):
         assume("t", df=5).get_p_value(1.0, "diagonal")
-    assert isinstance(assume("t", df=5).visualize(), ggplot)
+    assert isinstance(assume("t", df=5).visualize(engine="plotnine").gg, ggplot)
 
 
 # ============================ viz.py =====================================
@@ -305,10 +305,13 @@ def test_shade_p_value_left_and_two_sided_and_ci_tuple():
         .generate(reps=100, type="bootstrap", seed=1)
         .calculate(stat="mean")
     )
-    assert isinstance(visualize(boot) + shade_p_value(obs_stat=10.0, direction="left"), ggplot)
-    assert isinstance(visualize(boot) + shade_p_value(obs_stat=5.0, direction="two-sided"), ggplot)
+    left = visualize(boot, engine="plotnine") + shade_p_value(obs_stat=10.0, direction="left")
+    assert isinstance(left.gg, ggplot)
+    two = visualize(boot, engine="plotnine") + shade_p_value(obs_stat=5.0, direction="two-sided")
+    assert isinstance(two.gg, ggplot)
     # endpoints as a plain tuple
-    assert isinstance(visualize(boot) + shade_confidence_interval(endpoints=(10.0, 30.0)), ggplot)
+    ci = visualize(boot, engine="plotnine") + shade_confidence_interval(endpoints=(10.0, 30.0))
+    assert isinstance(ci.gg, ggplot)
 
 
 # ============================ wrappers.py ================================
@@ -387,11 +390,13 @@ def test_pairplot_returns_figure():
     from matplotlib.figure import Figure
 
     coffee = md.load_coffee_quality()
-    fig = md.pairplot(coffee, columns=["total_cup_points", "aroma", "flavor"])
+    fig = md.pairplot(coffee, columns=["total_cup_points", "aroma", "flavor"], engine="seaborn")
     assert isinstance(fig, Figure)
     # default columns (auto-detect numeric) + hue path
     fig2 = md.pairplot(
-        coffee.select("total_cup_points", "aroma", "continent_of_origin"), hue="continent_of_origin"
+        coffee.select("total_cup_points", "aroma", "continent_of_origin"),
+        hue="continent_of_origin",
+        engine="seaborn",
     )
     assert isinstance(fig2, Figure)
 

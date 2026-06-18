@@ -70,7 +70,9 @@ class TheoreticalDistribution:
         return (
             ggplot(pdf, aes(x="x", y="density"))
             + geom_line()
-            + labs(x="statistic", y="density", title=f"Theoretical {self.distribution} distribution")
+            + labs(
+                x="statistic", y="density", title=f"Theoretical {self.distribution} distribution"
+            )
             + theme_light()
         )
 

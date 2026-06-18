@@ -30,9 +30,7 @@ def rep_slice_sample(
     rng = np.random.default_rng(seed)
     n_rows = data.height
     if not replace and n > n_rows:
-        raise ValueError(
-            f"cannot take a sample of size {n} without replacement from {n_rows} rows"
-        )
+        raise ValueError(f"cannot take a sample of size {n} without replacement from {n_rows} rows")
 
     samples = []
     for replicate in range(1, reps + 1):

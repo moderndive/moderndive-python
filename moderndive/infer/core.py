@@ -81,9 +81,7 @@ class Specification:
         self, null: str, *, mu: float | None = None, p: float | None = None
     ) -> Hypothesis:
         if null not in ("point", "independence", "paired independence"):
-            raise ValueError(
-                "null must be 'point', 'independence', or 'paired independence'"
-            )
+            raise ValueError("null must be 'point', 'independence', or 'paired independence'")
         return Hypothesis(spec=self, null=null, mu=mu, p=p)
 
     def generate(
@@ -122,7 +120,7 @@ class Specification:
     def hypothesise(self, null: str, *, mu=None, p=None):
         return self.hypothesize(null, mu=mu, p=p)
 
-    def fit(self) -> "FitResult":
+    def fit(self) -> FitResult:
         """Fit the observed regression (ordinary least squares) for the formula."""
         import statsmodels.formula.api as smf
 
@@ -177,9 +175,7 @@ class GeneratedReplicates:
     hyp_p: float | None = None
 
     # --- single-variable / two-group statistics ---------------------------
-    def calculate(
-        self, stat, *, order: tuple[object, object] | None = None
-    ) -> Distribution:
+    def calculate(self, stat, *, order: tuple[object, object] | None = None) -> Distribution:
         spec = self.spec
         resp_full = self.shifted_response
         if resp_full is None:
@@ -203,8 +199,13 @@ class GeneratedReplicates:
                 expl = None
             values.append(
                 _stats.compute_statistic(
-                    resp, expl, stat, success=spec.success, order=order,
-                    mu=self.hyp_mu, p=self.hyp_p,
+                    resp,
+                    expl,
+                    stat,
+                    success=spec.success,
+                    order=order,
+                    mu=self.hyp_mu,
+                    p=self.hyp_p,
                 )
             )
         df = pl.DataFrame(
@@ -217,7 +218,7 @@ class GeneratedReplicates:
         return Distribution(data=df, stat=label, null=self.null, type=self.type)
 
     # --- multiple regression ---------------------------------------------
-    def fit(self) -> "FitResult":
+    def fit(self) -> FitResult:
         """Fit OLS on each replicate, returning per-term estimates (long form)."""
         import statsmodels.formula.api as smf
 
@@ -239,7 +240,7 @@ class GeneratedReplicates:
             else:
                 raise ValueError("fit() supports type='bootstrap' or 'permute'")
             model = smf.ols(formula, data=rep_data.to_pandas()).fit()
-            for term, est in zip(model.params.index, model.params.to_numpy()):
+            for term, est in zip(model.params.index, model.params.to_numpy(), strict=False):
                 rows_replicate.append(i)
                 rows_term.append(_clean_term(term))
                 rows_estimate.append(float(est))
@@ -287,11 +288,7 @@ def _generate(
             draws = rng.random(n) < p0
             plans.append(np.where(draws, success, nonsuccess).astype(object))
     else:  # bootstrap
-        if (
-            hypothesis is not None
-            and hypothesis.null == "point"
-            and hypothesis.mu is not None
-        ):
+        if hypothesis is not None and hypothesis.null == "point" and hypothesis.mu is not None:
             shifted = _resample.shift_for_point_null(
                 spec._response_values, stat="mean", mu=hypothesis.mu, p=None
             )
@@ -351,9 +348,7 @@ class Distribution:
     ) -> pl.DataFrame:
         from .intervals import get_confidence_interval
 
-        return get_confidence_interval(
-            self, level=level, type=type, point_estimate=point_estimate
-        )
+        return get_confidence_interval(self, level=level, type=type, point_estimate=point_estimate)
 
     def get_p_value(self, obs_stat, direction: str) -> pl.DataFrame:
         from .pvalue import get_p_value
@@ -408,7 +403,7 @@ class FitResult:
 
         return get_fit_confidence_interval(self, level=level)
 
-    def get_p_value(self, obs_stat: "FitResult", direction: str = "two-sided") -> pl.DataFrame:
+    def get_p_value(self, obs_stat: FitResult, direction: str = "two-sided") -> pl.DataFrame:
         from .pvalue import get_fit_p_value
 
         return get_fit_p_value(self, obs_stat=obs_stat, direction=direction)

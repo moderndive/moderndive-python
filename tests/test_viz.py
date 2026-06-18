@@ -6,6 +6,8 @@ import matplotlib
 
 matplotlib.use("Agg")
 
+from plotnine import ggplot
+
 import moderndive as md
 from moderndive import (
     get_confidence_interval,
@@ -14,19 +16,26 @@ from moderndive import (
     specify,
     visualize,
 )
-from plotnine import ggplot
 
 
 def test_visualize_returns_ggplot():
     almonds = md.load_almonds_sample_100()
-    boot = specify(almonds, response="weight").generate(reps=200, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(almonds, response="weight")
+        .generate(reps=200, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
     p = visualize(boot)
     assert isinstance(p, ggplot)
 
 
 def test_shade_layers_increase_layer_count_and_render(tmp_path):
     almonds = md.load_almonds_sample_100()
-    boot = specify(almonds, response="weight").generate(reps=200, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(almonds, response="weight")
+        .generate(reps=200, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
     ci = get_confidence_interval(boot, level=0.95, type="percentile")
     base = visualize(boot)
     shaded = base + shade_confidence_interval(endpoints=ci)

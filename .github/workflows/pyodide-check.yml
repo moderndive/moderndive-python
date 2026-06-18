@@ -1,0 +1,38 @@
+name: Pyodide compatibility
+
+# The package must stay PURE-PYTHON so it installs under Pyodide via micropip
+# (it powers in-browser code cells in the ModernDive book). This guards that
+# invariant: the built wheel must contain no compiled extensions.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: pyodide-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pure-python-wheel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Build wheel
+        run: uv build --wheel
+      - name: Assert wheel is pure-Python (Pyodide/micropip-safe)
+        run: |
+          python - <<'PY'
+          import glob, sys, zipfile
+          whl = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(whl).namelist()
+          compiled = [n for n in names if n.endswith((".so", ".pyd", ".dylib"))]
+          tag = whl.split("-")[-1].replace(".whl", "")
+          assert not compiled, f"compiled extensions found: {compiled}"
+          assert "py3-none-any" in whl, f"wheel is not universal: {whl}"
+          print(f"OK: {whl} is pure-Python ({sum(n.endswith('.parquet') for n in names)} datasets bundled)")
+          PY

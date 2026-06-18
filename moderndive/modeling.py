@@ -75,7 +75,10 @@ def get_regression_points(model, digits: int = 3) -> pl.DataFrame:
     exog_names = [n for n in model.model.exog_names if n != "Intercept"]
     frame = _to_pandas(model.model.data.frame)
 
-    out = {"ID": np.arange(1, len(frame) + 1, dtype=np.int64), endog_name: np.asarray(frame[endog_name])}
+    out = {
+        "ID": np.arange(1, len(frame) + 1, dtype=np.int64),
+        endog_name: np.asarray(frame[endog_name]),
+    }
     for name in exog_names:
         if name in frame.columns:
             out[name] = np.asarray(frame[name])

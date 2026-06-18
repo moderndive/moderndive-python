@@ -71,9 +71,7 @@ def load_dataset(name: str) -> pl.DataFrame:
     if name == "spotify_metal_deephouse":
         return load_spotify_metal_deephouse()
     if name not in _REGISTRY:
-        raise ValueError(
-            f"Unknown dataset {name!r}. Available: {', '.join(available_datasets())}"
-        )
+        raise ValueError(f"Unknown dataset {name!r}. Available: {', '.join(available_datasets())}")
     path = files("moderndive.data").joinpath(f"{name}.parquet")
     with path.open("rb") as handle:
         return pl.read_parquet(handle)
@@ -86,7 +84,7 @@ def load_spotify_metal_deephouse() -> pl.DataFrame:
     two genres and selecting the columns of interest.
     """
     return (
-        load_spotify_by_genre()
+        load_dataset("spotify_by_genre")
         .filter(pl.col("track_genre").is_in(["metal", "deep-house"]))
         .select(
             "track_id",
@@ -100,6 +98,7 @@ def load_spotify_metal_deephouse() -> pl.DataFrame:
 
 
 # --- Generate a load_<name>() function for every registered dataset ----------
+
 
 def _make_loader(_name: str, _doc: str):
     def _loader() -> pl.DataFrame:

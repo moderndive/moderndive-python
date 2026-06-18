@@ -22,7 +22,9 @@ def pairplot(data: pl.DataFrame, columns: list[str] | None = None, hue: str | No
     import seaborn as sns
 
     pdf = data.to_pandas()
-    cols = columns or [c for c, dt in zip(data.columns, data.dtypes) if dt.is_numeric()]
+    cols = columns or [
+        c for c, dt in zip(data.columns, data.dtypes, strict=False) if dt.is_numeric()
+    ]
     keep = list(cols)
     if hue is not None and hue not in keep:
         keep = keep + [hue]

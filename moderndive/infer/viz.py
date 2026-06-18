@@ -35,7 +35,7 @@ def _stat_label(stat: str | None) -> str:
     return "stat" if stat is None else stat
 
 
-def visualize(distribution: "Distribution", bins: int = 20, **kwargs):
+def visualize(distribution: Distribution, bins: int = 20, **kwargs):
     """Histogram of the simulated statistics (a plotnine ggplot)."""
     pdf = distribution.data.select("stat").to_pandas()
     title = (
@@ -73,9 +73,7 @@ def visualize_fit(fit, bins: int = 20):
 
 def _full_height_rect(xmin: float, xmax: float, fill: str):
     """A translucent rectangle spanning the full panel height between xmin and xmax."""
-    return annotate(
-        "rect", xmin=xmin, xmax=xmax, ymin=-_INF, ymax=_INF, alpha=0.3, fill=fill
-    )
+    return annotate("rect", xmin=xmin, xmax=xmax, ymin=-_INF, ymax=_INF, alpha=0.3, fill=fill)
 
 
 def shade_p_value(obs_stat, direction: str) -> list:
@@ -95,9 +93,7 @@ def shade_p_value(obs_stat, direction: str) -> list:
     else:  # two-sided: mirror about 0 (null statistics center on 0)
         mirror = -obs
         lo, hi = sorted((obs, mirror))
-        layers.append(
-            geom_vline(xintercept=mirror, color=_OBS_COLOR, size=1.0, linetype="dashed")
-        )
+        layers.append(geom_vline(xintercept=mirror, color=_OBS_COLOR, size=1.0, linetype="dashed"))
         layers.append(_full_height_rect(-_INF, lo, _OBS_COLOR))
         layers.append(_full_height_rect(hi, _INF, _OBS_COLOR))
     return layers

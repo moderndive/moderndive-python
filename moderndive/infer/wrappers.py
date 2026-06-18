@@ -134,9 +134,7 @@ def chisq_test(
     if expl is None:
         raise ValueError("chisq_test needs an explanatory variable (test of independence)")
     sub = data.select(resp, expl).drop_nulls()
-    table = sub.to_pandas().pivot_table(
-        index=resp, columns=expl, aggfunc="size", fill_value=0
-    )
+    table = sub.to_pandas().pivot_table(index=resp, columns=expl, aggfunc="size", fill_value=0)
     chi2, pval, dof, _ = stats.chi2_contingency(table.to_numpy(), correction=False)
     return pl.DataFrame(
         {"statistic": [float(chi2)], "chisq_df": [int(dof)], "p_value": [float(pval)]}

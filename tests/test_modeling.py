@@ -50,7 +50,17 @@ def test_tidy_summary_layout_and_values():
     df = pl.DataFrame({"a": [1.0, 2.0, 3.0, 4.0], "b": ["x", "y", "x", "y"]})
     out = tidy_summary(df)
     assert out.columns == [
-        "column", "n", "group", "type", "min", "Q1", "mean", "median", "Q3", "max", "sd",
+        "column",
+        "n",
+        "group",
+        "type",
+        "min",
+        "Q1",
+        "mean",
+        "median",
+        "Q3",
+        "max",
+        "sd",
     ]
     a_row = out.filter(pl.col("column") == "a")
     assert a_row["type"][0] == "numeric"

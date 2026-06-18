@@ -16,6 +16,7 @@ def _yawn():
 
 # --- new calculate stats --------------------------------------------------
 
+
 def test_count_and_prop_consistent():
     df = pl.DataFrame({"y": ["s"] * 7 + ["f"] * 3})
     spec = specify(df, response="y", success="s")
@@ -40,16 +41,20 @@ def test_ratio_and_odds_props_manual():
 def test_chisq_equals_prop_test_z_squared():
     yawn = _yawn()
     chi = float(specify(yawn, formula="yawn ~ group").calculate(stat="Chisq"))
-    z = float(prop_test(yawn, formula="yawn ~ group", success="yes", order=("seed", "control"))["statistic"][0])
+    z = float(
+        prop_test(yawn, formula="yawn ~ group", success="yes", order=("seed", "control"))[
+            "statistic"
+        ][0]
+    )
     assert chi == pytest.approx(z**2, rel=1e-6)
 
 
 def test_anova_f_equals_two_sample_t_squared():
     movies = md.load_movies_sample()
     f = float(specify(movies, formula="rating ~ genre").calculate(stat="F"))
-    t = float(t_test(movies, formula="rating ~ genre", order=("Action", "Romance"))["statistic"][0])
-    # Welch t differs slightly from pooled; use pooled via equal_var for the identity
+    # ANOVA F equals the pooled two-sample t, squared (for two groups).
     from scipy import stats as st
+
     a = movies.filter(pl.col("genre") == "Action")["rating"].to_numpy()
     b = movies.filter(pl.col("genre") == "Romance")["rating"].to_numpy()
     t_pooled = st.ttest_ind(a, b, equal_var=True).statistic
@@ -73,6 +78,7 @@ def test_custom_stat_callable():
 
 # --- observe --------------------------------------------------------------
 
+
 def test_observe_matches_pipeline():
     df = pl.DataFrame({"x": [2.0, 4, 6]})
     assert float(observe(df, response="x", stat="mean")) == float(
@@ -82,11 +88,14 @@ def test_observe_matches_pipeline():
 
 # --- assume (theoretical) -------------------------------------------------
 
+
 def test_assume_t_pvalue_matches_scipy():
     th = assume("t", df=10)
     from scipy.stats import t as tdist
 
-    assert float(th.get_p_value(2.0, "right")["p_value"][0]) == pytest.approx(float(tdist.sf(2.0, 10)))
+    assert float(th.get_p_value(2.0, "right")["p_value"][0]) == pytest.approx(
+        float(tdist.sf(2.0, 10))
+    )
 
 
 def test_assume_visualize_builds():
@@ -100,6 +109,7 @@ def test_assume_visualize_builds():
 
 
 # --- wrappers -------------------------------------------------------------
+
 
 def test_t_test_one_sample_tidy_columns():
     age = md.load_age_at_marriage()
@@ -115,15 +125,21 @@ def test_chisq_test_df_and_stat():
 
 # --- bias-corrected CI ----------------------------------------------------
 
+
 def test_bias_corrected_ci_brackets_estimate():
     age = md.load_age_at_marriage()
     est = float(observe(age, response="age", stat="mean"))
-    boot = specify(age, response="age").generate(reps=500, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(age, response="age")
+        .generate(reps=500, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
     ci = boot.get_confidence_interval(level=0.95, type="bias-corrected", point_estimate=est)
     assert float(ci["lower_ci"][0]) < est < float(ci["upper_ci"][0])
 
 
 # --- paired null ----------------------------------------------------------
+
 
 def test_paired_null_centers_near_zero():
     rng = np.random.default_rng(0)
@@ -138,6 +154,7 @@ def test_paired_null_centers_near_zero():
 
 
 # --- aliases --------------------------------------------------------------
+
 
 def test_aliases_point_to_canonical():
     assert md.get_pvalue is md.get_p_value

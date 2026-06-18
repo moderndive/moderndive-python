@@ -21,7 +21,7 @@ def _as_float(obs_stat) -> float:
 
 
 def get_p_value(
-    distribution: "Distribution",
+    distribution: Distribution,
     obs_stat,
     direction: str,
 ) -> pl.DataFrame:
@@ -33,7 +33,6 @@ def get_p_value(
     """
     stats = distribution.stats
     obs = _as_float(obs_stat)
-    n = stats.size
     direction = direction.lower()
 
     if direction in _RIGHT:
@@ -45,9 +44,7 @@ def get_p_value(
         p_left = float(np.mean(stats <= obs))
         p = min(1.0, 2.0 * min(p_right, p_left))
     else:
-        raise ValueError(
-            "direction must be 'right'/'greater', 'left'/'less', or 'two-sided'"
-        )
+        raise ValueError("direction must be 'right'/'greater', 'left'/'less', or 'two-sided'")
     return pl.DataFrame({"p_value": [p]})
 
 

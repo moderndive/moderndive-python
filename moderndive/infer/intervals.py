@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 def get_confidence_interval(
-    distribution: "Distribution",
+    distribution: Distribution,
     level: float = 0.95,
     type: str = "percentile",
     *,

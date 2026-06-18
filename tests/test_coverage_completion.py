@@ -20,8 +20,8 @@ from moderndive.infer import resample as _resample
 from moderndive.infer.core import _parse_formula
 from moderndive.infer.statistics import compute_statistic, needs_explanatory, needs_success
 
-
 # ============================ core.py ====================================
+
 
 def test_parse_formula_requires_tilde():
     with pytest.raises(ValueError):
@@ -77,8 +77,10 @@ def test_generate_invalid_type():
 def test_fit_requires_bootstrap_or_permute_for_generated():
     # draw-type generated has no fit() path
     df = pl.DataFrame({"y": ["s"] * 5 + ["f"] * 5})
-    gen = specify(df, response="y", success="s").hypothesize(null="point", p=0.5).generate(
-        reps=3, type="draw", seed=1
+    gen = (
+        specify(df, response="y", success="s")
+        .hypothesize(null="point", p=0.5)
+        .generate(reps=3, type="draw", seed=1)
     )
     with pytest.raises(ValueError):
         gen.fit()
@@ -100,7 +102,9 @@ def test_observed_statistic_dunders():
 
 def test_distribution_aliases():
     df = pl.DataFrame({"y": np.arange(20.0)})
-    boot = specify(df, response="y").generate(reps=50, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(df, response="y").generate(reps=50, type="bootstrap", seed=1).calculate(stat="mean")
+    )
     assert "lower_ci" in boot.get_ci(level=0.9).columns
     # get_pvalue alias + visualise alias
     assert "p_value" in boot.get_pvalue(obs_stat=10.0, direction="two-sided").columns
@@ -114,15 +118,21 @@ def test_fitresult_display_and_helpers():
     assert obs._repr_html_().startswith("<")
     assert "term" in repr(obs)
     assert not obs.is_distribution
-    boot = specify(sar, formula="price ~ living_area").generate(reps=20, type="bootstrap", seed=1).fit()
+    boot = (
+        specify(sar, formula="price ~ living_area")
+        .generate(reps=20, type="bootstrap", seed=1)
+        .fit()
+    )
     assert boot.is_distribution
     assert isinstance(boot.visualize(), ggplot)
 
 
 def test_calculate_with_callable_labels_stat():
     df = pl.DataFrame({"y": [1.0, 2, 3]})
-    boot = specify(df, response="y").generate(reps=10, type="bootstrap", seed=1).calculate(
-        stat=lambda r, e: float(r.mean())
+    boot = (
+        specify(df, response="y")
+        .generate(reps=10, type="bootstrap", seed=1)
+        .calculate(stat=lambda r, e: float(r.mean()))
     )
     assert boot.stat == "stat"
 
@@ -133,6 +143,7 @@ def test_observe_without_null_path():
 
 
 # ============================ statistics.py ==============================
+
 
 def test_all_one_variable_stats():
     r = np.array([1.0, 2, 3, 4, 5])
@@ -170,6 +181,7 @@ def test_stat_helpers_and_errors():
 
 # ============================ resample.py ================================
 
+
 def test_shift_for_point_null_centers_mean_and_median():
     r = np.array([1.0, 2, 3, 4])
     shifted = _resample.shift_for_point_null(r, stat="mean", mu=10.0, p=None)
@@ -182,24 +194,36 @@ def test_shift_for_point_null_centers_mean_and_median():
 
 def test_point_null_mean_bootstrap_centers_distribution():
     df = pl.DataFrame({"x": np.arange(30.0)})
-    null = specify(df, response="x").hypothesize(null="point", mu=100.0).generate(
-        reps=200, type="bootstrap", seed=1
-    ).calculate(stat="mean")
+    null = (
+        specify(df, response="x")
+        .hypothesize(null="point", mu=100.0)
+        .generate(reps=200, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
     assert float(null.stats.mean()) == pytest.approx(100.0, abs=1.0)
 
 
 # ============================ intervals.py ===============================
 
+
 def test_se_confidence_interval_value():
     df = pl.DataFrame({"x": np.arange(50.0)})
-    boot = specify(df, response="x").generate(reps=300, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(df, response="x")
+        .generate(reps=300, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
     ci = boot.get_confidence_interval(level=0.95, type="se", point_estimate=24.5)
     assert float(ci["lower_ci"][0]) < 24.5 < float(ci["upper_ci"][0])
 
 
 def test_invalid_ci_type():
     df = pl.DataFrame({"x": np.arange(20.0)})
-    boot = specify(df, response="x").generate(reps=100, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(df, response="x")
+        .generate(reps=100, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
     with pytest.raises(ValueError):
         boot.get_confidence_interval(type="bogus")
     with pytest.raises(ValueError):  # bias-corrected needs point estimate
@@ -208,13 +232,19 @@ def test_invalid_ci_type():
 
 # ============================ pvalue.py ==================================
 
+
 def test_pvalue_left_and_invalid_direction():
     df = pl.DataFrame({"y": [1.0, 2, 3, 4, 5, 6], "g": ["a", "a", "a", "b", "b", "b"]})
-    null = specify(df, formula="y ~ g").hypothesize(null="independence").generate(
-        reps=200, type="permute", seed=1
-    ).calculate(stat="diff in means", order=("a", "b"))
+    null = (
+        specify(df, formula="y ~ g")
+        .hypothesize(null="independence")
+        .generate(reps=200, type="permute", seed=1)
+        .calculate(stat="diff in means", order=("a", "b"))
+    )
     small = float(np.min(null.stats)) - 1.0
-    assert float(null.get_p_value(obs_stat=small, direction="left")["p_value"][0]) == pytest.approx(0.0)
+    assert float(null.get_p_value(obs_stat=small, direction="left")["p_value"][0]) == pytest.approx(
+        0.0
+    )
     with pytest.raises(ValueError):
         null.get_p_value(obs_stat=0.0, direction="sideways")
 
@@ -222,9 +252,12 @@ def test_pvalue_left_and_invalid_direction():
 def test_fit_pvalue_directions():
     sar = md.load_saratoga_houses()
     obs = specify(sar, formula="price ~ living_area").fit()
-    null = specify(sar, formula="price ~ living_area").hypothesize(null="independence").generate(
-        reps=100, type="permute", seed=1
-    ).fit()
+    null = (
+        specify(sar, formula="price ~ living_area")
+        .hypothesize(null="independence")
+        .generate(reps=100, type="permute", seed=1)
+        .fit()
+    )
     for direction in ("right", "left", "two-sided"):
         out = null.get_p_value(obs_stat=obs, direction=direction)
         assert "p_value" in out.columns
@@ -232,14 +265,24 @@ def test_fit_pvalue_directions():
 
 # ============================ theoretical.py =============================
 
+
 def test_assume_distributions_and_directions():
-    from scipy.stats import norm, f as fdist, chi2
+    from scipy.stats import chi2, norm
+    from scipy.stats import f as fdist
 
     assert float(assume("z").get_p_value(1.0, "right")["p_value"][0]) == pytest.approx(norm.sf(1.0))
-    assert float(assume("z").get_p_value(-1.0, "left")["p_value"][0]) == pytest.approx(norm.cdf(-1.0))
-    assert float(assume("z").get_p_value(1.0, "two-sided")["p_value"][0]) == pytest.approx(2 * norm.sf(1.0))
-    assert float(assume("F", df=(2, 20)).get_p_value(3.0, "right")["p_value"][0]) == pytest.approx(fdist.sf(3.0, 2, 20))
-    assert float(assume("Chisq", df=3).get_p_value(5.0, "right")["p_value"][0]) == pytest.approx(chi2.sf(5.0, 3))
+    assert float(assume("z").get_p_value(-1.0, "left")["p_value"][0]) == pytest.approx(
+        norm.cdf(-1.0)
+    )
+    assert float(assume("z").get_p_value(1.0, "two-sided")["p_value"][0]) == pytest.approx(
+        2 * norm.sf(1.0)
+    )
+    assert float(assume("F", df=(2, 20)).get_p_value(3.0, "right")["p_value"][0]) == pytest.approx(
+        fdist.sf(3.0, 2, 20)
+    )
+    assert float(assume("Chisq", df=3).get_p_value(5.0, "right")["p_value"][0]) == pytest.approx(
+        chi2.sf(5.0, 3)
+    )
 
 
 def test_assume_errors_and_visualize():
@@ -252,11 +295,16 @@ def test_assume_errors_and_visualize():
 
 # ============================ viz.py =====================================
 
+
 def test_shade_p_value_left_and_two_sided_and_ci_tuple():
     from moderndive import shade_confidence_interval, shade_p_value, visualize
 
     df = pl.DataFrame({"x": np.arange(40.0)})
-    boot = specify(df, response="x").generate(reps=100, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(df, response="x")
+        .generate(reps=100, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
     assert isinstance(visualize(boot) + shade_p_value(obs_stat=10.0, direction="left"), ggplot)
     assert isinstance(visualize(boot) + shade_p_value(obs_stat=5.0, direction="two-sided"), ggplot)
     # endpoints as a plain tuple
@@ -264,6 +312,7 @@ def test_shade_p_value_left_and_two_sided_and_ci_tuple():
 
 
 # ============================ wrappers.py ================================
+
 
 def test_wrapper_t_test_two_sample_and_t_stat():
     from moderndive import t_stat, t_test
@@ -287,7 +336,10 @@ def test_wrapper_prop_test_paths():
     # two-sample needs order
     with pytest.raises(ValueError):
         prop_test(yawn, formula="yawn ~ group", success="yes")
-    assert "statistic" in prop_test(yawn, formula="yawn ~ group", success="yes", order=("seed", "control")).columns
+    assert (
+        "statistic"
+        in prop_test(yawn, formula="yawn ~ group", success="yes", order=("seed", "control")).columns
+    )
 
 
 def test_wrapper_chisq_needs_explanatory():
@@ -301,6 +353,7 @@ def test_wrapper_chisq_needs_explanatory():
 
 # ============================ theory.py ==================================
 
+
 def test_theory_module_functions():
     age = md.load_age_at_marriage()["age"]
     assert "statistic" in md.theory.t_test_one_sample(age, mu=23).columns
@@ -308,12 +361,17 @@ def test_theory_module_functions():
     a = np.array([1.0, 2, 3, 4])
     b = np.array([2.0, 3, 4, 5])
     assert "statistic" in md.theory.t_test_two_sample(a, b).columns
-    out = md.theory.prop_test_two_sample(successes=(60, 40), totals=(100, 100), alternative="greater")
+    out = md.theory.prop_test_two_sample(
+        successes=(60, 40), totals=(100, 100), alternative="greater"
+    )
     assert float(out["estimate"][0]) == pytest.approx(0.2)
-    assert md.theory.prop_test_two_sample((40, 60), (100, 100), alternative="less")["p_value"][0] <= 1
+    assert (
+        md.theory.prop_test_two_sample((40, 60), (100, 100), alternative="less")["p_value"][0] <= 1
+    )
 
 
 # ============================ modeling.py ================================
+
 
 def test_tidy_summary_accepts_pandas():
     import pandas as pd
@@ -324,6 +382,7 @@ def test_tidy_summary_accepts_pandas():
 
 # ============================ plots.py ===================================
 
+
 def test_pairplot_returns_figure():
     from matplotlib.figure import Figure
 
@@ -331,11 +390,14 @@ def test_pairplot_returns_figure():
     fig = md.pairplot(coffee, columns=["total_cup_points", "aroma", "flavor"])
     assert isinstance(fig, Figure)
     # default columns (auto-detect numeric) + hue path
-    fig2 = md.pairplot(coffee.select("total_cup_points", "aroma", "continent_of_origin"), hue="continent_of_origin")
+    fig2 = md.pairplot(
+        coffee.select("total_cup_points", "aroma", "continent_of_origin"), hue="continent_of_origin"
+    )
     assert isinstance(fig2, Figure)
 
 
 # ============================ sampling.py ================================
+
 
 def test_rep_sample_n_alias_and_replace_error():
     df = pl.DataFrame({"x": range(10)})
@@ -346,12 +408,14 @@ def test_rep_sample_n_alias_and_replace_error():
 
 # ============================ data/__init__.py ===========================
 
+
 def test_load_dataset_dispatches_derived():
     out = md.load_dataset("spotify_metal_deephouse")
     assert out.height == 2000
 
 
 # ============================ final-line mop-up ==========================
+
 
 def test_fit_with_response_explanatory_builds_formula():
     # _full_formula via response/explanatory (not a formula string)
@@ -362,7 +426,9 @@ def test_fit_with_response_explanatory_builds_formula():
 
 def test_distribution_len():
     df = pl.DataFrame({"x": np.arange(15.0)})
-    boot = specify(df, response="x").generate(reps=42, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(df, response="x").generate(reps=42, type="bootstrap", seed=1).calculate(stat="mean")
+    )
     assert len(boot) == 42
 
 
@@ -392,5 +458,7 @@ def test_to_pandas_both_branches():
 
 
 def test_prop_test_two_sample_two_sided():
-    out = md.theory.prop_test_two_sample(successes=(60, 40), totals=(100, 100), alternative="two-sided")
+    out = md.theory.prop_test_two_sample(
+        successes=(60, 40), totals=(100, 100), alternative="two-sided"
+    )
     assert 0 <= float(out["p_value"][0]) <= 1

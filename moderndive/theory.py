@@ -51,9 +51,7 @@ def t_confidence_interval(x, level: float = 0.95) -> pl.DataFrame:
     mean = float(a.mean())
     se = float(a.std(ddof=1) / np.sqrt(n))
     tcrit = float(stats.t.ppf(1 - (1 - level) / 2, df=n - 1))
-    return pl.DataFrame(
-        {"lower_ci": [mean - tcrit * se], "upper_ci": [mean + tcrit * se]}
-    )
+    return pl.DataFrame({"lower_ci": [mean - tcrit * se], "upper_ci": [mean + tcrit * se]})
 
 
 def t_test_two_sample(
@@ -64,9 +62,7 @@ def t_test_two_sample(
 
     a, b = _arr(x), _arr(y)
     res = stats.ttest_ind(a, b, equal_var=equal_var, alternative=alternative)
-    return pl.DataFrame(
-        {"statistic": [float(res.statistic)], "p_value": [float(res.pvalue)]}
-    )
+    return pl.DataFrame({"statistic": [float(res.statistic)], "p_value": [float(res.pvalue)]})
 
 
 def prop_test_two_sample(
@@ -87,6 +83,4 @@ def prop_test_two_sample(
         p = float(stats.norm.cdf(z))
     else:
         p = float(2 * stats.norm.sf(abs(z)))
-    return pl.DataFrame(
-        {"estimate": [p1 - p2], "statistic": [float(z)], "p_value": [p]}
-    )
+    return pl.DataFrame({"estimate": [p1 - p2], "statistic": [float(z)], "p_value": [p]})

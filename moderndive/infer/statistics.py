@@ -27,9 +27,7 @@ _BIVARIATE = frozenset(
     }
 )
 # Statistics that need a `success` level (categorical response).
-_NEEDS_SUCCESS = frozenset(
-    {"prop", "count", "diff in props", "ratio of props", "odds ratio", "z"}
-)
+_NEEDS_SUCCESS = frozenset({"prop", "count", "diff in props", "ratio of props", "odds ratio", "z"})
 
 SUPPORTED_STATS = frozenset(
     {
@@ -167,9 +165,7 @@ def compute_statistic(
     if stat == "Chisq":  # chi-square statistic of independence (cat ~ cat)
         return _chisq_independence(response, explanatory)
 
-    raise ValueError(
-        f"Unknown stat {stat!r}. Supported: {', '.join(sorted(SUPPORTED_STATS))}"
-    )
+    raise ValueError(f"Unknown stat {stat!r}. Supported: {', '.join(sorted(SUPPORTED_STATS))}")
 
 
 def _anova_f(y: np.ndarray, group: np.ndarray) -> float:

@@ -10,8 +10,8 @@ import moderndive as md
 from moderndive import get_confidence_interval, get_p_value, specify
 from moderndive.infer.statistics import compute_statistic
 
-
 # --- statistics on known small inputs -------------------------------------
+
 
 def test_mean_and_median():
     df = pl.DataFrame({"x": [1.0, 2.0, 3.0, 4.0]})
@@ -66,6 +66,7 @@ def test_unknown_stat_raises():
 
 # --- formula parsing -------------------------------------------------------
 
+
 def test_formula_null_explanatory():
     df = pl.DataFrame({"weight": [1.0, 2.0]})
     spec = specify(df, formula="weight ~ NULL")
@@ -81,18 +82,37 @@ def test_specify_rejects_missing_column():
 
 # --- resampling reproducibility -------------------------------------------
 
+
 def test_bootstrap_reproducible_under_seed():
     df = pl.DataFrame({"x": np.arange(50, dtype=float)})
-    a = specify(df, response="x").generate(reps=200, type="bootstrap", seed=42).calculate(stat="mean")
-    b = specify(df, response="x").generate(reps=200, type="bootstrap", seed=42).calculate(stat="mean")
+    a = (
+        specify(df, response="x")
+        .generate(reps=200, type="bootstrap", seed=42)
+        .calculate(stat="mean")
+    )
+    b = (
+        specify(df, response="x")
+        .generate(reps=200, type="bootstrap", seed=42)
+        .calculate(stat="mean")
+    )
     assert np.array_equal(a.stats, b.stats)
 
 
 def test_permute_reproducible_under_seed():
     df = pl.DataFrame({"y": [1.0, 2, 3, 4, 5, 6], "g": ["a", "a", "a", "b", "b", "b"]})
     kw = dict(formula="y ~ g")
-    a = specify(df, **kw).hypothesize(null="independence").generate(reps=200, type="permute", seed=7).calculate(stat="diff in means", order=("a", "b"))
-    b = specify(df, **kw).hypothesize(null="independence").generate(reps=200, type="permute", seed=7).calculate(stat="diff in means", order=("a", "b"))
+    a = (
+        specify(df, **kw)
+        .hypothesize(null="independence")
+        .generate(reps=200, type="permute", seed=7)
+        .calculate(stat="diff in means", order=("a", "b"))
+    )
+    b = (
+        specify(df, **kw)
+        .hypothesize(null="independence")
+        .generate(reps=200, type="permute", seed=7)
+        .calculate(stat="diff in means", order=("a", "b"))
+    )
     assert np.array_equal(a.stats, b.stats)
 
 
@@ -104,10 +124,15 @@ def test_permute_requires_explanatory():
 
 # --- intervals & p-values --------------------------------------------------
 
+
 def test_percentile_ci_brackets_point_estimate():
     almonds = md.load_almonds_sample_100()
     xbar = float(specify(almonds, response="weight").calculate(stat="mean"))
-    boot = specify(almonds, response="weight").generate(reps=1000, type="bootstrap", seed=76).calculate(stat="mean")
+    boot = (
+        specify(almonds, response="weight")
+        .generate(reps=1000, type="bootstrap", seed=76)
+        .calculate(stat="mean")
+    )
     ci = get_confidence_interval(boot, level=0.95, type="percentile")
     lo, hi = float(ci["lower_ci"][0]), float(ci["upper_ci"][0])
     assert lo < xbar < hi
@@ -115,7 +140,11 @@ def test_percentile_ci_brackets_point_estimate():
 
 def test_se_ci_requires_point_estimate():
     df = pl.DataFrame({"x": np.arange(30, dtype=float)})
-    boot = specify(df, response="x").generate(reps=200, type="bootstrap", seed=1).calculate(stat="mean")
+    boot = (
+        specify(df, response="x")
+        .generate(reps=200, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
     with pytest.raises(ValueError):
         get_confidence_interval(boot, type="se")
 
@@ -124,7 +153,12 @@ def test_p_value_directions():
     # Null distribution symmetric around 0; obs at 0 -> right/left ~0.5, two-sided ~1.
     rng = np.random.default_rng(0)
     df = pl.DataFrame({"y": rng.normal(size=400), "g": ["a"] * 200 + ["b"] * 200})
-    null = specify(df, formula="y ~ g").hypothesize(null="independence").generate(reps=1000, type="permute", seed=3).calculate(stat="diff in means", order=("a", "b"))
+    null = (
+        specify(df, formula="y ~ g")
+        .hypothesize(null="independence")
+        .generate(reps=1000, type="permute", seed=3)
+        .calculate(stat="diff in means", order=("a", "b"))
+    )
     p_two = float(get_p_value(null, obs_stat=0.0, direction="two-sided")["p_value"][0])
     assert 0.0 <= p_two <= 1.0
     # An obs far in the right tail should give a small right p-value.

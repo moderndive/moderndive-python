@@ -1,0 +1,30 @@
+name: Weekly tests
+
+# Catch breakage from upstream releases by testing against the latest versions of
+# our key dependencies on a schedule.
+on:
+  schedule:
+    - cron: "40 06 * * SAT"
+  workflow_dispatch:
+
+jobs:
+  latest-deps:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install with newest dependencies
+        run: |
+          uv sync --extra test --upgrade
+          uv pip install --upgrade polars plotnine seaborn statsmodels scipy pandas numpy
+      - name: Environment information
+        run: uv pip list
+      - name: Run tests
+        run: uv run pytest

@@ -42,3 +42,6 @@ source_suffix = {".md": "markdown", ".rst": "restructuredtext"}
 
 html_theme = "furo"
 html_title = f"moderndive {version}"
+html_static_path = ["_static"]
+html_logo = "_static/moderndive-logo.png"
+html_favicon = "_static/moderndive-logo.png"

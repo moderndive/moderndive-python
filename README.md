@@ -1,5 +1,7 @@
 # moderndive (Python)
 
+<img src="https://raw.githubusercontent.com/moderndive/moderndive-python/main/doc/_static/moderndive-logo.png" align="right" height="160" alt="ModernDive hex logo" />
+
 [![Tests](https://github.com/moderndive/moderndive-python/actions/workflows/tests.yml/badge.svg)](https://github.com/moderndive/moderndive-python/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/moderndive/moderndive-python/branch/main/graph/badge.svg)](https://codecov.io/gh/moderndive/moderndive-python)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)

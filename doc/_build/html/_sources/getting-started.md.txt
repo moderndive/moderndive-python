@@ -56,6 +56,15 @@ from moderndive import tidy_summary
 tidy_summary(md.load_almonds_sample_100(), columns=["weight"])
 ```
 
+`count_missing` reports how many `null` values each column has, sorted worst-first
+— handy for a quick data-quality check:
+
+```{code-cell} python
+from moderndive import count_missing
+
+count_missing(md.load_evals())
+```
+
 ## The inference pipeline
 
 The core grammar mirrors R `infer`. You build a pipeline and read it like a

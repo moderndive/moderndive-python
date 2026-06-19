@@ -42,7 +42,7 @@
    :members:
 ```
 
-## Regression helpers
+## Regression & summary helpers
 
 ```{eval-rst}
 .. autofunction:: moderndive.get_regression_table
@@ -51,6 +51,7 @@
 .. autofunction:: moderndive.get_correlation
 .. autofunction:: moderndive.pop_sd
 .. autofunction:: moderndive.tidy_summary
+.. autofunction:: moderndive.count_missing
 ```
 
 ## Sampling and plots

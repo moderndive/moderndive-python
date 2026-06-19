@@ -34,9 +34,9 @@ pip install git+https://github.com/moderndive/moderndive-python
   bias-corrected). British-spelling and short aliases are included.
 - **Theory-based wrapper tests**: `t_test`, `prop_test`, `chisq_test`,
   `t_stat`, `chisq_stat`, plus the `moderndive.theory` module.
-- **Regression helpers** mirroring R `moderndive`: `get_regression_table`,
-  `get_regression_points`, `tidy_summary` (built on `statsmodels`, returning
-  `polars` frames).
+- **Regression & summary helpers** mirroring R `moderndive`: `get_regression_table`,
+  `get_regression_points` (built on `statsmodels`), `tidy_summary`, and
+  `count_missing` (per-column null counts) — all returning `polars` frames.
 - **Sampling**: `rep_slice_sample` / `rep_sample_n` for sampling-distribution
   activities.
 - **Plots**: `pairplot` (a seaborn scatterplot-matrix, the `GGally::ggpairs` analog).

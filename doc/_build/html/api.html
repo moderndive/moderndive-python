@@ -804,8 +804,8 @@ so the chapters can draw the simulation-vs-theory comparison.</p>
 </dd></dl>
 
 </section>
-<section id="regression-helpers">
-<h2>Regression helpers<a class="headerlink" href="#regression-helpers" title="Link to this heading">¶</a></h2>
+<section id="regression-summary-helpers">
+<h2>Regression &amp; summary helpers<a class="headerlink" href="#regression-summary-helpers" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.get_regression_table">
 <span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_regression_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/modeling.html#get_regression_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_regression_table" title="Link to this definition">¶</a></dt>
@@ -912,6 +912,27 @@ report <code class="docutils literal notranslate"><span class="pre">n</span></co
 <li><p><strong>columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>digits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.count_missing">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">count_missing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/modeling.html#count_missing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.count_missing" title="Link to this definition">¶</a></dt>
+<dd><p>Count missing (<code class="docutils literal notranslate"><span class="pre">null</span></code>) values in each column.</p>
+<p>A beginner-friendly alternative to <code class="docutils literal notranslate"><span class="pre">df.select(pl.all().is_null().sum())</span></code>:
+it returns a tidy two-column data frame with one row per column
+(<code class="docutils literal notranslate"><span class="pre">column</span></code>, <code class="docutils literal notranslate"><span class="pre">n_missing</span></code>), sorted from most to fewest missing values so the
+columns needing attention surface first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> – A polars (or pandas) data frame.</p></li>
+<li><p><strong>columns</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Optional list of column names to check; defaults to every column.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1166,13 +1187,14 @@ full list.</p>
 <li><a class="reference internal" href="#moderndive.theory.prop_test_two_sample"><code class="docutils literal notranslate"><span class="pre">prop_test_two_sample()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#regression-helpers">Regression helpers</a><ul>
+<li><a class="reference internal" href="#regression-summary-helpers">Regression &amp; summary helpers</a><ul>
 <li><a class="reference internal" href="#moderndive.get_regression_table"><code class="docutils literal notranslate"><span class="pre">get_regression_table()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.get_regression_points"><code class="docutils literal notranslate"><span class="pre">get_regression_points()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.get_regression_summaries"><code class="docutils literal notranslate"><span class="pre">get_regression_summaries()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.get_correlation"><code class="docutils literal notranslate"><span class="pre">get_correlation()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.pop_sd"><code class="docutils literal notranslate"><span class="pre">pop_sd()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.tidy_summary"><code class="docutils literal notranslate"><span class="pre">tidy_summary()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.count_missing"><code class="docutils literal notranslate"><span class="pre">count_missing()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#sampling-and-plots">Sampling and plots</a><ul>

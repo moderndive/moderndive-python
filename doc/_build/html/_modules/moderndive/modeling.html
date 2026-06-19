@@ -269,6 +269,7 @@
     <span class="s2">&quot;get_regression_points&quot;</span><span class="p">,</span>
     <span class="s2">&quot;get_regression_summaries&quot;</span><span class="p">,</span>
     <span class="s2">&quot;tidy_summary&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;count_missing&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -441,6 +442,35 @@
         <span class="s2">&quot;sd&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Float64</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="count_missing">
+<a class="viewcode-back" href="../../api.html#moderndive.count_missing">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">count_missing</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Count missing (``null``) values in each column.</span>
+
+<span class="sd">    A beginner-friendly alternative to ``df.select(pl.all().is_null().sum())``:</span>
+<span class="sd">    it returns a tidy two-column data frame with one row per column</span>
+<span class="sd">    (``column``, ``n_missing``), sorted from most to fewest missing values so the</span>
+<span class="sd">    columns needing attention surface first.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data:</span>
+<span class="sd">        A polars (or pandas) data frame.</span>
+<span class="sd">    columns:</span>
+<span class="sd">        Optional list of column names to check; defaults to every column.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="k">else</span> <span class="n">pl</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span> <span class="ow">or</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+    <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;column&quot;</span><span class="p">:</span> <span class="n">columns</span><span class="p">,</span>
+            <span class="s2">&quot;n_missing&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">null_count</span><span class="p">())</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">],</span>
+        <span class="p">},</span>
+        <span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;column&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Utf8</span><span class="p">,</span> <span class="s2">&quot;n_missing&quot;</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">},</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;n_missing&quot;</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

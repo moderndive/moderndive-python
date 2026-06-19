@@ -41,10 +41,11 @@ pip install git+https://github.com/moderndive/moderndive-python
   `engine="plotnine"` — same code, your choice of output.
 - **Theory-based wrapper tests**: `t_test`, `prop_test`, `chisq_test`,
   `t_stat`, `chisq_stat`, plus the `moderndive.theory` module.
-- **Regression helpers** mirroring R `moderndive`: `get_regression_table`,
+- **Regression & summary helpers** mirroring R `moderndive`: `get_regression_table`,
   `get_regression_points`, `get_regression_summaries`, `get_correlation`,
-  `pop_sd`, `tidy_summary` (built on `statsmodels`, returning `polars` frames),
-  plus the model plots `gg_parallel_slopes` / `geom_parallel_slopes` and
+  `pop_sd`, `tidy_summary`, `count_missing` (built on `statsmodels` where
+  relevant, returning `polars` frames), plus the model plots
+  `gg_parallel_slopes` / `geom_parallel_slopes` and
   `gg_categorical_model` / `geom_categorical_model`, and `pairplot`
   (the `GGally::ggpairs` analog).
 - **Sampling**: `rep_slice_sample` / `rep_sample_n` for sampling-distribution

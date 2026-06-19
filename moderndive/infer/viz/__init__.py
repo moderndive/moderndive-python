@@ -107,7 +107,9 @@ class InferPlot:
         if self.engine == "plotnine":
             from . import _plotnine as P
 
-            return InferPlot(P.apply_fit_shade_gg(self.figure, spec, self.terms), "plotnine", self.terms)
+            return InferPlot(
+                P.apply_fit_shade_gg(self.figure, spec, self.terms), "plotnine", self.terms
+            )
         from . import _plotly as PX
 
         return InferPlot(PX.apply_fit_shade_px(self.figure, spec, self.terms), "plotly", self.terms)
@@ -134,6 +136,23 @@ class InferPlot:
         if path_str.endswith(".html"):
             return self.figure.write_html(path_str)
         return self.figure.write_image(path_str)
+
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        """Rich display for Jupyter/Quarto across both engines.
+
+        Both plotnine ``ggplot`` and plotly ``Figure`` expose
+        ``_repr_mimebundle_``, so we delegate to it and the wrapped figure renders
+        exactly as a bare figure would. We fall back to ``text/html`` and finally
+        to no output. This is required because ``_repr_html_`` alone returns
+        ``None`` for a ``ggplot`` — without this method, plotnine-engine
+        ``InferPlot``s render blank in notebooks and Quarto.
+        """
+        fig = self.figure
+        if hasattr(fig, "_repr_mimebundle_"):
+            return fig._repr_mimebundle_(include=include, exclude=exclude)
+        if hasattr(fig, "_repr_html_"):
+            return {"text/html": fig._repr_html_()}
+        return None
 
     def _repr_html_(self):
         fig = self.figure

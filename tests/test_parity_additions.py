@@ -96,9 +96,10 @@ def test_gg_parallel_slopes_both_engines(engine):
 
 def test_geom_parallel_slopes_adds_plotnine_layers():
     ev = md.load_evals()
-    base = ggplot(
-        ev.select("score", "age", "gender").to_pandas(), aes("age", "score", color="gender")
-    ) + geom_point()
+    base = (
+        ggplot(ev.select("score", "age", "gender").to_pandas(), aes("age", "score", color="gender"))
+        + geom_point()
+    )
     layered = base + geom_parallel_slopes(ev, "score", "age", "gender")
     assert len(layered.layers) > len(base.layers)
     # explicit color path (single-color lines)
@@ -157,9 +158,7 @@ def test_one_sample_mean_z_with_sigma():
     df = pl.DataFrame({"w": np.arange(1.0, 51.0)})
     n = df.height
     obs = (
-        specify(df, response="w")
-        .hypothesize(null="point", mu=25.0, sigma=5.0)
-        .calculate(stat="z")
+        specify(df, response="w").hypothesize(null="point", mu=25.0, sigma=5.0).calculate(stat="z")
     )
     expected = (float(df["w"].mean()) - 25.0) / (5.0 / np.sqrt(n))
     assert float(obs) == pytest.approx(expected)

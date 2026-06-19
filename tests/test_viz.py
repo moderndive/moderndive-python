@@ -46,9 +46,9 @@ def _boot():
 
 def _null_diff():
     spotify = md.load_spotify_metal_deephouse()
-    obs = specify(
-        spotify, formula="popular_or_not ~ track_genre", success="popular"
-    ).calculate(stat="diff in props", order=("metal", "deep-house"))
+    obs = specify(spotify, formula="popular_or_not ~ track_genre", success="popular").calculate(
+        stat="diff in props", order=("metal", "deep-house")
+    )
     null = (
         specify(spotify, formula="popular_or_not ~ track_genre", success="popular")
         .hypothesize(null="independence")
@@ -161,6 +161,34 @@ def test_inferplot_errors_and_reprs():
     p = visualize(boot, engine="plotly")
     assert isinstance(repr(p), str)
     assert isinstance(p._repr_html_(), str)
+
+
+def test_repr_mimebundle_both_engines_and_fallbacks():
+    boot = _boot()
+
+    # plotnine ggplot delegates to its own mimebundle (the path that rendered
+    # blank before this method existed, since _repr_html_ returns None for ggplot).
+    # plotnine returns a (data, metadata) tuple with a real PNG payload.
+    mb_gg = visualize(boot, engine="plotnine")._repr_mimebundle_()
+    data_gg = mb_gg[0] if isinstance(mb_gg, tuple) else mb_gg
+    assert isinstance(data_gg, dict) and "image/png" in data_gg
+    # plotly Figure also exposes _repr_mimebundle_ and is delegated to (it may be an
+    # empty bundle outside an active render context, but the call must succeed).
+    mb_px = visualize(boot, engine="plotly")._repr_mimebundle_()
+    assert isinstance(mb_px, (dict, tuple))
+
+    # a figure with only _repr_html_ -> text/html fallback
+    class HtmlOnly:
+        def _repr_html_(self):
+            return "<div>x</div>"
+
+    assert InferPlot(HtmlOnly(), "plotly")._repr_mimebundle_() == {"text/html": "<div>x</div>"}
+
+    # a figure with neither -> no output
+    class Bare:
+        pass
+
+    assert InferPlot(Bare(), "plotly")._repr_mimebundle_() is None
 
 
 def test_shade_spec_is_frozen_dataclass():

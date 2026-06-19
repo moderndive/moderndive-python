@@ -4,6 +4,12 @@
 
 Full parity with the R `moderndive` and `infer` packages.
 
+- **`InferPlot` now renders in Jupyter/Quarto for both engines**: added
+  `_repr_mimebundle_`, which delegates to the wrapped figure. Previously only
+  `_repr_html_` was implemented, so plotnine-engine plots
+  (`visualize(..., engine="plotnine")`) rendered blank in notebooks and Quarto
+  because a `ggplot` returns `None` from `_repr_html_` (it renders via
+  `_repr_mimebundle_`). plotly-engine plots were unaffected.
 - **Per-facet shading for regression-fit plots**: `shade_p_value` and
   `shade_confidence_interval` now accept per-term values (an observed `FitResult`,
   a `term`-keyed CI/p-value table, or a dict) so each facet of a faceted

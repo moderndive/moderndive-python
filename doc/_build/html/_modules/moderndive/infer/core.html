@@ -684,10 +684,14 @@
 
         <span class="k">return</span> <span class="n">get_fit_p_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs_stat</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">visualize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plotly&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visualize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;plotly&quot;</span><span class="p">,</span> <span class="n">shade_pvalue</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">shade_ci</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize_fit</span>
 
-        <span class="k">return</span> <span class="n">visualize_fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">visualize_fit</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="n">engine</span><span class="p">,</span> <span class="n">shade_pvalue</span><span class="o">=</span><span class="n">shade_pvalue</span><span class="p">,</span> <span class="n">shade_ci</span><span class="o">=</span><span class="n">shade_ci</span>
+        <span class="p">)</span></div>
 
 
 

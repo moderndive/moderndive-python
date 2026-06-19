@@ -44,7 +44,6 @@ def _write(df: pl.DataFrame, name: str) -> None:
 def main() -> None:
     from_r = [
         "envoy_flights",
-        "early_january_2023_weather",
         "weather",
         "flights",
         "airlines",
@@ -81,6 +80,15 @@ def main() -> None:
     ]
     for name in from_r:
         _write(_read_csv(name), name)
+
+    # early_january_2023_weather: the R `moderndive` dataset ships with
+    # temp/dewp/humid/pressure entirely NA, so derive it from `weather` (Newark,
+    # first 15 days of January 2023) to get the real, correctly-typed values.
+    weather = _read_csv("weather")
+    ejw = weather.filter(
+        (pl.col("origin") == "EWR") & (pl.col("month") == 1) & (pl.col("day") <= 15)
+    ).sort("time_hour")
+    _write(ejw, "early_january_2023_weather")
 
     # Gapminder ships a CSV inside the `gapminder` PyPI package. We read that file
     # directly (the package's Python import is broken on 3.14: it uses the removed

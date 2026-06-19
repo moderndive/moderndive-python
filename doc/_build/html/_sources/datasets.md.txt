@@ -1,9 +1,27 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"
+```
+
 # Datasets
 
 `moderndive` bundles 58 datasets (the R `moderndive` + `infer` data, plus a few
 derived tables). Each loads with `load_<name>()` and returns a polars DataFrame.
 
-```python
+```{code-cell} python
 import moderndive as md
 
 md.available_datasets()          # sorted list of every dataset name

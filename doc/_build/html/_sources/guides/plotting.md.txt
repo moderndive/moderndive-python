@@ -1,3 +1,21 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"
+```
+
 # Plotting: plotly & plotnine
 
 Every plotting function in `moderndive` takes an `engine=` argument:
@@ -6,16 +24,15 @@ Every plotting function in `moderndive` takes an `engine=` argument:
 - `engine="plotnine"` — grammar-of-graphics figures (`plotnine.ggplot`).
 
 The composition syntax is identical across engines, so you can switch a whole
-analysis by changing one argument.
+analysis by changing one argument. (In this documentation, plotly figures are
+shown as static images; in a notebook they're fully interactive.)
 
-## visualize() returns an InferPlot
-
-`visualize()` returns a small `InferPlot` wrapper that you compose with shading via
-`+` in **both** engines:
-
-```python
+```{code-cell} python
 import moderndive as md
-from moderndive import specify, get_confidence_interval, visualize, shade_confidence_interval
+from moderndive import (
+    specify, observe, get_confidence_interval,
+    visualize, shade_confidence_interval, shade_p_value,
+)
 
 boot = (
     specify(md.load_almonds_sample_100(), response="weight")
@@ -23,51 +40,54 @@ boot = (
     .calculate(stat="mean")
 )
 ci = get_confidence_interval(boot, level=0.95, type="percentile")
-
-p = visualize(boot) + shade_confidence_interval(ci)   # plotly InferPlot
-p.figure          # the underlying plotly Figure
-p.show()          # display it
+ci
 ```
 
-For the plotnine engine, the raw `ggplot` is available via `.gg`:
+## visualize() returns an InferPlot
 
-```python
-g = visualize(boot, engine="plotnine") + shade_confidence_interval(ci)
-g.gg              # the underlying plotnine ggplot
+`visualize()` returns a small `InferPlot` wrapper that you compose with shading via
+`+` in **both** engines. The underlying figure is on `.figure` (and, for plotnine,
+the raw `ggplot` on `.gg`).
+
+```{code-cell} python
+visualize(boot) + shade_confidence_interval(ci)
+```
+
+```{code-cell} python
+# the same plot via the plotnine engine
+visualize(boot, engine="plotnine") + shade_confidence_interval(ci)
 ```
 
 ### Keyword form
 
 If you'd rather not use `+`, pass the shading inline (handy for plotly):
 
-```python
+```{code-cell} python
 visualize(boot, shade_ci=ci)
-visualize(null, shade_pvalue={"obs_stat": obs, "direction": "right"})
 ```
 
 ## Shading p-values
 
-```python
-from moderndive import observe, shade_p_value
-
-promotions = md.load_promotions()
-obs = observe(promotions, formula="decision ~ gender", success="promoted",
-              stat="diff in props", order=("male", "female"))
+```{code-cell} python
+spotify = md.load_spotify_metal_deephouse()
+obs = observe(spotify, formula="popular_or_not ~ track_genre", success="popular",
+              stat="diff in props", order=("metal", "deep-house"))
 null = (
-    specify(promotions, formula="decision ~ gender", success="promoted")
+    specify(spotify, formula="popular_or_not ~ track_genre", success="popular")
     .hypothesize(null="independence")
-    .generate(reps=1000, type="permute", seed=42)
-    .calculate(stat="diff in props", order=("male", "female"))
+    .generate(reps=1000, type="permute", seed=76)
+    .calculate(stat="diff in props", order=("metal", "deep-house"))
 )
-
 visualize(null) + shade_p_value(obs_stat=obs, direction="right")
 ```
 
 ## Simulation vs. theory overlays
 
-```python
-visualize(boot, method="simulation")    # histogram (default)
+```{code-cell} python
 visualize(boot, method="theoretical")   # normal-approximation curve
+```
+
+```{code-cell} python
 visualize(boot, method="both")          # histogram + curve overlaid
 ```
 
@@ -75,24 +95,35 @@ visualize(boot, method="both")          # histogram + curve overlaid
 
 `visualize_fit` shows one panel per term, and shading is **per-facet**:
 
-```python
+```{code-cell} python
 from moderndive.infer.viz import visualize_fit
 
-f = "price ~ living_area + bedrooms"
 houses = md.load_saratoga_houses()
-boot_fit = specify(houses, formula=f).generate(reps=1000, type="bootstrap", seed=1).fit()
-
+boot_fit = (
+    specify(houses, formula="price ~ living_area + bedrooms")
+    .generate(reps=1000, type="bootstrap", seed=1)
+    .fit()
+)
 visualize_fit(boot_fit) + shade_confidence_interval(boot_fit.get_confidence_interval())
 ```
 
 ## Model plots
 
-```python
-from moderndive import gg_parallel_slopes, gg_categorical_model, pairplot
+```{code-cell} python
+from moderndive import gg_parallel_slopes
 
 evals = md.load_evals()
 gg_parallel_slopes(evals, response="score", explanatory="age", by="gender")
+```
+
+```{code-cell} python
+from moderndive import gg_categorical_model
+
 gg_categorical_model(evals, response="score", explanatory="rank")
+```
+
+```{code-cell} python
+from moderndive import pairplot
 
 # Scatterplot matrix (~ GGally::ggpairs)
 pairplot(md.load_coffee_quality(), columns=["total_cup_points", "aroma", "flavor"])

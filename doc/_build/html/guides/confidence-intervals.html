@@ -11,6 +11,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -251,13 +252,17 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="bootstrapping-confidence-intervals">
+          <div class="cell tag_remove-input docutils container">
+</div>
+<section id="bootstrapping-confidence-intervals">
 <h1>Bootstrapping &amp; confidence intervals<a class="headerlink" href="#bootstrapping-confidence-intervals" title="Link to this heading">¶</a></h1>
 <p>Resample your data with replacement to build a <strong>bootstrap distribution</strong>, then
 read a confidence interval off it.</p>
 <section id="a-bootstrap-distribution-for-a-mean">
 <h2>A bootstrap distribution for a mean<a class="headerlink" href="#a-bootstrap-distribution-for-a-mean" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">get_confidence_interval</span><span class="p">,</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_confidence_interval</span>
 
 <span class="n">almonds</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_almonds_sample_100</span><span class="p">()</span>
@@ -269,10 +274,14 @@ read a confidence interval off it.</p>
 <span class="p">)</span>
 </pre></div>
 </div>
+</div>
+</div>
 </section>
 <section id="confidence-intervals-three-methods">
 <h2>Confidence intervals — three methods<a class="headerlink" href="#confidence-intervals-three-methods" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Percentile method (default)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Percentile method (default)</span>
 <span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
 <span class="c1"># shape: (1, 2) → lower_ci ≈ 3.61, upper_ci ≈ 3.75</span>
 
@@ -284,14 +293,40 @@ read a confidence interval off it.</p>
 <span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bias-corrected&quot;</span><span class="p">,</span> <span class="n">point_estimate</span><span class="o">=</span><span class="n">point</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>3.613883</td><td>3.755272</td></tr></tbody></table></div></div></div>
+</div>
 <p>Distribution objects also expose the getter as a method:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">boot</span><span class="o">.</span><span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">boot</span><span class="o">.</span><span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>3.606975</td><td>3.75</td></tr></tbody></table></div></div></div>
 </div>
 </section>
 <section id="visualize-the-interval">
 <h2>Visualize the interval<a class="headerlink" href="#visualize-the-interval" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ci</span> <span class="o">=</span> <span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ci</span> <span class="o">=</span> <span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
 
 <span class="c1"># plotly (default) — interactive</span>
 <span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_confidence_interval</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
@@ -303,10 +338,17 @@ read a confidence interval off it.</p>
 <span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">shade_ci</span><span class="o">=</span><span class="n">ci</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/ac66f688faad576ec00fb6dfa22ab9d34977edb8a0a5ff3cadb158ce22be94fd.png" src="../_images/ac66f688faad576ec00fb6dfa22ab9d34977edb8a0a5ff3cadb158ce22be94fd.png" />
+</div>
+</div>
 </section>
 <section id="a-confidence-interval-for-a-proportion">
 <h2>A confidence interval for a proportion<a class="headerlink" href="#a-confidence-interval-for-a-proportion" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 
 <span class="n">mythbusters</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_mythbusters_yawn</span><span class="p">()</span>
 
@@ -318,17 +360,41 @@ read a confidence interval off it.</p>
 <span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot_prop</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>0.1595</td><td>0.4</td></tr></tbody></table></div></div></div>
+</div>
 </section>
 <section id="a-confidence-interval-for-a-difference">
 <h2>A confidence interval for a difference<a class="headerlink" href="#a-confidence-interval-for-a-difference" title="Link to this heading">¶</a></h2>
 <p>Add an explanatory variable and an <code class="docutils literal notranslate"><span class="pre">order=</span></code> to compare two groups:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">boot_diff</span> <span class="o">=</span> <span class="p">(</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">boot_diff</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">specify</span><span class="p">(</span><span class="n">mythbusters</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;yawn ~ group&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="s2">&quot;control&quot;</span><span class="p">))</span>
 <span class="p">)</span>
 <span class="n">boot_diff</span><span class="o">.</span><span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>-0.224934</td><td>0.316189</td></tr></tbody></table></div></div></div>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>

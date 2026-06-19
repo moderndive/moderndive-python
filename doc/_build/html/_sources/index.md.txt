@@ -1,3 +1,21 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"  # render plotly figures as static images in the docs
+```
+
 # moderndive (Python)
 
 The Python companion package for **ModernDive: Statistical Inference via Data
@@ -35,31 +53,36 @@ pip install "moderndive[image]"   # adds kaleido
 
 ## 30-second example
 
-Did promotion decisions depend on the applicant's (perceived) gender? Shuffle the
-labels 1000 times to build a null distribution and read off a p-value:
+Are tracks more likely to be popular in *metal* than in *deep house*? Compute the
+observed difference in "popular" rates, then shuffle the genre labels 1000 times
+to build a null distribution and read off a p-value.
 
-```python
+```{code-cell} python
 import moderndive as md
 from moderndive import specify, observe, get_p_value, visualize, shade_p_value
 
-promotions = md.load_promotions()
+spotify = md.load_spotify_metal_deephouse()
 
-# Observed difference in promotion rates (male − female)
+# Observed difference in "popular" proportions (metal − deep-house)
 obs = observe(
-    promotions, formula="decision ~ gender", success="promoted",
-    stat="diff in props", order=("male", "female"),
+    spotify, formula="popular_or_not ~ track_genre", success="popular",
+    stat="diff in props", order=("metal", "deep-house"),
 )
+obs
+```
 
-# Null distribution under "gender doesn't matter" (permutation)
+```{code-cell} python
+# Null distribution under "genre doesn't matter" (permutation)
 null = (
-    specify(promotions, formula="decision ~ gender", success="promoted")
+    specify(spotify, formula="popular_or_not ~ track_genre", success="popular")
     .hypothesize(null="independence")
-    .generate(reps=1000, type="permute", seed=42)
-    .calculate(stat="diff in props", order=("male", "female"))
+    .generate(reps=1000, type="permute", seed=76)
+    .calculate(stat="diff in props", order=("metal", "deep-house"))
 )
+get_p_value(null, obs_stat=obs, direction="right")
+```
 
-get_p_value(null, obs_stat=obs, direction="right")   # ≈ 0.025
-
+```{code-cell} python
 # Visualize it (interactive plotly by default; engine="plotnine" also works)
 visualize(null) + shade_p_value(obs_stat=obs, direction="right")
 ```

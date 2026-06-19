@@ -1,3 +1,21 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"
+```
+
 # Bootstrapping & confidence intervals
 
 Resample your data with replacement to build a **bootstrap distribution**, then
@@ -5,7 +23,7 @@ read a confidence interval off it.
 
 ## A bootstrap distribution for a mean
 
-```python
+```{code-cell} python
 import moderndive as md
 from moderndive import specify, get_confidence_interval, visualize, shade_confidence_interval
 
@@ -20,7 +38,7 @@ boot = (
 
 ## Confidence intervals — three methods
 
-```python
+```{code-cell} python
 # Percentile method (default)
 get_confidence_interval(boot, level=0.95, type="percentile")
 # shape: (1, 2) → lower_ci ≈ 3.61, upper_ci ≈ 3.75
@@ -35,13 +53,13 @@ get_confidence_interval(boot, level=0.95, type="bias-corrected", point_estimate=
 
 Distribution objects also expose the getter as a method:
 
-```python
+```{code-cell} python
 boot.get_confidence_interval(level=0.95, type="percentile")
 ```
 
 ## Visualize the interval
 
-```python
+```{code-cell} python
 ci = get_confidence_interval(boot, level=0.95, type="percentile")
 
 # plotly (default) — interactive
@@ -56,7 +74,7 @@ visualize(boot, shade_ci=ci)
 
 ## A confidence interval for a proportion
 
-```python
+```{code-cell} python
 import polars as pl
 
 mythbusters = md.load_mythbusters_yawn()
@@ -73,7 +91,7 @@ get_confidence_interval(boot_prop, level=0.95, type="percentile")
 
 Add an explanatory variable and an `order=` to compare two groups:
 
-```python
+```{code-cell} python
 boot_diff = (
     specify(mythbusters, formula="yawn ~ group", success="yes")
     .generate(reps=1000, type="bootstrap", seed=1)

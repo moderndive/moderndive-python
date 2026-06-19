@@ -11,6 +11,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -251,7 +252,9 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="sampling">
+          <div class="cell tag_remove-input docutils container">
+</div>
+<section id="sampling">
 <h1>Sampling<a class="headerlink" href="#sampling" title="Link to this heading">¶</a></h1>
 <p>Sampling activities (the “bowl” of balls, tactile samples) are how ModernDive
 builds intuition for sampling variation. <code class="docutils literal notranslate"><span class="pre">rep_slice_sample</span></code> takes repeated samples
@@ -259,28 +262,56 @@ and stacks them with a <code class="docutils literal notranslate"><span class="p
 <code class="docutils literal notranslate"><span class="pre">moderndive::rep_slice_sample()</span></code> / <code class="docutils literal notranslate"><span class="pre">infer::rep_sample_n()</span></code>.</p>
 <section id="the-bowl">
 <h2>The bowl<a class="headerlink" href="#the-bowl" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 
 <span class="n">bowl</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_bowl</span><span class="p">()</span>      <span class="c1"># 2400 red/white balls</span>
 <span class="n">bowl</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 2)</small><table border="1" class="dataframe"><thead><tr><th>ball_ID</th><th>color</th></tr><tr><td>i64</td><td>str</td></tr></thead><tbody><tr><td>1</td><td>&quot;white&quot;</td></tr><tr><td>2</td><td>&quot;white&quot;</td></tr><tr><td>3</td><td>&quot;white&quot;</td></tr><tr><td>4</td><td>&quot;red&quot;</td></tr><tr><td>5</td><td>&quot;white&quot;</td></tr></tbody></table></div></div></div>
+</div>
 </section>
 <section id="one-virtual-sample">
 <h2>One virtual sample<a class="headerlink" href="#one-virtual-sample" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">rep_slice_sample</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">rep_slice_sample</span>
 
 <span class="n">sample</span> <span class="o">=</span> <span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="c1"># proportion red in this sample</span>
 <span class="n">sample</span><span class="o">.</span><span class="n">select</span><span class="p">((</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;red&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;prop_red&quot;</span><span class="p">))</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>prop_red</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.38</td></tr></tbody></table></div></div></div>
+</div>
 </section>
 <section id="many-samples-a-sampling-distribution">
 <h2>Many samples → a sampling distribution<a class="headerlink" href="#many-samples-a-sampling-distribution" title="Link to this heading">¶</a></h2>
 <p>Take 1000 samples of size 50 and compute the proportion red in each:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">prop_red</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">samples</span>
@@ -290,6 +321,17 @@ and stacks them with a <code class="docutils literal notranslate"><span class="p
 <span class="n">prop_red</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 2)</small><table border="1" class="dataframe"><thead><tr><th>replicate</th><th>prop_red</th></tr><tr><td>i64</td><td>f64</td></tr></thead><tbody><tr><td>1</td><td>0.38</td></tr><tr><td>2</td><td>0.42</td></tr><tr><td>3</td><td>0.42</td></tr><tr><td>4</td><td>0.42</td></tr><tr><td>5</td><td>0.46</td></tr></tbody></table></div></div></div>
+</div>
 <p>That <code class="docutils literal notranslate"><span class="pre">prop_red</span></code> column is a <strong>sampling distribution</strong>. Visualize its spread the
 same way you would any distribution (see <a class="reference internal" href="confidence-intervals.html"><span class="doc">Bootstrapping &amp; confidence intervals</span></a> for building
 one with the inference pipeline instead).</p>
@@ -298,15 +340,41 @@ one with the inference pipeline instead).</p>
 <h2>With vs. without replacement<a class="headerlink" href="#with-vs-without-replacement" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">rep_slice_sample</span></code> samples <strong>without</strong> replacement by default (like dealing from a
 deck). Pass <code class="docutils literal notranslate"><span class="pre">replace=True</span></code> for bootstrap-style resampling:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (50_000, 3)</small><table border="1" class="dataframe"><thead><tr><th>replicate</th><th>ball_ID</th><th>color</th></tr><tr><td>i64</td><td>i64</td><td>str</td></tr></thead><tbody><tr><td>1</td><td>1136</td><td>&quot;white&quot;</td></tr><tr><td>1</td><td>1229</td><td>&quot;red&quot;</td></tr><tr><td>1</td><td>1813</td><td>&quot;white&quot;</td></tr><tr><td>1</td><td>2282</td><td>&quot;red&quot;</td></tr><tr><td>1</td><td>84</td><td>&quot;white&quot;</td></tr><tr><td>&hellip;</td><td>&hellip;</td><td>&hellip;</td></tr><tr><td>1000</td><td>439</td><td>&quot;white&quot;</td></tr><tr><td>1000</td><td>1203</td><td>&quot;red&quot;</td></tr><tr><td>1000</td><td>252</td><td>&quot;white&quot;</td></tr><tr><td>1000</td><td>1113</td><td>&quot;white&quot;</td></tr><tr><td>1000</td><td>1277</td><td>&quot;red&quot;</td></tr></tbody></table></div></div></div>
 </div>
 </section>
 <section id="tactile-samples">
 <h2>Tactile samples<a class="headerlink" href="#tactile-samples" title="Link to this heading">¶</a></h2>
 <p>The hand-collected counterparts are bundled too:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">md</span><span class="o">.</span><span class="n">load_tactile_prop_red</span><span class="p">()</span>   <span class="c1"># 33 groups&#39; samples of 50 balls</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">md</span><span class="o">.</span><span class="n">load_tactile_prop_red</span><span class="p">()</span>   <span class="c1"># 33 groups&#39; samples of 50 balls</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (33, 4)</small><table border="1" class="dataframe"><thead><tr><th>group</th><th>replicate</th><th>red_balls</th><th>prop_red</th></tr><tr><td>str</td><td>i64</td><td>i64</td><td>f64</td></tr></thead><tbody><tr><td>&quot;Ilyas, Yohan&quot;</td><td>1</td><td>21</td><td>0.42</td></tr><tr><td>&quot;Morgan, Terrance&quot;</td><td>2</td><td>17</td><td>0.34</td></tr><tr><td>&quot;Martin, Thomas&quot;</td><td>3</td><td>21</td><td>0.42</td></tr><tr><td>&quot;Clark, Frank&quot;</td><td>4</td><td>21</td><td>0.42</td></tr><tr><td>&quot;Riddhi, Karina&quot;</td><td>5</td><td>18</td><td>0.36</td></tr><tr><td>&hellip;</td><td>&hellip;</td><td>&hellip;</td><td>&hellip;</td></tr><tr><td>&quot;Julie, Hailin&quot;</td><td>29</td><td>15</td><td>0.3</td></tr><tr><td>&quot;Katie, Caroline&quot;</td><td>30</td><td>21</td><td>0.42</td></tr><tr><td>&quot;Mallory, Damani, Melissa&quot;</td><td>31</td><td>21</td><td>0.42</td></tr><tr><td>&quot;Katie&quot;</td><td>32</td><td>16</td><td>0.32</td></tr><tr><td>&quot;Francis, Vignesh&quot;</td><td>33</td><td>19</td><td>0.38</td></tr></tbody></table></div></div></div>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>

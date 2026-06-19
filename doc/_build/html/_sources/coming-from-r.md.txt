@@ -8,9 +8,9 @@ Python. The grammar is the same; the main differences are Python method-chaining
 
 ```r
 # R
-mtcars %>%
-  specify(response = mpg) %>%
-  hypothesize(null = "point", mu = 20) %>%
+pennies %>%
+  specify(response = year) %>%
+  hypothesize(null = "point", mu = 1995) %>%
   generate(reps = 1000, type = "bootstrap") %>%
   calculate(stat = "mean")
 ```
@@ -18,8 +18,8 @@ mtcars %>%
 ```python
 # Python — verbs are methods on the returned objects
 (
-    specify(data, response="mpg")
-    .hypothesize(null="point", mu=20)
+    specify(md.load_pennies(), response="year")
+    .hypothesize(null="point", mu=1995)
     .generate(reps=1000, type="bootstrap", seed=1)
     .calculate(stat="mean")
 )
@@ -28,48 +28,40 @@ mtcars %>%
 `specify(formula="y ~ x")` works just like R's formula interface; `success=` marks
 the success level for categorical responses.
 
-## Function map
+## Most names are identical
 
-| R (`infer` / `moderndive`)        | Python (`moderndive`)                                  |
-| --------------------------------- | ------------------------------------------------------ |
-| `specify()`                       | `specify()`                                            |
-| `hypothesize()` / `hypothesise()` | `.hypothesize()` / `.hypothesise()`                    |
-| `generate()`                      | `.generate()`                                          |
-| `calculate()`                     | `.calculate()`                                         |
-| `fit()`                           | `.fit()`                                               |
-| `assume()`                        | `assume()`                                             |
-| `observe()`                       | `observe()`                                            |
-| `get_p_value()` / `get_pvalue()`  | `get_p_value()` / `get_pvalue()`                       |
-| `get_confidence_interval()` / `get_ci()` | `get_confidence_interval()` / `get_ci()`        |
-| `visualize()` / `visualise()`     | `visualize()` / `visualise()`                          |
-| `shade_p_value()` / `shade_pvalue()` | `shade_p_value()` / `shade_pvalue()`                |
-| `shade_confidence_interval()` / `shade_ci()` | `shade_confidence_interval()` / `shade_ci()` |
-| `t_test()`, `prop_test()`, `chisq_test()` | same names                                     |
-| `t_stat()`, `chisq_stat()`        | same names                                             |
-| `rep_sample_n()` / `rep_slice_sample()` | `rep_sample_n()` / `rep_slice_sample()`          |
-| `get_regression_table()`          | `get_regression_table(model)`                          |
-| `get_regression_points()`         | `get_regression_points(model)`                         |
-| `get_regression_summaries()`      | `get_regression_summaries(model)`                      |
-| `get_correlation()`               | `get_correlation(data, "y ~ x")`                       |
-| `pop_sd()`                        | `pop_sd()`                                             |
-| `geom_parallel_slopes()`          | `geom_parallel_slopes()` (plotnine) / `gg_parallel_slopes(engine=...)` |
-| `geom_categorical_model()`        | `gg_categorical_model(engine=...)`                     |
-| `tidy_summary()`                  | `tidy_summary()`                                       |
+The overwhelming majority of functions keep **the same name** (including the
+British-spelling and short-form aliases). They're called just as in R — as
+methods on the pipeline where applicable:
 
-## Key differences
+> `specify`, `hypothesize`/`hypothesise`, `generate`, `calculate`, `fit`,
+> `assume`, `observe`, `get_p_value`/`get_pvalue`,
+> `get_confidence_interval`/`get_ci`, `visualize`/`visualise`,
+> `shade_p_value`/`shade_pvalue`, `shade_confidence_interval`/`shade_ci`,
+> `t_test`, `prop_test`, `chisq_test`, `t_stat`, `chisq_stat`,
+> `rep_sample_n`/`rep_slice_sample`, `get_regression_table`,
+> `get_regression_points`, `get_regression_summaries`, `get_correlation`,
+> `pop_sd`, `tidy_summary`, `geom_parallel_slopes`.
 
-- **Pipe → methods.** `x %>% hypothesize(...)` becomes `x.hypothesize(...)`.
-- **Models.** Where R passes an `lm()` object, Python passes a fitted
-  [statsmodels](https://www.statsmodels.org) model:
-  `smf.ols("y ~ x", data=df.to_pandas()).fit()`.
-- **Plotting engine.** R returns ggplot2; Python defaults to **plotly**
-  (interactive) with `engine="plotnine"` available everywhere. Plots compose with
-  `+` in both engines.
-- **DataFrames.** Inputs/outputs are polars; pass `.to_pandas()` when a downstream
-  tool needs pandas.
-- **Reproducibility.** Pass `seed=` to `generate()` (R uses `set.seed()`).
+## What's actually different
+
+| R | Python | Why |
+| --- | --- | --- |
+| `x %>% f(...)` / `x \|> f(...)` | `x.f(...)` (method chaining) | no pipe operator in Python |
+| `geom_categorical_model()` | `gg_categorical_model(engine=...)` | renamed to match `gg_parallel_slopes` |
+| ggplot2 `geom_*` layers | plotly by default; `engine="plotnine"` for ggplot-style | dual-engine plotting |
+| `lm(y ~ x, data)` object | a fitted **statsmodels** model: `smf.ols("y ~ x", data=df.to_pandas()).fit()` | regression backend |
+| `get_correlation(df, y ~ x)` | `get_correlation(df, "y ~ x")` *or* `get_correlation(df, x="x", y="y")` | formula passed as a string |
+
+## Other things to know
+
+- **Plots compose with `+`** in both engines, and default to **plotly**
+  (interactive); pass `engine="plotnine"` anywhere for ggplot-style output.
+- **DataFrames** are polars in and out; pass `.to_pandas()` when a downstream tool
+  needs pandas.
+- **Reproducibility:** pass `seed=` to `generate()` (R uses `set.seed()`).
 
 ## Same datasets
 
 Most R `moderndive`/`infer` datasets are bundled here under the same name —
-`load_promotions()`, `load_pennies()`, `load_gss()`, etc. See {doc}`datasets`.
+`load_pennies()`, `load_promotions()`, `load_gss()`, etc. See {doc}`datasets`.

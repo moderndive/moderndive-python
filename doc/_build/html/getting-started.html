@@ -11,6 +11,7 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -251,7 +252,9 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="getting-started">
+          <div class="cell tag_remove-input docutils container">
+</div>
+<section id="getting-started">
 <h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h1>
 <p>This page walks through a complete analysis end to end, then points you at the
 task guides for more depth.</p>
@@ -266,22 +269,24 @@ accepts pandas DataFrames as input.</p>
 <section id="load-a-dataset">
 <h2>Load a dataset<a class="headerlink" href="#load-a-dataset" title="Link to this heading">¶</a></h2>
 <p>All datasets ship with the package and load with <code class="docutils literal notranslate"><span class="pre">load_&lt;name&gt;()</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 
 <span class="n">promotions</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_promotions</span><span class="p">()</span>
 <span class="n">promotions</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>shape: (5, 3)
-┌─────┬──────────┬────────┐
-│ id  ┆ decision ┆ gender │
-│ i64 ┆ str      ┆ str    │
-╞═════╪══════════╪════════╡
-│ 1   ┆ promoted ┆ male   │
-│ 2   ┆ promoted ┆ male   │
-│ …   ┆ …        ┆ …      │
-└─────┴──────────┴────────┘
-</pre></div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 3)</small><table border="1" class="dataframe"><thead><tr><th>id</th><th>decision</th><th>gender</th></tr><tr><td>i64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>1</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>2</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>3</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>4</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>5</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr></tbody></table></div></div></div>
 </div>
 <p>List everything that’s available with <code class="docutils literal notranslate"><span class="pre">md.available_datasets()</span></code> (58 datasets), and
 see <a class="reference internal" href="datasets.html"><span class="doc">Datasets</span></a> for a thematic tour.</p>
@@ -290,17 +295,32 @@ see <a class="reference internal" href="datasets.html"><span class="doc">Dataset
 <h2>A first summary<a class="headerlink" href="#a-first-summary" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">tidy_summary</span></code> gives a per-variable five-number summary (numeric) or counts
 (categorical):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">tidy_summary</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">tidy_summary</span>
 
 <span class="n">tidy_summary</span><span class="p">(</span><span class="n">md</span><span class="o">.</span><span class="n">load_almonds_sample_100</span><span class="p">(),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">])</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 11)</small><table border="1" class="dataframe"><thead><tr><th>column</th><th>n</th><th>group</th><th>type</th><th>min</th><th>Q1</th><th>mean</th><th>median</th><th>Q3</th><th>max</th><th>sd</th></tr><tr><td>str</td><td>i64</td><td>str</td><td>str</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>&quot;weight&quot;</td><td>100</td><td>null</td><td>&quot;numeric&quot;</td><td>2.9</td><td>3.4</td><td>3.682</td><td>3.7</td><td>3.9</td><td>4.5</td><td>0.362</td></tr></tbody></table></div></div></div>
 </div>
 </section>
 <section id="the-inference-pipeline">
 <h2>The inference pipeline<a class="headerlink" href="#the-inference-pipeline" title="Link to this heading">¶</a></h2>
 <p>The core grammar mirrors R <code class="docutils literal notranslate"><span class="pre">infer</span></code>. You build a pipeline and read it like a
 sentence:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">observe</span><span class="p">,</span> <span class="n">get_p_value</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">observe</span><span class="p">,</span> <span class="n">get_p_value</span>
 
 <span class="c1"># 1. The observed statistic</span>
 <span class="n">obs</span> <span class="o">=</span> <span class="n">observe</span><span class="p">(</span>
@@ -320,6 +340,17 @@ sentence:</p>
 <span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>   <span class="c1"># ≈ 0.025</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.025</td></tr></tbody></table></div></div></div>
+</div>
 <p>Each verb has a focused guide: <a class="reference internal" href="guides/sampling.html"><span class="doc">Sampling</span></a>,
 <a class="reference internal" href="guides/confidence-intervals.html"><span class="doc">Bootstrapping &amp; confidence intervals</span></a>, and <a class="reference internal" href="guides/hypothesis-testing.html"><span class="doc">Hypothesis testing</span></a>.</p>
 </section>
@@ -327,7 +358,9 @@ sentence:</p>
 <h2>Visualizing — choose your engine<a class="headerlink" href="#visualizing-choose-your-engine" title="Link to this heading">¶</a></h2>
 <p>Plots default to <strong>plotly</strong> (interactive). Pass <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> for
 grammar-of-graphics output. The composition syntax is identical:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_p_value</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_p_value</span>
 
 <span class="c1"># Interactive plotly figure</span>
 <span class="n">visualize</span><span class="p">(</span><span class="n">null</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
@@ -336,18 +369,37 @@ grammar-of-graphics output. The composition syntax is identical:</p>
 <span class="n">visualize</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;plotnine&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="_images/679346fce431777e0d221fb96d0d46c94c46266531703754ae8cf2b7aea89916.png"><img alt="_images/679346fce431777e0d221fb96d0d46c94c46266531703754ae8cf2b7aea89916.png" height="480" src="_images/679346fce431777e0d221fb96d0d46c94c46266531703754ae8cf2b7aea89916.png" width="640" />
+</a>
+</div>
+</div>
 <p>See <a class="reference internal" href="guides/plotting.html"><span class="doc">Plotting: plotly &amp; plotnine</span></a> for shading, confidence-interval overlays, theoretical
 overlays, and the regression-model plots.</p>
 </section>
 <section id="regression">
 <h2>Regression<a class="headerlink" href="#regression" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_regression_table</span>
 
 <span class="n">houses</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_saratoga_houses</span><span class="p">()</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="s2">&quot;price ~ living_area + bedrooms&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">houses</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="n">get_regression_table</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (3, 7)</small><table border="1" class="dataframe"><thead><tr><th>term</th><th>estimate</th><th>std_error</th><th>statistic</th><th>p_value</th><th>lower_ci</th><th>upper_ci</th></tr><tr><td>str</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>&quot;intercept&quot;</td><td>20986.094</td><td>6816.251</td><td>3.079</td><td>0.002</td><td>7611.128</td><td>34361.06</td></tr><tr><td>&quot;living_area&quot;</td><td>93.842</td><td>3.109</td><td>30.183</td><td>0.0</td><td>87.741</td><td>99.943</td></tr><tr><td>&quot;bedrooms&quot;</td><td>-7483.095</td><td>2783.531</td><td>-2.688</td><td>0.007</td><td>-12944.988</td><td>-2021.203</td></tr></tbody></table></div></div></div>
 </div>
 <p>Full details in <a class="reference internal" href="guides/regression.html"><span class="doc">Regression</span></a>.</p>
 </section>

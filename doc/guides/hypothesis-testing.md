@@ -1,3 +1,21 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"
+```
+
 # Hypothesis testing
 
 Hypothesis tests follow the same grammar as confidence intervals, with an added
@@ -9,7 +27,7 @@ from it.
 The classic "promotions" experiment — does the (perceived) gender on a résumé
 change the promotion rate?
 
-```python
+```{code-cell} python
 import moderndive as md
 from moderndive import specify, observe, get_p_value, visualize, shade_p_value
 
@@ -34,7 +52,7 @@ get_p_value(null, obs_stat=obs, direction="right")   # ≈ 0.025
 
 ## Shade the p-value
 
-```python
+```{code-cell} python
 visualize(null) + shade_p_value(obs_stat=obs, direction="right")
 ```
 
@@ -45,7 +63,7 @@ The two-sided shading mirrors the observed statistic about 0.
 
 Use a `"point"` null with bootstrap resampling, supplying the hypothesized value:
 
-```python
+```{code-cell} python
 age = md.load_age_at_marriage()
 
 obs_t = observe(age, response="age", stat="t", null="point", mu=23)
@@ -61,7 +79,7 @@ get_p_value(null_t, obs_stat=obs_t, direction="two-sided")
 
 For a one-proportion test you can also *simulate* draws directly:
 
-```python
+```{code-cell} python
 import polars as pl
 
 coins = pl.DataFrame({"flip": ["heads"] * 30 + ["tails"] * 70})

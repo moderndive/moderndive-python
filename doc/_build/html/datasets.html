@@ -11,6 +11,7 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -251,16 +252,31 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="datasets">
+          <div class="cell tag_remove-input docutils container">
+</div>
+<section id="datasets">
 <h1>Datasets<a class="headerlink" href="#datasets" title="Link to this heading">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">moderndive</span></code> bundles 58 datasets (the R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code> + <code class="docutils literal notranslate"><span class="pre">infer</span></code> data, plus a few
 derived tables). Each loads with <code class="docutils literal notranslate"><span class="pre">load_&lt;name&gt;()</span></code> and returns a polars DataFrame.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 
 <span class="n">md</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">()</span>          <span class="c1"># sorted list of every dataset name</span>
 <span class="n">md</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;promotions&quot;</span><span class="p">)</span>    <span class="c1"># load by name (string)</span>
 <span class="n">md</span><span class="o">.</span><span class="n">load_promotions</span><span class="p">()</span>             <span class="c1"># or via the generated loader</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (48, 3)</small><table border="1" class="dataframe"><thead><tr><th>id</th><th>decision</th><th>gender</th></tr><tr><td>i64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>1</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>2</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>3</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>4</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>5</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>&hellip;</td><td>&hellip;</td><td>&hellip;</td></tr><tr><td>44</td><td>&quot;not&quot;</td><td>&quot;female&quot;</td></tr><tr><td>45</td><td>&quot;not&quot;</td><td>&quot;female&quot;</td></tr><tr><td>46</td><td>&quot;not&quot;</td><td>&quot;female&quot;</td></tr><tr><td>47</td><td>&quot;not&quot;</td><td>&quot;female&quot;</td></tr><tr><td>48</td><td>&quot;not&quot;</td><td>&quot;female&quot;</td></tr></tbody></table></div></div></div>
 </div>
 <section id="by-topic">
 <h2>By topic<a class="headerlink" href="#by-topic" title="Link to this heading">¶</a></h2>

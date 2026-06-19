@@ -1,3 +1,21 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"
+```
+
 # Theory-based inference
 
 Alongside the simulation grammar, `moderndive` ships tidy wrappers for the
@@ -6,7 +24,7 @@ mirroring R `infer`'s `t_test`, `prop_test`, `chisq_test`, and `assume()`.
 
 ## One-line tests
 
-```python
+```{code-cell} python
 import moderndive as md
 from moderndive import t_test, prop_test, chisq_test
 
@@ -35,7 +53,7 @@ chisq_test(yawn, formula="yawn ~ group")
 `assume()` defines a theoretical sampling distribution you can visualize and use
 for p-values without simulating:
 
-```python
+```{code-cell} python
 from moderndive import assume
 
 # t-distribution with 10 degrees of freedom
@@ -55,7 +73,7 @@ Supported distributions: `"t"`, `"z"`, `"F"` (pass `df=(df1, df2)`), and
 `visualize(..., method=...)` can show the simulation histogram, the theoretical
 curve, or both:
 
-```python
+```{code-cell} python
 from moderndive import specify, visualize
 
 boot = (
@@ -72,7 +90,7 @@ visualize(boot, method="theoretical")   # just the curve
 
 A small helper that divides by `n` (not `n − 1`):
 
-```python
+```{code-cell} python
 from moderndive import pop_sd
 
 pop_sd([1, 2, 3, 4, 5])   # → 1.414…

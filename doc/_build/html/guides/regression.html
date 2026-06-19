@@ -11,6 +11,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -251,13 +252,17 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="regression">
+          <div class="cell tag_remove-input docutils container">
+</div>
+<section id="regression">
 <h1>Regression<a class="headerlink" href="#regression" title="Link to this heading">¶</a></h1>
 <p>The regression helpers turn a fitted <a class="reference external" href="https://www.statsmodels.org">statsmodels</a>
 model into tidy polars tables — the analog of R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code>’s
 <code class="docutils literal notranslate"><span class="pre">get_regression_table()</span></code> / <code class="docutils literal notranslate"><span class="pre">get_regression_points()</span></code> / <code class="docutils literal notranslate"><span class="pre">get_regression_summaries()</span></code>.</p>
 <p>Fit models with statsmodels’ formula API, then tidy them:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_regression_table</span><span class="p">,</span> <span class="n">get_regression_points</span><span class="p">,</span> <span class="n">get_regression_summaries</span><span class="p">,</span> <span class="n">get_correlation</span><span class="p">,</span>
@@ -267,48 +272,94 @@ model into tidy polars tables — the analog of R <code class="docutils literal 
 <span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="s2">&quot;price ~ living_area + bedrooms&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">houses</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+</div>
 <section id="coefficient-table-with-confidence-intervals">
 <h2>Coefficient table (with confidence intervals)<a class="headerlink" href="#coefficient-table-with-confidence-intervals" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">get_regression_table</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_regression_table</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>shape: (3, 7)
-┌─────────────┬───────────┬───────────┬───────────┬─────────┬────────────┬───────────┐
-│ term        ┆ estimate  ┆ std_error ┆ statistic ┆ p_value ┆ lower_ci   ┆ upper_ci  │
-╞═════════════╪═══════════╪═══════════╪═══════════╪═════════╪════════════╪═══════════╡
-│ intercept   ┆ 20986.094 ┆ 6816.251  ┆ 3.079     ┆ 0.002   ┆ 7611.128   ┆ 34361.06  │
-│ living_area ┆ 93.842    ┆ 3.109     ┆ 30.183    ┆ 0.0     ┆ 87.741     ┆ 99.943    │
-│ bedrooms    ┆ -7483.095 ┆ 2783.531  ┆ -2.688    ┆ 0.007   ┆ -12944.988 ┆ -2021.203 │
-└─────────────┴───────────┴───────────┴───────────┴─────────┴────────────┴───────────┘
-</pre></div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (3, 7)</small><table border="1" class="dataframe"><thead><tr><th>term</th><th>estimate</th><th>std_error</th><th>statistic</th><th>p_value</th><th>lower_ci</th><th>upper_ci</th></tr><tr><td>str</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>&quot;intercept&quot;</td><td>20986.094</td><td>6816.251</td><td>3.079</td><td>0.002</td><td>7611.128</td><td>34361.06</td></tr><tr><td>&quot;living_area&quot;</td><td>93.842</td><td>3.109</td><td>30.183</td><td>0.0</td><td>87.741</td><td>99.943</td></tr><tr><td>&quot;bedrooms&quot;</td><td>-7483.095</td><td>2783.531</td><td>-2.688</td><td>0.007</td><td>-12944.988</td><td>-2021.203</td></tr></tbody></table></div></div></div>
 </div>
 <p>Change the confidence level with <code class="docutils literal notranslate"><span class="pre">conf_level=</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">0.99</span></code>).</p>
 </section>
 <section id="fitted-values-residuals">
 <h2>Fitted values &amp; residuals<a class="headerlink" href="#fitted-values-residuals" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">get_regression_points</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_regression_points</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 <span class="c1"># columns: ID, price, living_area, bedrooms, price_hat, residual</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 6)</small><table border="1" class="dataframe"><thead><tr><th>ID</th><th>price</th><th>living_area</th><th>bedrooms</th><th>price_hat</th><th>residual</th></tr><tr><td>i64</td><td>i64</td><td>i64</td><td>i64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>1</td><td>142212</td><td>1982</td><td>3</td><td>184531.942</td><td>-42319.942</td></tr><tr><td>2</td><td>134865</td><td>1676</td><td>3</td><td>155816.245</td><td>-20951.245</td></tr><tr><td>3</td><td>118007</td><td>1694</td><td>3</td><td>157505.404</td><td>-39498.404</td></tr><tr><td>4</td><td>138297</td><td>1800</td><td>2</td><td>174935.767</td><td>-36638.767</td></tr><tr><td>5</td><td>129470</td><td>2088</td><td>3</td><td>194479.21</td><td>-65009.21</td></tr></tbody></table></div></div></div>
 </div>
 </section>
 <section id="model-fit-summaries">
 <h2>Model-fit summaries<a class="headerlink" href="#model-fit-summaries" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">get_regression_summaries</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_regression_summaries</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 <span class="c1"># r_squared, adj_r_squared, mse, rmse, sigma, statistic (F), p_value, df, nobs</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 9)</small><table border="1" class="dataframe"><thead><tr><th>r_squared</th><th>adj_r_squared</th><th>mse</th><th>rmse</th><th>sigma</th><th>statistic</th><th>p_value</th><th>df</th><th>nobs</th></tr><tr><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>i64</td><td>i64</td></tr></thead><tbody><tr><td>0.578</td><td>0.578</td><td>2.5071e9</td><td>50071.187</td><td>50142.395</td><td>723.229</td><td>0.0</td><td>2</td><td>1057</td></tr></tbody></table></div></div></div>
 </div>
 </section>
 <section id="correlation">
 <h2>Correlation<a class="headerlink" href="#correlation" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">get_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ living_area&quot;</span><span class="p">)</span>   <span class="c1"># ≈ 0.759</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ living_area&quot;</span><span class="p">)</span>   <span class="c1"># ≈ 0.759</span>
 <span class="c1"># or: get_correlation(houses, x=&quot;living_area&quot;, y=&quot;price&quot;)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>cor</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.758674</td></tr></tbody></table></div></div></div>
 </div>
 </section>
 <section id="visualizing-models">
 <h2>Visualizing models<a class="headerlink" href="#visualizing-models" title="Link to this heading">¶</a></h2>
 <p>Two ports of R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code>’s ggplot helpers, both dual-engine:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">gg_parallel_slopes</span><span class="p">,</span> <span class="n">gg_categorical_model</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">gg_parallel_slopes</span><span class="p">,</span> <span class="n">gg_categorical_model</span>
 
 <span class="n">evals</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_evals</span><span class="p">()</span>
 
@@ -321,6 +372,11 @@ model into tidy polars tables — the analog of R <code class="docutils literal 
 <span class="n">gg_categorical_model</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">explanatory</span><span class="o">=</span><span class="s2">&quot;rank&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/c095fdc806a901609764f3a83013d31798e7b884fd7e4d4c51f4edb0142b30cf.png" src="../_images/c095fdc806a901609764f3a83013d31798e7b884fd7e4d4c51f4edb0142b30cf.png" />
+</div>
+</div>
 <p>For the plotnine engine you can also drop the parallel-slopes lines onto your own
 <code class="docutils literal notranslate"><span class="pre">ggplot</span></code> with <code class="docutils literal notranslate"><span class="pre">geom_parallel_slopes()</span></code>.</p>
 </section>
@@ -329,7 +385,9 @@ model into tidy polars tables — the analog of R <code class="docutils literal 
 <p><code class="docutils literal notranslate"><span class="pre">fit()</span></code> runs the regression on every bootstrap/permutation replicate, giving a
 distribution per coefficient. Pair it with <code class="docutils literal notranslate"><span class="pre">visualize_fit</span></code> and <strong>per-facet</strong>
 shading:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive.infer.viz</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize_fit</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">shade_confidence_interval</span><span class="p">,</span> <span class="n">shade_p_value</span>
 
@@ -349,6 +407,11 @@ shading:</p>
 <span class="n">null_fit</span><span class="o">.</span><span class="n">get_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">=</span><span class="n">obs_fit</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;two-sided&quot;</span><span class="p">)</span>
 <span class="n">visualize_fit</span><span class="p">(</span><span class="n">null_fit</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">=</span><span class="n">obs_fit</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;two-sided&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/4f6137e2efe6c6b33540a969fb71e0dc9370f9392a068c674921b84116e9ca18.png" src="../_images/4f6137e2efe6c6b33540a969fb71e0dc9370f9392a068c674921b84116e9ca18.png" />
+</div>
 </div>
 <p>Per-facet shading works in both engines: <code class="docutils literal notranslate"><span class="pre">shade_p_value</span></code> / <code class="docutils literal notranslate"><span class="pre">shade_confidence_interval</span></code>
 accept the observed <code class="docutils literal notranslate"><span class="pre">FitResult</span></code> or a term-keyed table, and each facet is shaded

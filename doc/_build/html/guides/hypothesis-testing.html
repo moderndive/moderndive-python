@@ -11,6 +11,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -251,7 +252,9 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="hypothesis-testing">
+          <div class="cell tag_remove-input docutils container">
+</div>
+<section id="hypothesis-testing">
 <h1>Hypothesis testing<a class="headerlink" href="#hypothesis-testing" title="Link to this heading">¶</a></h1>
 <p>Hypothesis tests follow the same grammar as confidence intervals, with an added
 <code class="docutils literal notranslate"><span class="pre">hypothesize()</span></code> step that defines the null world, and <code class="docutils literal notranslate"><span class="pre">generate()</span></code> that simulates
@@ -260,7 +263,9 @@ from it.</p>
 <h2>Two groups: a permutation test<a class="headerlink" href="#two-groups-a-permutation-test" title="Link to this heading">¶</a></h2>
 <p>The classic “promotions” experiment — does the (perceived) gender on a résumé
 change the promotion rate?</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">observe</span><span class="p">,</span> <span class="n">get_p_value</span><span class="p">,</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_p_value</span>
 
 <span class="n">promotions</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_promotions</span><span class="p">()</span>
@@ -282,11 +287,29 @@ change the promotion rate?</p>
 <span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>   <span class="c1"># ≈ 0.025</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.025</td></tr></tbody></table></div></div></div>
+</div>
 </section>
 <section id="shade-the-p-value">
 <h2>Shade the p-value<a class="headerlink" href="#shade-the-p-value" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">visualize</span><span class="p">(</span><span class="n">null</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">visualize</span><span class="p">(</span><span class="n">null</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/446856f7a7a4b3ae8beb128934fc4936f3afde3e478c71e657c8305dcee97764.png" src="../_images/446856f7a7a4b3ae8beb128934fc4936f3afde3e478c71e657c8305dcee97764.png" />
+</div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">direction</span></code> is one of <code class="docutils literal notranslate"><span class="pre">&quot;right&quot;</span></code>/<code class="docutils literal notranslate"><span class="pre">&quot;greater&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;left&quot;</span></code>/<code class="docutils literal notranslate"><span class="pre">&quot;less&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;two-sided&quot;</span></code>.
 The two-sided shading mirrors the observed statistic about 0.</p>
@@ -294,7 +317,9 @@ The two-sided shading mirrors the observed statistic about 0.</p>
 <section id="one-mean-one-proportion-point-null">
 <h2>One mean / one proportion (point null)<a class="headerlink" href="#one-mean-one-proportion-point-null" title="Link to this heading">¶</a></h2>
 <p>Use a <code class="docutils literal notranslate"><span class="pre">&quot;point&quot;</span></code> null with bootstrap resampling, supplying the hypothesized value:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">age</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_age_at_marriage</span><span class="p">()</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">age</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_age_at_marriage</span><span class="p">()</span>
 
 <span class="n">obs_t</span> <span class="o">=</span> <span class="n">observe</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mi">23</span><span class="p">)</span>
 
@@ -307,8 +332,21 @@ The two-sided shading mirrors the observed statistic about 0.</p>
 <span class="n">get_p_value</span><span class="p">(</span><span class="n">null_t</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs_t</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;two-sided&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.0</td></tr></tbody></table></div></div></div>
+</div>
 <p>For a one-proportion test you can also <em>simulate</em> draws directly:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 
 <span class="n">coins</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;flip&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;heads&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">30</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;tails&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">70</span><span class="p">})</span>
 
@@ -319,6 +357,8 @@ The two-sided shading mirrors the observed statistic about 0.</p>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;prop&quot;</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="available-statistics">

@@ -1,3 +1,21 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"
+```
+
 # Getting started
 
 This page walks through a complete analysis end to end, then points you at the
@@ -16,24 +34,13 @@ accepts pandas DataFrames as input.
 
 All datasets ship with the package and load with `load_<name>()`:
 
-```python
+```{code-cell} python
 import moderndive as md
 
 promotions = md.load_promotions()
 promotions.head()
 ```
 
-```text
-shape: (5, 3)
-┌─────┬──────────┬────────┐
-│ id  ┆ decision ┆ gender │
-│ i64 ┆ str      ┆ str    │
-╞═════╪══════════╪════════╡
-│ 1   ┆ promoted ┆ male   │
-│ 2   ┆ promoted ┆ male   │
-│ …   ┆ …        ┆ …      │
-└─────┴──────────┴────────┘
-```
 
 List everything that's available with `md.available_datasets()` (58 datasets), and
 see {doc}`datasets` for a thematic tour.
@@ -43,7 +50,7 @@ see {doc}`datasets` for a thematic tour.
 `tidy_summary` gives a per-variable five-number summary (numeric) or counts
 (categorical):
 
-```python
+```{code-cell} python
 from moderndive import tidy_summary
 
 tidy_summary(md.load_almonds_sample_100(), columns=["weight"])
@@ -54,7 +61,7 @@ tidy_summary(md.load_almonds_sample_100(), columns=["weight"])
 The core grammar mirrors R `infer`. You build a pipeline and read it like a
 sentence:
 
-```python
+```{code-cell} python
 from moderndive import specify, observe, get_p_value
 
 # 1. The observed statistic
@@ -83,7 +90,7 @@ Each verb has a focused guide: {doc}`guides/sampling`,
 Plots default to **plotly** (interactive). Pass `engine="plotnine"` for
 grammar-of-graphics output. The composition syntax is identical:
 
-```python
+```{code-cell} python
 from moderndive import visualize, shade_p_value
 
 # Interactive plotly figure
@@ -98,7 +105,7 @@ overlays, and the regression-model plots.
 
 ## Regression
 
-```python
+```{code-cell} python
 import statsmodels.formula.api as smf
 from moderndive import get_regression_table
 

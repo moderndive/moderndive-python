@@ -1,3 +1,21 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"
+```
+
 # Regression
 
 The regression helpers turn a fitted [statsmodels](https://www.statsmodels.org)
@@ -6,7 +24,7 @@ model into tidy polars tables — the analog of R `moderndive`'s
 
 Fit models with statsmodels' formula API, then tidy them:
 
-```python
+```{code-cell} python
 import statsmodels.formula.api as smf
 import moderndive as md
 from moderndive import (
@@ -19,40 +37,30 @@ model = smf.ols("price ~ living_area + bedrooms", data=houses.to_pandas()).fit()
 
 ## Coefficient table (with confidence intervals)
 
-```python
+```{code-cell} python
 get_regression_table(model)
 ```
 
-```text
-shape: (3, 7)
-┌─────────────┬───────────┬───────────┬───────────┬─────────┬────────────┬───────────┐
-│ term        ┆ estimate  ┆ std_error ┆ statistic ┆ p_value ┆ lower_ci   ┆ upper_ci  │
-╞═════════════╪═══════════╪═══════════╪═══════════╪═════════╪════════════╪═══════════╡
-│ intercept   ┆ 20986.094 ┆ 6816.251  ┆ 3.079     ┆ 0.002   ┆ 7611.128   ┆ 34361.06  │
-│ living_area ┆ 93.842    ┆ 3.109     ┆ 30.183    ┆ 0.0     ┆ 87.741     ┆ 99.943    │
-│ bedrooms    ┆ -7483.095 ┆ 2783.531  ┆ -2.688    ┆ 0.007   ┆ -12944.988 ┆ -2021.203 │
-└─────────────┴───────────┴───────────┴───────────┴─────────┴────────────┴───────────┘
-```
 
 Change the confidence level with `conf_level=` (e.g. `0.99`).
 
 ## Fitted values & residuals
 
-```python
+```{code-cell} python
 get_regression_points(model).head()
 # columns: ID, price, living_area, bedrooms, price_hat, residual
 ```
 
 ## Model-fit summaries
 
-```python
+```{code-cell} python
 get_regression_summaries(model)
 # r_squared, adj_r_squared, mse, rmse, sigma, statistic (F), p_value, df, nobs
 ```
 
 ## Correlation
 
-```python
+```{code-cell} python
 get_correlation(houses, "price ~ living_area")   # ≈ 0.759
 # or: get_correlation(houses, x="living_area", y="price")
 ```
@@ -61,7 +69,7 @@ get_correlation(houses, "price ~ living_area")   # ≈ 0.759
 
 Two ports of R `moderndive`'s ggplot helpers, both dual-engine:
 
-```python
+```{code-cell} python
 from moderndive import gg_parallel_slopes, gg_categorical_model
 
 evals = md.load_evals()
@@ -84,7 +92,7 @@ For the plotnine engine you can also drop the parallel-slopes lines onto your ow
 distribution per coefficient. Pair it with `visualize_fit` and **per-facet**
 shading:
 
-```python
+```{code-cell} python
 from moderndive import specify
 from moderndive.infer.viz import visualize_fit
 from moderndive import shade_confidence_interval, shade_p_value

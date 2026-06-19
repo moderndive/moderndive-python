@@ -11,6 +11,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -251,14 +252,18 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="theory-based-inference">
+          <div class="cell tag_remove-input docutils container">
+</div>
+<section id="theory-based-inference">
 <h1>Theory-based inference<a class="headerlink" href="#theory-based-inference" title="Link to this heading">¶</a></h1>
 <p>Alongside the simulation grammar, <code class="docutils literal notranslate"><span class="pre">moderndive</span></code> ships tidy wrappers for the
 classical (formula-based) tests and a way to draw the theoretical distributions —
 mirroring R <code class="docutils literal notranslate"><span class="pre">infer</span></code>’s <code class="docutils literal notranslate"><span class="pre">t_test</span></code>, <code class="docutils literal notranslate"><span class="pre">prop_test</span></code>, <code class="docutils literal notranslate"><span class="pre">chisq_test</span></code>, and <code class="docutils literal notranslate"><span class="pre">assume()</span></code>.</p>
 <section id="one-line-tests">
 <h2>One-line tests<a class="headerlink" href="#one-line-tests" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">t_test</span><span class="p">,</span> <span class="n">prop_test</span><span class="p">,</span> <span class="n">chisq_test</span>
 
 <span class="c1"># One-sample t-test</span>
@@ -279,13 +284,26 @@ mirroring R <code class="docutils literal notranslate"><span class="pre">infer</
 <span class="c1"># → statistic, chisq_df, p_value</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 3)</small><table border="1" class="dataframe"><thead><tr><th>statistic</th><th>chisq_df</th><th>p_value</th></tr><tr><td>f64</td><td>i64</td><td>f64</td></tr></thead><tbody><tr><td>0.105042</td><td>1</td><td>0.745861</td></tr></tbody></table></div></div></div>
+</div>
 <p><code class="docutils literal notranslate"><span class="pre">t_stat</span></code> and <code class="docutils literal notranslate"><span class="pre">chisq_stat</span></code> return just the test statistic if that’s all you need.</p>
 </section>
 <section id="theoretical-distributions-with-assume">
 <h2>Theoretical distributions with <code class="docutils literal notranslate"><span class="pre">assume()</span></code><a class="headerlink" href="#theoretical-distributions-with-assume" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">assume()</span></code> defines a theoretical sampling distribution you can visualize and use
 for p-values without simulating:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">assume</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">assume</span>
 
 <span class="c1"># t-distribution with 10 degrees of freedom</span>
 <span class="n">t_dist</span> <span class="o">=</span> <span class="n">assume</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
@@ -296,6 +314,12 @@ for p-values without simulating:</p>
 <span class="n">t_dist</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">engine</span><span class="o">=</span><span class="s2">&quot;plotnine&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/0cbf7366b5b2086def6aceec9bf8e8320703e5fcdb1857544f8d601b5ef8edd9.png"><img alt="../_images/0cbf7366b5b2086def6aceec9bf8e8320703e5fcdb1857544f8d601b5ef8edd9.png" height="480" src="../_images/0cbf7366b5b2086def6aceec9bf8e8320703e5fcdb1857544f8d601b5ef8edd9.png" width="640" />
+</a>
+</div>
+</div>
 <p>Supported distributions: <code class="docutils literal notranslate"><span class="pre">&quot;t&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;z&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;F&quot;</span></code> (pass <code class="docutils literal notranslate"><span class="pre">df=(df1,</span> <span class="pre">df2)</span></code>), and
 <code class="docutils literal notranslate"><span class="pre">&quot;Chisq&quot;</span></code>.</p>
 </section>
@@ -303,7 +327,9 @@ for p-values without simulating:</p>
 <h2>Overlaying theory on a simulation<a class="headerlink" href="#overlaying-theory-on-a-simulation" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">visualize(...,</span> <span class="pre">method=...)</span></code> can show the simulation histogram, the theoretical
 curve, or both:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">visualize</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">visualize</span>
 
 <span class="n">boot</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">specify</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">)</span>
@@ -315,14 +341,28 @@ curve, or both:</p>
 <span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;theoretical&quot;</span><span class="p">)</span>   <span class="c1"># just the curve</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/b366a9ba76d2135e3480197df1efa63a52fcc6c3aade26c457542b5eae9607b8.png" src="../_images/b366a9ba76d2135e3480197df1efa63a52fcc6c3aade26c457542b5eae9607b8.png" />
+</div>
+</div>
 </section>
 <section id="population-standard-deviation">
 <h2>Population standard deviation<a class="headerlink" href="#population-standard-deviation" title="Link to this heading">¶</a></h2>
 <p>A small helper that divides by <code class="docutils literal notranslate"><span class="pre">n</span></code> (not <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">−</span> <span class="pre">1</span></code>):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">pop_sd</span>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">pop_sd</span>
 
 <span class="n">pop_sd</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>   <span class="c1"># → 1.414…</span>
 </pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.4142135623730951
+</pre></div>
+</div>
+</div>
 </div>
 </section>
 </section>

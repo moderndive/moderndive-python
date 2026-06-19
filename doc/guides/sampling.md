@@ -1,3 +1,21 @@
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+kernelspec:
+  display_name: Python 3
+  name: python3
+---
+
+```{code-cell} python
+:tags: [remove-input]
+import matplotlib
+matplotlib.use("Agg")
+import plotly.io as pio
+pio.renderers.default = "png"
+```
+
 # Sampling
 
 Sampling activities (the "bowl" of balls, tactile samples) are how ModernDive
@@ -7,7 +25,7 @@ and stacks them with a `replicate` column — the analog of R
 
 ## The bowl
 
-```python
+```{code-cell} python
 import moderndive as md
 import polars as pl
 
@@ -17,7 +35,7 @@ bowl.head()
 
 ## One virtual sample
 
-```python
+```{code-cell} python
 from moderndive import rep_slice_sample
 
 sample = rep_slice_sample(bowl, n=50, seed=1)
@@ -29,7 +47,7 @@ sample.select((pl.col("color") == "red").mean().alias("prop_red"))
 
 Take 1000 samples of size 50 and compute the proportion red in each:
 
-```python
+```{code-cell} python
 samples = rep_slice_sample(bowl, n=50, reps=1000, seed=1)
 
 prop_red = (
@@ -49,7 +67,7 @@ one with the inference pipeline instead).
 `rep_slice_sample` samples **without** replacement by default (like dealing from a
 deck). Pass `replace=True` for bootstrap-style resampling:
 
-```python
+```{code-cell} python
 rep_slice_sample(bowl, n=50, reps=1000, replace=True, seed=1)
 ```
 
@@ -57,7 +75,7 @@ rep_slice_sample(bowl, n=50, reps=1000, replace=True, seed=1)
 
 The hand-collected counterparts are bundled too:
 
-```python
+```{code-cell} python
 md.load_tactile_prop_red()   # 33 groups' samples of 50 balls
 ```
 

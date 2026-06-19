@@ -25,8 +25,8 @@ derived tables). Each loads with `load_<name>()` and returns a polars DataFrame.
 import moderndive as md
 
 md.available_datasets()          # sorted list of every dataset name
-md.load_dataset("promotions")    # load by name (string)
-md.load_promotions()             # or via the generated loader
+md.load_dataset("pennies")       # load by name (string)
+md.load_pennies()                # or via the generated loader
 ```
 
 ## By topic
@@ -37,10 +37,9 @@ md.load_promotions()             # or via the generated loader
   `pennies`, `pennies_sample`, `pennies_resamples`, `orig_pennies_sample`
 
 **Hypothesis testing & CIs**
-: `promotions`, `promotions_shuffled`, `mythbusters_yawn`, `movies_sample`,
-  `spotify_by_genre`, `spotify_52_original`, `spotify_52_shuffled`,
-  `spotify_metal_deephouse`, `offshore`, `age_at_marriage`, `zinc_tidy`,
-  `cle_sac`, `gss`
+: `mythbusters_yawn`, `movies_sample`, `spotify_by_genre`, `spotify_52_original`,
+  `spotify_52_shuffled`, `spotify_metal_deephouse`, `offshore`, `age_at_marriage`,
+  `zinc_tidy`, `cle_sac`, `gss`
 
 **Regression**
 : `evals`, `saratoga_houses`, `house_prices`, `coffee_quality`, `coffee_ratings`,

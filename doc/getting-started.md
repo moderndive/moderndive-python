@@ -37,8 +37,8 @@ All datasets ship with the package and load with `load_<name>()`:
 ```{code-cell} python
 import moderndive as md
 
-promotions = md.load_promotions()
-promotions.head()
+yawn = md.load_mythbusters_yawn()
+yawn.head()
 ```
 
 
@@ -64,22 +64,22 @@ sentence:
 ```{code-cell} python
 from moderndive import specify, observe, get_p_value
 
-# 1. The observed statistic
+# 1. The observed statistic: do "seeded" people yawn more than the control group?
 obs = observe(
-    promotions, formula="decision ~ gender", success="promoted",
-    stat="diff in props", order=("male", "female"),
+    yawn, formula="yawn ~ group", success="yes",
+    stat="diff in props", order=("seed", "control"),
 )
 
 # 2. A null distribution: specify → hypothesize → generate → calculate
 null = (
-    specify(promotions, formula="decision ~ gender", success="promoted")
+    specify(yawn, formula="yawn ~ group", success="yes")
     .hypothesize(null="independence")
     .generate(reps=1000, type="permute", seed=42)
-    .calculate(stat="diff in props", order=("male", "female"))
+    .calculate(stat="diff in props", order=("seed", "control"))
 )
 
 # 3. Summarize
-get_p_value(null, obs_stat=obs, direction="right")   # ≈ 0.025
+get_p_value(null, obs_stat=obs, direction="right")
 ```
 
 Each verb has a focused guide: {doc}`guides/sampling`,

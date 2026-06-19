@@ -41,14 +41,13 @@ methods on the pipeline where applicable:
 > `t_test`, `prop_test`, `chisq_test`, `t_stat`, `chisq_stat`,
 > `rep_sample_n`/`rep_slice_sample`, `get_regression_table`,
 > `get_regression_points`, `get_regression_summaries`, `get_correlation`,
-> `pop_sd`, `tidy_summary`, `geom_parallel_slopes`.
+> `pop_sd`, `tidy_summary`, `geom_parallel_slopes`, `geom_categorical_model`.
 
 ## What's actually different
 
 | R | Python | Why |
 | --- | --- | --- |
 | `x %>% f(...)` / `x \|> f(...)` | `x.f(...)` (method chaining) | no pipe operator in Python |
-| `geom_categorical_model()` | `gg_categorical_model(engine=...)` | renamed to match `gg_parallel_slopes` |
 | ggplot2 `geom_*` layers | plotly by default; `engine="plotnine"` for ggplot-style | dual-engine plotting |
 | `lm(y ~ x, data)` object | a fitted **statsmodels** model: `smf.ols("y ~ x", data=df.to_pandas()).fit()` | regression backend |
 | `get_correlation(df, y ~ x)` | `get_correlation(df, "y ~ x")` *or* `get_correlation(df, x="x", y="y")` | formula passed as a string |
@@ -64,4 +63,4 @@ methods on the pipeline where applicable:
 ## Same datasets
 
 Most R `moderndive`/`infer` datasets are bundled here under the same name —
-`load_pennies()`, `load_promotions()`, `load_gss()`, etc. See {doc}`datasets`.
+`load_pennies()`, `load_mythbusters_yawn()`, `load_gss()`, etc. See {doc}`datasets`.

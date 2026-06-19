@@ -292,7 +292,7 @@ methods on the pipeline where applicable:</p>
 <code class="docutils literal notranslate"><span class="pre">t_test</span></code>, <code class="docutils literal notranslate"><span class="pre">prop_test</span></code>, <code class="docutils literal notranslate"><span class="pre">chisq_test</span></code>, <code class="docutils literal notranslate"><span class="pre">t_stat</span></code>, <code class="docutils literal notranslate"><span class="pre">chisq_stat</span></code>,
 <code class="docutils literal notranslate"><span class="pre">rep_sample_n</span></code>/<code class="docutils literal notranslate"><span class="pre">rep_slice_sample</span></code>, <code class="docutils literal notranslate"><span class="pre">get_regression_table</span></code>,
 <code class="docutils literal notranslate"><span class="pre">get_regression_points</span></code>, <code class="docutils literal notranslate"><span class="pre">get_regression_summaries</span></code>, <code class="docutils literal notranslate"><span class="pre">get_correlation</span></code>,
-<code class="docutils literal notranslate"><span class="pre">pop_sd</span></code>, <code class="docutils literal notranslate"><span class="pre">tidy_summary</span></code>, <code class="docutils literal notranslate"><span class="pre">geom_parallel_slopes</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">pop_sd</span></code>, <code class="docutils literal notranslate"><span class="pre">tidy_summary</span></code>, <code class="docutils literal notranslate"><span class="pre">geom_parallel_slopes</span></code>, <code class="docutils literal notranslate"><span class="pre">geom_categorical_model</span></code>.</p>
 </div></blockquote>
 </section>
 <section id="what-s-actually-different">
@@ -310,19 +310,15 @@ methods on the pipeline where applicable:</p>
 <td><p><code class="docutils literal notranslate"><span class="pre">x.f(...)</span></code> (method chaining)</p></td>
 <td><p>no pipe operator in Python</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">geom_categorical_model()</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">gg_categorical_model(engine=...)</span></code></p></td>
-<td><p>renamed to match <code class="docutils literal notranslate"><span class="pre">gg_parallel_slopes</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p>ggplot2 <code class="docutils literal notranslate"><span class="pre">geom_*</span></code> layers</p></td>
+<tr class="row-odd"><td><p>ggplot2 <code class="docutils literal notranslate"><span class="pre">geom_*</span></code> layers</p></td>
 <td><p>plotly by default; <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> for ggplot-style</p></td>
 <td><p>dual-engine plotting</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lm(y</span> <span class="pre">~</span> <span class="pre">x,</span> <span class="pre">data)</span></code> object</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lm(y</span> <span class="pre">~</span> <span class="pre">x,</span> <span class="pre">data)</span></code> object</p></td>
 <td><p>a fitted <strong>statsmodels</strong> model: <code class="docutils literal notranslate"><span class="pre">smf.ols(&quot;y</span> <span class="pre">~</span> <span class="pre">x&quot;,</span> <span class="pre">data=df.to_pandas()).fit()</span></code></p></td>
 <td><p>regression backend</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">get_correlation(df,</span> <span class="pre">y</span> <span class="pre">~</span> <span class="pre">x)</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">get_correlation(df,</span> <span class="pre">y</span> <span class="pre">~</span> <span class="pre">x)</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">get_correlation(df,</span> <span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">x&quot;)</span></code> <em>or</em> <code class="docutils literal notranslate"><span class="pre">get_correlation(df,</span> <span class="pre">x=&quot;x&quot;,</span> <span class="pre">y=&quot;y&quot;)</span></code></p></td>
 <td><p>formula passed as a string</p></td>
 </tr>
@@ -343,7 +339,7 @@ needs pandas.</p></li>
 <section id="same-datasets">
 <h2>Same datasets<a class="headerlink" href="#same-datasets" title="Link to this heading">¶</a></h2>
 <p>Most R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code>/<code class="docutils literal notranslate"><span class="pre">infer</span></code> datasets are bundled here under the same name —
-<code class="docutils literal notranslate"><span class="pre">load_pennies()</span></code>, <code class="docutils literal notranslate"><span class="pre">load_promotions()</span></code>, <code class="docutils literal notranslate"><span class="pre">load_gss()</span></code>, etc. See <a class="reference internal" href="datasets.html"><span class="doc">Datasets</span></a>.</p>
+<code class="docutils literal notranslate"><span class="pre">load_pennies()</span></code>, <code class="docutils literal notranslate"><span class="pre">load_mythbusters_yawn()</span></code>, <code class="docutils literal notranslate"><span class="pre">load_gss()</span></code>, etc. See <a class="reference internal" href="datasets.html"><span class="doc">Datasets</span></a>.</p>
 </section>
 </section>
 

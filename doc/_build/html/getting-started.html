@@ -273,8 +273,8 @@ accepts pandas DataFrames as input.</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 
-<span class="n">promotions</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_promotions</span><span class="p">()</span>
-<span class="n">promotions</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">yawn</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_mythbusters_yawn</span><span class="p">()</span>
+<span class="n">yawn</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -286,7 +286,7 @@ accepts pandas DataFrames as input.</p>
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (5, 3)</small><table border="1" class="dataframe"><thead><tr><th>id</th><th>decision</th><th>gender</th></tr><tr><td>i64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>1</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>2</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>3</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>4</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr><tr><td>5</td><td>&quot;promoted&quot;</td><td>&quot;male&quot;</td></tr></tbody></table></div></div></div>
+<small>shape: (5, 3)</small><table border="1" class="dataframe"><thead><tr><th>subj</th><th>group</th><th>yawn</th></tr><tr><td>i64</td><td>str</td><td>str</td></tr></thead><tbody><tr><td>1</td><td>&quot;seed&quot;</td><td>&quot;yes&quot;</td></tr><tr><td>2</td><td>&quot;control&quot;</td><td>&quot;yes&quot;</td></tr><tr><td>3</td><td>&quot;seed&quot;</td><td>&quot;no&quot;</td></tr><tr><td>4</td><td>&quot;seed&quot;</td><td>&quot;yes&quot;</td></tr><tr><td>5</td><td>&quot;seed&quot;</td><td>&quot;no&quot;</td></tr></tbody></table></div></div></div>
 </div>
 <p>List everything that’s available with <code class="docutils literal notranslate"><span class="pre">md.available_datasets()</span></code> (58 datasets), and
 see <a class="reference internal" href="datasets.html"><span class="doc">Datasets</span></a> for a thematic tour.</p>
@@ -322,22 +322,22 @@ sentence:</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">observe</span><span class="p">,</span> <span class="n">get_p_value</span>
 
-<span class="c1"># 1. The observed statistic</span>
+<span class="c1"># 1. The observed statistic: do &quot;seeded&quot; people yawn more than the control group?</span>
 <span class="n">obs</span> <span class="o">=</span> <span class="n">observe</span><span class="p">(</span>
-    <span class="n">promotions</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;decision ~ gender&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;promoted&quot;</span><span class="p">,</span>
-    <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;male&quot;</span><span class="p">,</span> <span class="s2">&quot;female&quot;</span><span class="p">),</span>
+    <span class="n">yawn</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;yawn ~ group&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">,</span>
+    <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="s2">&quot;control&quot;</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="c1"># 2. A null distribution: specify → hypothesize → generate → calculate</span>
 <span class="n">null</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">promotions</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;decision ~ gender&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;promoted&quot;</span><span class="p">)</span>
+    <span class="n">specify</span><span class="p">(</span><span class="n">yawn</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;yawn ~ group&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;independence&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;male&quot;</span><span class="p">,</span> <span class="s2">&quot;female&quot;</span><span class="p">))</span>
+    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="s2">&quot;control&quot;</span><span class="p">))</span>
 <span class="p">)</span>
 
 <span class="c1"># 3. Summarize</span>
-<span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>   <span class="c1"># ≈ 0.025</span>
+<span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -349,7 +349,7 @@ sentence:</p>
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.025</td></tr></tbody></table></div></div></div>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.512</td></tr></tbody></table></div></div></div>
 </div>
 <p>Each verb has a focused guide: <a class="reference internal" href="guides/sampling.html"><span class="doc">Sampling</span></a>,
 <a class="reference internal" href="guides/confidence-intervals.html"><span class="doc">Bootstrapping &amp; confidence intervals</span></a>, and <a class="reference internal" href="guides/hypothesis-testing.html"><span class="doc">Hypothesis testing</span></a>.</p>
@@ -371,7 +371,7 @@ grammar-of-graphics output. The composition syntax is identical:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<a class="reference internal image-reference" href="_images/679346fce431777e0d221fb96d0d46c94c46266531703754ae8cf2b7aea89916.png"><img alt="_images/679346fce431777e0d221fb96d0d46c94c46266531703754ae8cf2b7aea89916.png" height="480" src="_images/679346fce431777e0d221fb96d0d46c94c46266531703754ae8cf2b7aea89916.png" width="640" />
+<a class="reference internal image-reference" href="_images/a716ffc5702927ebba6a9176ddba190577d8d13ed180fbd9a689d9d06129dac6.png"><img alt="_images/a716ffc5702927ebba6a9176ddba190577d8d13ed180fbd9a689d9d06129dac6.png" height="480" src="_images/a716ffc5702927ebba6a9176ddba190577d8d13ed180fbd9a689d9d06129dac6.png" width="640" />
 </a>
 </div>
 </div>

@@ -24,30 +24,30 @@ from it.
 
 ## Two groups: a permutation test
 
-The classic "promotions" experiment — does the (perceived) gender on a résumé
-change the promotion rate?
+Are tracks more likely to be popular in *metal* than in *deep house*? Compare the
+two genres' "popular" rates, then permute the genre labels to build the null.
 
 ```{code-cell} python
 import moderndive as md
 from moderndive import specify, observe, get_p_value, visualize, shade_p_value
 
-promotions = md.load_promotions()
+spotify = md.load_spotify_metal_deephouse()
 
-# Observed difference in promotion proportions, male − female
+# Observed difference in "popular" proportions, metal − deep-house
 obs = observe(
-    promotions, formula="decision ~ gender", success="promoted",
-    stat="diff in props", order=("male", "female"),
-)   # ≈ 0.292
-
-# Null: gender is independent of the decision → permute the labels
-null = (
-    specify(promotions, formula="decision ~ gender", success="promoted")
-    .hypothesize(null="independence")
-    .generate(reps=1000, type="permute", seed=42)
-    .calculate(stat="diff in props", order=("male", "female"))
+    spotify, formula="popular_or_not ~ track_genre", success="popular",
+    stat="diff in props", order=("metal", "deep-house"),
 )
 
-get_p_value(null, obs_stat=obs, direction="right")   # ≈ 0.025
+# Null: genre is independent of popularity → permute the labels
+null = (
+    specify(spotify, formula="popular_or_not ~ track_genre", success="popular")
+    .hypothesize(null="independence")
+    .generate(reps=1000, type="permute", seed=76)
+    .calculate(stat="diff in props", order=("metal", "deep-house"))
+)
+
+get_p_value(null, obs_stat=obs, direction="right")
 ```
 
 ## Shade the p-value
@@ -97,8 +97,33 @@ null_p = (
 `calculate(stat=...)` supports the full infer vocabulary: `"mean"`, `"median"`,
 `"sum"`, `"sd"`, `"prop"`, `"count"`, `"diff in means"`, `"diff in medians"`,
 `"diff in props"`, `"ratio of means"`, `"ratio of props"`, `"odds ratio"`,
-`"slope"`, `"correlation"`, `"t"`, `"z"`, `"F"`, `"Chisq"`, plus any custom
-callable `stat(response, explanatory) -> float`.
+`"slope"`, `"correlation"`, `"t"`, `"z"`, `"F"`, `"Chisq"`.
+
+## Custom test statistics
+
+Beyond those strings, `stat=` accepts **any function** that takes the response
+(and explanatory) arrays and returns a single number — so you can infer about a
+statistic that isn't built in. Here we bootstrap the interquartile range of
+almond weights and read off a 95% interval:
+
+```{code-cell} python
+import numpy as np
+from moderndive import get_confidence_interval
+
+def iqr(response, explanatory):
+    return float(np.percentile(response, 75) - np.percentile(response, 25))
+
+boot_iqr = (
+    md.load_almonds_sample_100()
+    .specify(response="weight")
+    .generate(reps=1000, type="bootstrap", seed=1)
+    .calculate(stat=iqr)
+)
+get_confidence_interval(boot_iqr, level=0.95, type="percentile")
+```
+
+The function receives `(response, explanatory)` as numpy arrays (`explanatory` is
+`None` for a single-variable `specify`), and must return a scalar.
 
 ```{seealso}
 Prefer a one-line classical test? See the tidy wrappers in {doc}`theory-based`

@@ -261,30 +261,30 @@
 from it.</p>
 <section id="two-groups-a-permutation-test">
 <h2>Two groups: a permutation test<a class="headerlink" href="#two-groups-a-permutation-test" title="Link to this heading">¶</a></h2>
-<p>The classic “promotions” experiment — does the (perceived) gender on a résumé
-change the promotion rate?</p>
+<p>Are tracks more likely to be popular in <em>metal</em> than in <em>deep house</em>? Compare the
+two genres’ “popular” rates, then permute the genre labels to build the null.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">observe</span><span class="p">,</span> <span class="n">get_p_value</span><span class="p">,</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_p_value</span>
 
-<span class="n">promotions</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_promotions</span><span class="p">()</span>
+<span class="n">spotify</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_spotify_metal_deephouse</span><span class="p">()</span>
 
-<span class="c1"># Observed difference in promotion proportions, male − female</span>
+<span class="c1"># Observed difference in &quot;popular&quot; proportions, metal − deep-house</span>
 <span class="n">obs</span> <span class="o">=</span> <span class="n">observe</span><span class="p">(</span>
-    <span class="n">promotions</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;decision ~ gender&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;promoted&quot;</span><span class="p">,</span>
-    <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;male&quot;</span><span class="p">,</span> <span class="s2">&quot;female&quot;</span><span class="p">),</span>
-<span class="p">)</span>   <span class="c1"># ≈ 0.292</span>
-
-<span class="c1"># Null: gender is independent of the decision → permute the labels</span>
-<span class="n">null</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">promotions</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;decision ~ gender&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;promoted&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;independence&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;male&quot;</span><span class="p">,</span> <span class="s2">&quot;female&quot;</span><span class="p">))</span>
+    <span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">,</span>
+    <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">),</span>
 <span class="p">)</span>
 
-<span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>   <span class="c1"># ≈ 0.025</span>
+<span class="c1"># Null: genre is independent of popularity → permute the labels</span>
+<span class="n">null</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">specify</span><span class="p">(</span><span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;independence&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">76</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">))</span>
+<span class="p">)</span>
+
+<span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -296,7 +296,7 @@ change the promotion rate?</p>
   white-space: pre-wrap;
 }
 </style>
-<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.025</td></tr></tbody></table></div></div></div>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.075</td></tr></tbody></table></div></div></div>
 </div>
 </section>
 <section id="shade-the-p-value">
@@ -308,7 +308,7 @@ change the promotion rate?</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/446856f7a7a4b3ae8beb128934fc4936f3afde3e478c71e657c8305dcee97764.png" src="../_images/446856f7a7a4b3ae8beb128934fc4936f3afde3e478c71e657c8305dcee97764.png" />
+<img alt="../_images/57bcfc0de676a5294afac27836489f257436cfdc208aba5a2907c8b2aa95d9f8.png" src="../_images/57bcfc0de676a5294afac27836489f257436cfdc208aba5a2907c8b2aa95d9f8.png" />
 </div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">direction</span></code> is one of <code class="docutils literal notranslate"><span class="pre">&quot;right&quot;</span></code>/<code class="docutils literal notranslate"><span class="pre">&quot;greater&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;left&quot;</span></code>/<code class="docutils literal notranslate"><span class="pre">&quot;less&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;two-sided&quot;</span></code>.
@@ -366,8 +366,44 @@ The two-sided shading mirrors the observed statistic about 0.</p>
 <p><code class="docutils literal notranslate"><span class="pre">calculate(stat=...)</span></code> supports the full infer vocabulary: <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;median&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;sum&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;sd&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;prop&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;count&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;diff</span> <span class="pre">in</span> <span class="pre">means&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;diff</span> <span class="pre">in</span> <span class="pre">medians&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;diff</span> <span class="pre">in</span> <span class="pre">props&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ratio</span> <span class="pre">of</span> <span class="pre">means&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ratio</span> <span class="pre">of</span> <span class="pre">props&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;odds</span> <span class="pre">ratio&quot;</span></code>,
-<code class="docutils literal notranslate"><span class="pre">&quot;slope&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;correlation&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;t&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;z&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;F&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Chisq&quot;</span></code>, plus any custom
-callable <code class="docutils literal notranslate"><span class="pre">stat(response,</span> <span class="pre">explanatory)</span> <span class="pre">-&gt;</span> <span class="pre">float</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">&quot;slope&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;correlation&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;t&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;z&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;F&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Chisq&quot;</span></code>.</p>
+</section>
+<section id="custom-test-statistics">
+<h2>Custom test statistics<a class="headerlink" href="#custom-test-statistics" title="Link to this heading">¶</a></h2>
+<p>Beyond those strings, <code class="docutils literal notranslate"><span class="pre">stat=</span></code> accepts <strong>any function</strong> that takes the response
+(and explanatory) arrays and returns a single number — so you can infer about a
+statistic that isn’t built in. Here we bootstrap the interquartile range of
+almond weights and read off a 95% interval:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_confidence_interval</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">iqr</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">explanatory</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="mi">25</span><span class="p">))</span>
+
+<span class="n">boot_iqr</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">md</span><span class="o">.</span><span class="n">load_almonds_sample_100</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="n">iqr</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot_iqr</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>0.4</td><td>0.625</td></tr></tbody></table></div></div></div>
+</div>
+<p>The function receives <code class="docutils literal notranslate"><span class="pre">(response,</span> <span class="pre">explanatory)</span></code> as numpy arrays (<code class="docutils literal notranslate"><span class="pre">explanatory</span></code> is
+<code class="docutils literal notranslate"><span class="pre">None</span></code> for a single-variable <code class="docutils literal notranslate"><span class="pre">specify</span></code>), and must return a scalar.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>Prefer a one-line classical test? See the tidy wrappers in <a class="reference internal" href="theory-based.html"><span class="doc">Theory-based inference</span></a>
@@ -436,6 +472,7 @@ callable <code class="docutils literal notranslate"><span class="pre">stat(respo
 <li><a class="reference internal" href="#shade-the-p-value">Shade the p-value</a></li>
 <li><a class="reference internal" href="#one-mean-one-proportion-point-null">One mean / one proportion (point null)</a></li>
 <li><a class="reference internal" href="#available-statistics">Available statistics</a></li>
+<li><a class="reference internal" href="#custom-test-statistics">Custom test statistics</a></li>
 </ul>
 </li>
 </ul>

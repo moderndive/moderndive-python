@@ -4,7 +4,7 @@
 
 [![Tests](https://github.com/moderndive/moderndive-python/actions/workflows/tests.yml/badge.svg)](https://github.com/moderndive/moderndive-python/actions/workflows/tests.yml)
 [![codecov](https://codecov.io/gh/moderndive/moderndive-python/branch/main/graph/badge.svg)](https://codecov.io/gh/moderndive/moderndive-python)
-[![Docs](https://readthedocs.org/projects/moderndive-python/badge/?version=latest)](https://moderndive-python.readthedocs.io/en/latest/)
+[![Docs](https://readthedocs.org/projects/moderndive/badge/?version=latest)](https://moderndive.readthedocs.io/en/latest/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 The Python companion package for **ModernDive: Statistical Inference via Data

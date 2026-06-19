@@ -164,3 +164,7 @@ def gg_categorical_model(data, response: str, explanatory: str, *, engine: str =
         + labs(x=explanatory, y=response, title="Categorical model")
         + theme_light()
     )
+
+
+# R-parity alias: R's helper is named geom_categorical_model(); expose both names.
+geom_categorical_model = gg_categorical_model

@@ -49,6 +49,7 @@ from .modeling import (
     tidy_summary,
 )
 from .plots import (
+    geom_categorical_model,
     geom_parallel_slopes,
     gg_categorical_model,
     gg_parallel_slopes,
@@ -87,6 +88,7 @@ __all__ = [
     "gg_parallel_slopes",
     "geom_parallel_slopes",
     "gg_categorical_model",
+    "geom_categorical_model",
     "rep_sample_n",
     "rep_slice_sample",
     "theory",

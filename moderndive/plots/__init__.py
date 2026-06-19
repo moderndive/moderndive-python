@@ -12,13 +12,19 @@ from __future__ import annotations
 
 import polars as pl
 
-from .models import geom_parallel_slopes, gg_categorical_model, gg_parallel_slopes
+from .models import (
+    geom_categorical_model,
+    geom_parallel_slopes,
+    gg_categorical_model,
+    gg_parallel_slopes,
+)
 
 __all__ = [
     "pairplot",
     "gg_parallel_slopes",
     "geom_parallel_slopes",
     "gg_categorical_model",
+    "geom_categorical_model",
 ]
 
 

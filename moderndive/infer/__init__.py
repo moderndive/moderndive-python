@@ -16,6 +16,7 @@ from .core import (
     ObservedStatistic,
     Specification,
     observe,
+    register_dataframe_accessor,
     specify,
 )
 from .intervals import get_confidence_interval
@@ -23,6 +24,10 @@ from .pvalue import get_p_value
 from .theoretical import TheoreticalDistribution, assume
 from .viz import shade_confidence_interval, shade_p_value, visualize
 from .wrappers import chisq_stat, chisq_test, prop_test, t_stat, t_test
+
+# Attach `.specify()` to polars/pandas DataFrames so `df.specify(...)` works,
+# mirroring R's `df %>% specify(...)`.
+register_dataframe_accessor()
 
 # infer-parity aliases (British spellings + short forms).
 # (`hypothesise`/`visualise` also exist as methods on Specification/Distribution.)

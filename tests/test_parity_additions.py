@@ -133,6 +133,51 @@ def test_pairplot_plotly_engine_and_bad_engine():
         md.pairplot(coffee, engine="bogus")
 
 
+def test_geom_categorical_model_is_alias():
+    ev = md.load_evals()
+    assert md.geom_categorical_model is md.gg_categorical_model
+    assert isinstance(md.geom_categorical_model(ev, "score", "rank", engine="plotly"), go.Figure)
+    assert isinstance(
+        md.geom_categorical_model(ev, "score", "rank", engine="plotnine"), ggplot
+    )
+
+
+# ============================ DataFrame .specify() accessor ===============
+
+
+def test_dataframe_specify_accessor_polars_and_pandas():
+    import pandas as pd
+
+    # polars: df.specify(...) mirrors specify(df, ...) and chains the pipeline
+    dist = (
+        md.load_pennies()
+        .specify(response="year")
+        .generate(reps=50, type="bootstrap", seed=1)
+        .calculate(stat="mean")
+    )
+    assert dist.data.height == 50
+    # formula + success via the method
+    obs = (
+        md.load_mythbusters_yawn()
+        .specify(formula="yawn ~ group", success="yes")
+        .calculate(stat="diff in props", order=("seed", "control"))
+    )
+    assert isinstance(float(obs), float)
+    # pandas DataFrames gain the same method
+    pdf = pd.DataFrame({"x": [1.0, 2, 3, 4]})
+    assert float(pdf.specify(response="x").calculate(stat="mean")) == pytest.approx(2.5)
+
+
+def test_register_dataframe_accessor_is_idempotent():
+    import polars as pl
+
+    from moderndive.infer.core import register_dataframe_accessor
+
+    before = pl.DataFrame.specify
+    register_dataframe_accessor()  # second call must not overwrite the method
+    assert pl.DataFrame.specify is before
+
+
 # ============================ WS4: infer gaps ============================
 
 

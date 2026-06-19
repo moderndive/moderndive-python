@@ -14,6 +14,8 @@ Public API (mirrors the R ``moderndive`` + ``infer`` packages):
 
 from __future__ import annotations
 
+import sys
+
 from . import data as data
 from . import theory as theory
 from .correlation import get_correlation, pop_sd
@@ -97,3 +99,38 @@ __all__ = [
     "data",
     *_data_all,
 ]
+
+
+def _apply_pyodide_polars_shims():
+    """Patch polars for Pyodide's WebAssembly build.
+
+    Pyodide's ``polars`` build has no Parquet IO and its Arrow/pandas export
+    panics, which breaks the dataset loaders (``load_*``) and any ``.to_pandas()``
+    call (e.g. feeding a plotnine plot). Route Parquet reads through ``pyarrow``
+    and ``to_pandas`` through a dict round-trip so interactive in-browser cells
+    work. Applied automatically under Pyodide; a no-op on a normal install.
+    """
+    import polars as pl
+
+    def _read_parquet(source, *args, **kwargs):
+        import pyarrow.parquet as pq
+
+        return pl.from_arrow(pq.read_table(source))
+
+    def _scan_parquet(source, *args, **kwargs):
+        import pyarrow.parquet as pq
+
+        return pl.from_arrow(pq.read_table(source)).lazy()
+
+    def _to_pandas(self, *args, **kwargs):
+        import pandas as pd
+
+        return pd.DataFrame(self.to_dict(as_series=False))
+
+    pl.read_parquet = _read_parquet
+    pl.scan_parquet = _scan_parquet
+    pl.DataFrame.to_pandas = _to_pandas
+
+
+if sys.platform == "emscripten":  # pragma: no cover - only runs under Pyodide
+    _apply_pyodide_polars_shims()

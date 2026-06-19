@@ -10,6 +10,7 @@ from plotnine import (
     facet_wrap,
     geom_histogram,
     geom_line,
+    geom_rect,
     geom_vline,
     ggplot,
     labs,
@@ -102,3 +103,69 @@ def shade_ci_layers(spec) -> list:
         geom_vline(xintercept=spec.lower, color=color, size=1.0),
         geom_vline(xintercept=spec.upper, color=color, size=1.0),
     ]
+
+
+def _facet_rect(rows, fill: str):
+    """A geom_rect keyed by the ``term`` facet column, spanning each panel's height."""
+    return geom_rect(
+        aes(xmin="xmin", xmax="xmax", group="term"),
+        data=pd.DataFrame(rows),
+        ymin=-C._INF,
+        ymax=C._INF,
+        alpha=0.3,
+        fill=fill,
+        inherit_aes=False,
+    )
+
+
+def _facet_vlines(rows, color: str, dashed: bool):
+    extra = {"linetype": "dashed"} if dashed else {}
+    return geom_vline(
+        aes(xintercept="x", group="term"),
+        data=pd.DataFrame(rows),
+        color=color,
+        size=1.0,
+        inherit_aes=False,
+        **extra,
+    )
+
+
+def apply_fit_shade_gg(gg, spec, terms):
+    """Per-facet shading for a faceted fit plot: each ``term`` panel shaded on its own.
+
+    Shading data carries a ``term`` column matching ``facet_wrap("term")`` so each
+    layer lands only in its panel. ``inherit_aes=False`` keeps the histogram's
+    ``x="estimate"`` mapping from leaking into these layers.
+    """
+    per = dict(spec.per_term)
+    layers = []
+    if spec.kind == "p_value":
+        solid, dashed, rects = [], [], []
+        for term, obs in per.items():
+            if term not in terms:
+                continue
+            vlines, term_rects = C.pvalue_regions(obs, spec.direction)
+            for x, is_dashed in vlines:
+                (dashed if is_dashed else solid).append({"term": term, "x": x})
+            for xmin, xmax in term_rects:
+                rects.append({"term": term, "xmin": xmin, "xmax": xmax})
+        if solid:
+            layers.append(_facet_vlines(solid, C._OBS_COLOR, dashed=False))
+        if dashed:
+            layers.append(_facet_vlines(dashed, C._OBS_COLOR, dashed=True))
+        if rects:
+            layers.append(_facet_rect(rects, C._OBS_COLOR))
+    else:
+        color = spec.color or C._SHADE_COLOR
+        rects, edges = [], []
+        for term, (lower, upper) in per.items():
+            if term not in terms:
+                continue
+            rects.append({"term": term, "xmin": lower, "xmax": upper})
+            edges.append({"term": term, "x": lower})
+            edges.append({"term": term, "x": upper})
+        if rects:
+            layers.append(_facet_rect(rects, color))
+        if edges:
+            layers.append(_facet_vlines(edges, color, dashed=False))
+    return gg + layers

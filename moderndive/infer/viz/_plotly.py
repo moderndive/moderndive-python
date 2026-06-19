@@ -131,3 +131,64 @@ def apply_shade_px(fig, spec):
         out.add_vline(x=spec.lower, line={"color": color, "width": 2})
         out.add_vline(x=spec.upper, line={"color": color, "width": 2})
     return out
+
+
+def _subplot_xrange(fig, col: int) -> tuple[float, float]:
+    """Finite x-range of the histogram in subplot ``col`` (for clipping infinite shades)."""
+    axis = "x" if col == 1 else f"x{col}"
+    xs = []
+    for trace in fig.data:
+        tx = getattr(trace, "xaxis", None) or "x"
+        if tx == axis and getattr(trace, "x", None) is not None and len(trace.x):
+            xs.append(np.asarray(trace.x, dtype=float))
+    if not xs:
+        return -1.0, 1.0
+    allx = np.concatenate(xs)
+    lo, hi = float(np.min(allx)), float(np.max(allx))
+    pad = (hi - lo) * 0.05 or 1.0
+    return lo - pad, hi + pad
+
+
+def apply_fit_shade_px(fig, spec, terms):
+    """Per-facet shading for a faceted fit figure: shade each term's subplot via row/col."""
+    go = _go()
+    out = go.Figure(fig)
+    term_to_col = {t: i + 1 for i, t in enumerate(terms)}
+    per = dict(spec.per_term)
+
+    if spec.kind == "p_value":
+        for term, obs in per.items():
+            col = term_to_col.get(term)
+            if col is None:
+                continue
+            lo, hi = _subplot_xrange(out, col)
+            vlines, rects = C.pvalue_regions(obs, spec.direction)
+            for x, dashed in vlines:
+                out.add_vline(
+                    x=x,
+                    line={"color": C._OBS_COLOR, "width": 2, "dash": "dash" if dashed else "solid"},
+                    row=1,
+                    col=col,
+                )
+            for xmin, xmax in rects:
+                out.add_vrect(
+                    x0=_clip(xmin, lo, hi),
+                    x1=_clip(xmax, lo, hi),
+                    fillcolor=C._OBS_COLOR,
+                    opacity=0.3,
+                    line_width=0,
+                    row=1,
+                    col=col,
+                )
+    else:  # confidence_interval
+        color = spec.color or C._SHADE_COLOR
+        for term, (lower, upper) in per.items():
+            col = term_to_col.get(term)
+            if col is None:
+                continue
+            out.add_vrect(
+                x0=lower, x1=upper, fillcolor=color, opacity=0.3, line_width=0, row=1, col=col
+            )
+            out.add_vline(x=lower, line={"color": color, "width": 2}, row=1, col=col)
+            out.add_vline(x=upper, line={"color": color, "width": 2}, row=1, col=col)
+    return out

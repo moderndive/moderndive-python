@@ -74,7 +74,7 @@ obs
 ```{code-cell} python
 # Null distribution under "genre doesn't matter" (permutation)
 null = (
-    specify(spotify, formula="popular_or_not ~ track_genre", success="popular")
+    spotify.specify(formula="popular_or_not ~ track_genre", success="popular")
     .hypothesize(null="independence")
     .generate(reps=1000, type="permute", seed=76)
     .calculate(stat="diff in props", order=("metal", "deep-house"))
@@ -85,6 +85,13 @@ get_p_value(null, obs_stat=obs, direction="right")
 ```{code-cell} python
 # Visualize it (interactive plotly by default; engine="plotnine" also works)
 visualize(null) + shade_p_value(obs_stat=obs, direction="right")
+```
+
+```{note}
+Plots throughout this documentation are rendered as **static images**. When you
+run the code yourself, the default `engine="plotly"` produces **interactive**
+figures (hover, zoom, pan); `engine="plotnine"` gives static grammar-of-graphics
+plots.
 ```
 
 ## Where to next

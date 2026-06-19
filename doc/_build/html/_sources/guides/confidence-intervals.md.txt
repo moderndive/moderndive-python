@@ -30,7 +30,7 @@ from moderndive import specify, get_confidence_interval, visualize, shade_confid
 almonds = md.load_almonds_sample_100()
 
 boot = (
-    specify(almonds, response="weight")
+    almonds.specify(response="weight")
     .generate(reps=1000, type="bootstrap", seed=1)
     .calculate(stat="mean")
 )
@@ -44,7 +44,7 @@ get_confidence_interval(boot, level=0.95, type="percentile")
 # shape: (1, 2) → lower_ci ≈ 3.61, upper_ci ≈ 3.75
 
 # Standard-error method (needs the point estimate)
-point = float(specify(almonds, response="weight").calculate(stat="mean"))
+point = float(almonds.specify(response="weight").calculate(stat="mean"))
 get_confidence_interval(boot, level=0.95, type="se", point_estimate=point)
 
 # Bias-corrected
@@ -80,7 +80,7 @@ import polars as pl
 mythbusters = md.load_mythbusters_yawn()
 
 boot_prop = (
-    specify(mythbusters, response="yawn", success="yes")
+    mythbusters.specify(response="yawn", success="yes")
     .generate(reps=1000, type="bootstrap", seed=1)
     .calculate(stat="prop")
 )
@@ -93,7 +93,7 @@ Add an explanatory variable and an `order=` to compare two groups:
 
 ```{code-cell} python
 boot_diff = (
-    specify(mythbusters, formula="yawn ~ group", success="yes")
+    mythbusters.specify(formula="yawn ~ group", success="yes")
     .generate(reps=1000, type="bootstrap", seed=1)
     .calculate(stat="diff in props", order=("seed", "control"))
 )

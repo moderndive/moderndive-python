@@ -72,7 +72,7 @@ obs = observe(
 
 # 2. A null distribution: specify → hypothesize → generate → calculate
 null = (
-    specify(yawn, formula="yawn ~ group", success="yes")
+    yawn.specify(formula="yawn ~ group", success="yes")
     .hypothesize(null="independence")
     .generate(reps=1000, type="permute", seed=42)
     .calculate(stat="diff in props", order=("seed", "control"))
@@ -89,6 +89,11 @@ Each verb has a focused guide: {doc}`guides/sampling`,
 
 Plots default to **plotly** (interactive). Pass `engine="plotnine"` for
 grammar-of-graphics output. The composition syntax is identical:
+
+```{note}
+The plots shown in this documentation are **static images**. Running the code
+yourself yields **interactive** plotly figures by default.
+```
 
 ```{code-cell} python
 from moderndive import visualize, shade_p_value

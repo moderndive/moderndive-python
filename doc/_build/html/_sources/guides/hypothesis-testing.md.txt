@@ -41,7 +41,7 @@ obs = observe(
 
 # Null: genre is independent of popularity → permute the labels
 null = (
-    specify(spotify, formula="popular_or_not ~ track_genre", success="popular")
+    spotify.specify(formula="popular_or_not ~ track_genre", success="popular")
     .hypothesize(null="independence")
     .generate(reps=1000, type="permute", seed=76)
     .calculate(stat="diff in props", order=("metal", "deep-house"))
@@ -69,7 +69,7 @@ age = md.load_age_at_marriage()
 obs_t = observe(age, response="age", stat="t", null="point", mu=23)
 
 null_t = (
-    specify(age, response="age")
+    age.specify(response="age")
     .hypothesize(null="point", mu=23)
     .generate(reps=1000, type="bootstrap", seed=1)
     .calculate(stat="t")
@@ -85,7 +85,7 @@ import polars as pl
 coins = pl.DataFrame({"flip": ["heads"] * 30 + ["tails"] * 70})
 
 null_p = (
-    specify(coins, response="flip", success="heads")
+    coins.specify(response="flip", success="heads")
     .hypothesize(null="point", p=0.5)
     .generate(reps=1000, type="draw", seed=1)   # "simulate" is an alias
     .calculate(stat="prop")

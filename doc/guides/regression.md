@@ -98,16 +98,16 @@ from moderndive.infer.viz import visualize_fit
 from moderndive import shade_confidence_interval, shade_p_value
 
 f = "price ~ living_area + bedrooms"
-obs_fit = specify(houses, formula=f).fit()
+obs_fit = houses.specify(formula=f).fit()
 
 # Bootstrap distribution of each coefficient → per-term CIs
-boot_fit = specify(houses, formula=f).generate(reps=1000, type="bootstrap", seed=1).fit()
+boot_fit = houses.specify(formula=f).generate(reps=1000, type="bootstrap", seed=1).fit()
 boot_fit.get_confidence_interval(level=0.95)          # one row per term
 visualize_fit(boot_fit) + shade_confidence_interval(boot_fit.get_confidence_interval())
 
 # Null distribution → per-term p-values, each facet shaded at its own estimate
 null_fit = (
-    specify(houses, formula=f).hypothesize(null="independence")
+    houses.specify(formula=f).hypothesize(null="independence")
     .generate(reps=1000, type="permute", seed=1).fit()
 )
 null_fit.get_p_value(obs_stat=obs_fit, direction="two-sided")

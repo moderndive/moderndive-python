@@ -268,7 +268,7 @@ read a confidence interval off it.</p>
 <span class="n">almonds</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_almonds_sample_100</span><span class="p">()</span>
 
 <span class="n">boot</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">almonds</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+    <span class="n">almonds</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
 <span class="p">)</span>
@@ -286,7 +286,7 @@ read a confidence interval off it.</p>
 <span class="c1"># shape: (1, 2) → lower_ci ≈ 3.61, upper_ci ≈ 3.75</span>
 
 <span class="c1"># Standard-error method (needs the point estimate)</span>
-<span class="n">point</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">specify</span><span class="p">(</span><span class="n">almonds</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
+<span class="n">point</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">almonds</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
 <span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;se&quot;</span><span class="p">,</span> <span class="n">point_estimate</span><span class="o">=</span><span class="n">point</span><span class="p">)</span>
 
 <span class="c1"># Bias-corrected</span>
@@ -353,7 +353,7 @@ read a confidence interval off it.</p>
 <span class="n">mythbusters</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_mythbusters_yawn</span><span class="p">()</span>
 
 <span class="n">boot_prop</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">mythbusters</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;yawn&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+    <span class="n">mythbusters</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;yawn&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;prop&quot;</span><span class="p">)</span>
 <span class="p">)</span>
@@ -378,7 +378,7 @@ read a confidence interval off it.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">boot_diff</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">mythbusters</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;yawn ~ group&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+    <span class="n">mythbusters</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;yawn ~ group&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="s2">&quot;control&quot;</span><span class="p">))</span>
 <span class="p">)</span>

@@ -24,8 +24,13 @@ Every plotting function in `moderndive` takes an `engine=` argument:
 - `engine="plotnine"` — grammar-of-graphics figures (`plotnine.ggplot`).
 
 The composition syntax is identical across engines, so you can switch a whole
-analysis by changing one argument. (In this documentation, plotly figures are
-shown as static images; in a notebook they're fully interactive.)
+analysis by changing one argument.
+
+```{note}
+The figures on this page are **static images** so they render in the docs. In a
+notebook or script, the default `engine="plotly"` produces **interactive**
+figures (hover, zoom, pan).
+```
 
 ```{code-cell} python
 import moderndive as md
@@ -35,7 +40,7 @@ from moderndive import (
 )
 
 boot = (
-    specify(md.load_almonds_sample_100(), response="weight")
+    md.load_almonds_sample_100().specify(response="weight")
     .generate(reps=1000, type="bootstrap", seed=1)
     .calculate(stat="mean")
 )
@@ -73,7 +78,7 @@ spotify = md.load_spotify_metal_deephouse()
 obs = observe(spotify, formula="popular_or_not ~ track_genre", success="popular",
               stat="diff in props", order=("metal", "deep-house"))
 null = (
-    specify(spotify, formula="popular_or_not ~ track_genre", success="popular")
+    spotify.specify(formula="popular_or_not ~ track_genre", success="popular")
     .hypothesize(null="independence")
     .generate(reps=1000, type="permute", seed=76)
     .calculate(stat="diff in props", order=("metal", "deep-house"))
@@ -100,7 +105,7 @@ from moderndive.infer.viz import visualize_fit
 
 houses = md.load_saratoga_houses()
 boot_fit = (
-    specify(houses, formula="price ~ living_area + bedrooms")
+    houses.specify(formula="price ~ living_area + bedrooms")
     .generate(reps=1000, type="bootstrap", seed=1)
     .fit()
 )

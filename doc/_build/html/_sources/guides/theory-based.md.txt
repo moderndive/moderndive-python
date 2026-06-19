@@ -77,7 +77,7 @@ curve, or both:
 from moderndive import specify, visualize
 
 boot = (
-    specify(age, response="age")
+    age.specify(response="age")
     .generate(reps=1000, type="bootstrap", seed=1)
     .calculate(stat="mean")
 )

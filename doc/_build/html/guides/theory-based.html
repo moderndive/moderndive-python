@@ -332,7 +332,7 @@ curve, or both:</p>
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">visualize</span>
 
 <span class="n">boot</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">)</span>
+    <span class="n">age</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
 <span class="p">)</span>

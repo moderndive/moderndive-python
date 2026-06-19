@@ -318,7 +318,7 @@ to build a null distribution and read off a p-value.</p>
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Null distribution under &quot;genre doesn&#39;t matter&quot; (permutation)</span>
 <span class="n">null</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span>
+    <span class="n">spotify</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;independence&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">76</span><span class="p">)</span>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">))</span>
@@ -347,6 +347,13 @@ to build a null distribution and read off a p-value.</p>
 <div class="cell_output docutils container">
 <img alt="_images/57bcfc0de676a5294afac27836489f257436cfdc208aba5a2907c8b2aa95d9f8.png" src="_images/57bcfc0de676a5294afac27836489f257436cfdc208aba5a2907c8b2aa95d9f8.png" />
 </div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Plots throughout this documentation are rendered as <strong>static images</strong>. When you
+run the code yourself, the default <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code> produces <strong>interactive</strong>
+figures (hover, zoom, pan); <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> gives static grammar-of-graphics
+plots.</p>
 </div>
 </section>
 <section id="where-to-next">

@@ -262,8 +262,13 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> — grammar-of-graphics figures (<code class="docutils literal notranslate"><span class="pre">plotnine.ggplot</span></code>).</p></li>
 </ul>
 <p>The composition syntax is identical across engines, so you can switch a whole
-analysis by changing one argument. (In this documentation, plotly figures are
-shown as static images; in a notebook they’re fully interactive.)</p>
+analysis by changing one argument.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The figures on this page are <strong>static images</strong> so they render in the docs. In a
+notebook or script, the default <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code> produces <strong>interactive</strong>
+figures (hover, zoom, pan).</p>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
@@ -273,7 +278,7 @@ shown as static images; in a notebook they’re fully interactive.)</p>
 <span class="p">)</span>
 
 <span class="n">boot</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">md</span><span class="o">.</span><span class="n">load_almonds_sample_100</span><span class="p">(),</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+    <span class="n">md</span><span class="o">.</span><span class="n">load_almonds_sample_100</span><span class="p">()</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
 <span class="p">)</span>
@@ -342,7 +347,7 @@ the raw <code class="docutils literal notranslate"><span class="pre">ggplot</spa
 <span class="n">obs</span> <span class="o">=</span> <span class="n">observe</span><span class="p">(</span><span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">,</span>
               <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">))</span>
 <span class="n">null</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span>
+    <span class="n">spotify</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;independence&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">76</span><span class="p">)</span>
     <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">))</span>
@@ -388,7 +393,7 @@ the raw <code class="docutils literal notranslate"><span class="pre">ggplot</spa
 
 <span class="n">houses</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_saratoga_houses</span><span class="p">()</span>
 <span class="n">boot_fit</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;price ~ living_area + bedrooms&quot;</span><span class="p">)</span>
+    <span class="n">houses</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;price ~ living_area + bedrooms&quot;</span><span class="p">)</span>
     <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="p">)</span>

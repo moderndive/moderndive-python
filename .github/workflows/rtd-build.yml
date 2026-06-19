@@ -1,0 +1,29 @@
+name: Trigger Read the Docs build
+
+# Build the docs on Read the Docs whenever main changes, instead of clicking
+# "Build version" by hand. Requires a repo secret READTHEDOCS_TOKEN (create one
+# at https://app.readthedocs.org/accounts/tokens/). If you instead connect the
+# repo via the Read the Docs GitHub App / incoming webhook, that handles this
+# natively and this workflow is unnecessary.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger a build of the latest version
+        env:
+          RTD_TOKEN: ${{ secrets.READTHEDOCS_TOKEN }}
+        run: |
+          if [ -z "$RTD_TOKEN" ]; then
+            echo "READTHEDOCS_TOKEN secret not set — skipping." && exit 0
+          fi
+          curl -fsSL -X POST \
+            -H "Authorization: Token ${RTD_TOKEN}" \
+            "https://app.readthedocs.org/api/v3/projects/moderndive/versions/latest/builds/"

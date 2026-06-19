@@ -74,7 +74,7 @@ Supported distributions: `"t"`, `"z"`, `"F"` (pass `df=(df1, df2)`), and
 curve, or both:
 
 ```{code-cell} python
-from moderndive import specify, visualize
+from moderndive import visualize
 
 boot = (
     age.specify(response="age")
@@ -83,6 +83,9 @@ boot = (
 )
 
 visualize(boot, method="both")          # histogram + normal-approximation curve
+```
+
+```{code-cell} python
 visualize(boot, method="theoretical")   # just the curve
 ```
 

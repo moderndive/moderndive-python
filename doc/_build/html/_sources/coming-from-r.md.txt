@@ -18,7 +18,8 @@ pennies %>%
 ```python
 # Python — verbs are methods on the returned objects
 (
-    md.load_pennies().specify(response="year")
+    md.load_pennies()
+    .specify(response="year")
     .hypothesize(null="point", mu=1995)
     .generate(reps=1000, type="bootstrap", seed=1)
     .calculate(stat="mean")

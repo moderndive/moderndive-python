@@ -137,9 +137,7 @@ def test_geom_categorical_model_is_alias():
     ev = md.load_evals()
     assert md.geom_categorical_model is md.gg_categorical_model
     assert isinstance(md.geom_categorical_model(ev, "score", "rank", engine="plotly"), go.Figure)
-    assert isinstance(
-        md.geom_categorical_model(ev, "score", "rank", engine="plotnine"), ggplot
-    )
+    assert isinstance(md.geom_categorical_model(ev, "score", "rank", engine="plotnine"), ggplot)
 
 
 # ============================ DataFrame .specify() accessor ===============

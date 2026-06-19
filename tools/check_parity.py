@@ -57,12 +57,16 @@ def _diff(upstream: dict, manifest: dict, py: dict) -> list[str]:
         for ds, meta in info["datasets"].items():
             r_dims = [meta["rows"], meta["cols"]]
             if ds not in py_names:
-                lines.append(f"- dataset `{ds}` ({pkg}) is **missing** from the Python package "
-                             f"(R dims {r_dims})")
+                lines.append(
+                    f"- dataset `{ds}` ({pkg}) is **missing** from the Python package "
+                    f"(R dims {r_dims})"
+                )
                 continue
             if [py[ds]["rows"], py[ds]["cols"]] != r_dims:
-                lines.append(f"- dataset `{ds}`: dims differ — Python "
-                             f"{[py[ds]['rows'], py[ds]['cols']]} vs R {r_dims}")
+                lines.append(
+                    f"- dataset `{ds}`: dims differ — Python "
+                    f"{[py[ds]['rows'], py[ds]['cols']]} vs R {r_dims}"
+                )
             missing_cols = sorted(set(meta["columns"]) - set(py[ds]["columns"]))
             if missing_cols:
                 lines.append(f"- dataset `{ds}`: columns missing in Python: {missing_cols}")
@@ -72,8 +76,11 @@ def _diff(upstream: dict, manifest: dict, py: dict) -> list[str]:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("upstream", help="JSON produced by tools/parity_probe.R")
-    ap.add_argument("--update-manifest", action="store_true",
-                    help="overwrite the manifest with the current upstream snapshot")
+    ap.add_argument(
+        "--update-manifest",
+        action="store_true",
+        help="overwrite the manifest with the current upstream snapshot",
+    )
     args = ap.parse_args()
 
     upstream = json.loads(Path(args.upstream).read_text())
@@ -89,8 +96,10 @@ def main() -> int:
     if lines:
         print("# Upstream parity drift detected\n")
         print("\n".join(lines))
-        print("\nPort the changes into the Python package, then run "
-              "`python tools/check_parity.py <upstream.json> --update-manifest` to accept.")
+        print(
+            "\nPort the changes into the Python package, then run "
+            "`python tools/check_parity.py <upstream.json> --update-manifest` to accept."
+        )
         return 1
     print("No parity drift: the Python port matches upstream moderndive/infer.")
     return 0

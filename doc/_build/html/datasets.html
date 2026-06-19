@@ -2,11 +2,13 @@
 <html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Sampling" href="guides/sampling.html"><link rel="prev" title="Coming from R" href="coming-from-r.html">
         <link rel="prefetch" href="_static/moderndive-logo.png" as="image">
 
-    <link rel="shortcut icon" href="_static/moderndive-logo.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 --><title>Python Module Index - moderndive 0.1.0</title>
-<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="shortcut icon" href="_static/moderndive-logo.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Datasets - moderndive 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -172,7 +174,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -194,10 +196,10 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coming-from-r.html">Coming from R</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -230,7 +232,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/datasets.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -238,45 +246,85 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<section class="domainindex-section">
-  <h1>Python Module Index</h1>
-  <div class="domainindex-jumpbox"><a href="#cap-m"><strong>m</strong></a></div>
+          <section id="datasets">
+<h1>Datasets<a class="headerlink" href="#datasets" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">moderndive</span></code> bundles 58 datasets (the R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code> + <code class="docutils literal notranslate"><span class="pre">infer</span></code> data, plus a few
+derived tables). Each loads with <code class="docutils literal notranslate"><span class="pre">load_&lt;name&gt;()</span></code> and returns a polars DataFrame.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+
+<span class="n">md</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">()</span>          <span class="c1"># sorted list of every dataset name</span>
+<span class="n">md</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;promotions&quot;</span><span class="p">)</span>    <span class="c1"># load by name (string)</span>
+<span class="n">md</span><span class="o">.</span><span class="n">load_promotions</span><span class="p">()</span>             <span class="c1"># or via the generated loader</span>
+</pre></div>
+</div>
+<section id="by-topic">
+<h2>By topic<a class="headerlink" href="#by-topic" title="Link to this heading">¶</a></h2>
+<dl class="simple myst">
+<dt><strong>Sampling &amp; simulation</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">bowl</span></code>, <code class="docutils literal notranslate"><span class="pre">bowl_sample_1</span></code>, <code class="docutils literal notranslate"><span class="pre">bowl_samples</span></code>, <code class="docutils literal notranslate"><span class="pre">tactile_prop_red</span></code>,
+<code class="docutils literal notranslate"><span class="pre">almonds_bowl</span></code>, <code class="docutils literal notranslate"><span class="pre">almonds_sample</span></code>, <code class="docutils literal notranslate"><span class="pre">almonds_sample_100</span></code>,
+<code class="docutils literal notranslate"><span class="pre">pennies</span></code>, <code class="docutils literal notranslate"><span class="pre">pennies_sample</span></code>, <code class="docutils literal notranslate"><span class="pre">pennies_resamples</span></code>, <code class="docutils literal notranslate"><span class="pre">orig_pennies_sample</span></code></p>
+</dd>
+<dt><strong>Hypothesis testing &amp; CIs</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">promotions</span></code>, <code class="docutils literal notranslate"><span class="pre">promotions_shuffled</span></code>, <code class="docutils literal notranslate"><span class="pre">mythbusters_yawn</span></code>, <code class="docutils literal notranslate"><span class="pre">movies_sample</span></code>,
+<code class="docutils literal notranslate"><span class="pre">spotify_by_genre</span></code>, <code class="docutils literal notranslate"><span class="pre">spotify_52_original</span></code>, <code class="docutils literal notranslate"><span class="pre">spotify_52_shuffled</span></code>,
+<code class="docutils literal notranslate"><span class="pre">spotify_metal_deephouse</span></code>, <code class="docutils literal notranslate"><span class="pre">offshore</span></code>, <code class="docutils literal notranslate"><span class="pre">age_at_marriage</span></code>, <code class="docutils literal notranslate"><span class="pre">zinc_tidy</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cle_sac</span></code>, <code class="docutils literal notranslate"><span class="pre">gss</span></code></p>
+</dd>
+<dt><strong>Regression</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">evals</span></code>, <code class="docutils literal notranslate"><span class="pre">saratoga_houses</span></code>, <code class="docutils literal notranslate"><span class="pre">house_prices</span></code>, <code class="docutils literal notranslate"><span class="pre">coffee_quality</span></code>, <code class="docutils literal notranslate"><span class="pre">coffee_ratings</span></code>,
+<code class="docutils literal notranslate"><span class="pre">credit</span></code>, <code class="docutils literal notranslate"><span class="pre">MA_schools</span></code>, <code class="docutils literal notranslate"><span class="pre">un_member_states_2024</span></code>, <code class="docutils literal notranslate"><span class="pre">mario_kart_auction</span></code>,
+<code class="docutils literal notranslate"><span class="pre">amazon_books</span></code>, <code class="docutils literal notranslate"><span class="pre">old_faithful_2024</span></code></p>
+</dd>
+<dt><strong>Flights &amp; weather (nycflights23 / 13)</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">flights</span></code>, <code class="docutils literal notranslate"><span class="pre">weather</span></code>, <code class="docutils literal notranslate"><span class="pre">airlines</span></code>, <code class="docutils literal notranslate"><span class="pre">airports</span></code>, <code class="docutils literal notranslate"><span class="pre">planes</span></code>, <code class="docutils literal notranslate"><span class="pre">envoy_flights</span></code>,
+<code class="docutils literal notranslate"><span class="pre">alaska_flights</span></code>, <code class="docutils literal notranslate"><span class="pre">early_january_weather</span></code>, <code class="docutils literal notranslate"><span class="pre">early_january_2023_weather</span></code></p>
+</dd>
+<dt><strong>Other example data</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">gapminder</span></code>, <code class="docutils literal notranslate"><span class="pre">gapminder_2007</span></code>, <code class="docutils literal notranslate"><span class="pre">drinks</span></code>, <code class="docutils literal notranslate"><span class="pre">airline_safety</span></code>, <code class="docutils literal notranslate"><span class="pre">dem_score</span></code>,
+<code class="docutils literal notranslate"><span class="pre">us_births_1994_2003</span></code>, <code class="docutils literal notranslate"><span class="pre">steves_episodes</span></code>, <code class="docutils literal notranslate"><span class="pre">avocados</span></code>, <code class="docutils literal notranslate"><span class="pre">babies</span></code>, <code class="docutils literal notranslate"><span class="pre">ipf_lifts</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ev_charging</span></code>, <code class="docutils literal notranslate"><span class="pre">DD_vs_SB</span></code>, <code class="docutils literal notranslate"><span class="pre">ma_traffic_2020_vs_2019</span></code>, <code class="docutils literal notranslate"><span class="pre">mass_traffic_2020</span></code></p>
+</dd>
+</dl>
 </section>
-<table class="domainindex-table">
-  <tr class="pcap">
-    <td></td><td>&#160;</td><td></td>
-  </tr>
-  <tr class="cap" id="cap-m">
-    <td></td><td><strong>m</strong></td><td></td>
-  </tr>
-  <tr>
-    <td><img src="_static/minus.png" class="toggler"
-              id="toggle-1" style="display: none" alt="-" /></td>
-    <td>
-        <code class="xref">moderndive</code></td><td>
-    <em></em></td>
-  </tr>
-  <tr class="cg-1">
-    <td></td>
-    <td>&#160;&#160;&#160;
-        <a href="api.html#module-moderndive.theory"><code class="xref">moderndive.theory</code></a></td><td>
-    <em></em></td>
-  </tr>
-</table>
+<section id="tips">
+<h2>Tips<a class="headerlink" href="#tips" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Every loader returns a polars DataFrame; call <code class="docutils literal notranslate"><span class="pre">.to_pandas()</span></code> if a function
+(e.g. statsmodels) expects pandas.</p></li>
+<li><p>Datetime columns (e.g. <code class="docutils literal notranslate"><span class="pre">time_hour</span></code> in the weather/flights data) are stored in
+UTC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">load_dataset(&quot;&lt;name&gt;&quot;)</span></code> raises a helpful <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> listing valid names if
+the dataset doesn’t exist.</p></li>
+</ul>
+</section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="guides/sampling.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Sampling</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="coming-from-r.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Coming from R</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -295,8 +343,28 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Datasets</a><ul>
+<li><a class="reference internal" href="#by-topic">By topic</a></li>
+<li><a class="reference internal" href="#tips">Tips</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

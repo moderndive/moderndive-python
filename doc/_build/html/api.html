@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="moderndive (Python)" href="index.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="prev" title="Plotting: plotly &amp; plotnine" href="guides/plotting.html">
         <link rel="prefetch" href="_static/moderndive-logo.png" as="image">
 
     <link rel="shortcut icon" href="_static/moderndive-logo.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
@@ -195,9 +195,23 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+  <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coming-from-r.html">Coming from R</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/sampling.html">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/confidence-intervals.html">Bootstrapping &amp; confidence intervals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/hypothesis-testing.html">Hypothesis testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/regression.html">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/theory-based.html">Theory-based inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/plotting.html">Plotting: plotly &amp; plotnine</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="index.html">moderndive (Python)</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">API reference</a></li>
 </ul>
 
@@ -587,7 +601,9 @@ Pass <code class="docutils literal notranslate"><span class="pre">shade_pvalue=<
 <dt class="sig sig-object py" id="moderndive.shade_p_value">
 <span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">shade_p_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_stat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/viz.html#shade_p_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.shade_p_value" title="Link to this definition">¶</a></dt>
 <dd><p>A p-value shading spec; add it to a <code class="docutils literal notranslate"><span class="pre">visualize()</span></code> plot with <code class="docutils literal notranslate"><span class="pre">+</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">direction</span></code> ∈ {right/greater, left/less, two-sided}.</p>
+<p><code class="docutils literal notranslate"><span class="pre">direction</span></code> ∈ {right/greater, left/less, two-sided}. For a faceted
+<code class="xref py py-func docutils literal notranslate"><span class="pre">visualize_fit()</span></code> plot, pass a per-term <code class="docutils literal notranslate"><span class="pre">obs_stat</span></code> — an observed
+<code class="docutils literal notranslate"><span class="pre">FitResult</span></code>, a <code class="docutils literal notranslate"><span class="pre">term</span></code>-keyed frame, or a dict — to shade each facet.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShadeSpec</span></code></span></p>
@@ -605,7 +621,9 @@ Pass <code class="docutils literal notranslate"><span class="pre">shade_pvalue=<
 <dt class="sig sig-object py" id="moderndive.shade_confidence_interval">
 <span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">shade_confidence_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/infer/viz.html#shade_confidence_interval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.shade_confidence_interval" title="Link to this definition">¶</a></dt>
 <dd><p>A confidence-interval shading spec; add it to a <code class="docutils literal notranslate"><span class="pre">visualize()</span></code> plot with <code class="docutils literal notranslate"><span class="pre">+</span></code>.</p>
-<p><code class="docutils literal notranslate"><span class="pre">endpoints</span></code> is a CI DataFrame (<code class="docutils literal notranslate"><span class="pre">lower_ci</span></code>/<code class="docutils literal notranslate"><span class="pre">upper_ci</span></code>) or a <code class="docutils literal notranslate"><span class="pre">(lower,</span> <span class="pre">upper)</span></code> tuple.</p>
+<p><code class="docutils literal notranslate"><span class="pre">endpoints</span></code> is a CI DataFrame (<code class="docutils literal notranslate"><span class="pre">lower_ci</span></code>/<code class="docutils literal notranslate"><span class="pre">upper_ci</span></code>) or a <code class="docutils literal notranslate"><span class="pre">(lower,</span> <span class="pre">upper)</span></code>
+tuple. For a faceted <code class="xref py py-func docutils literal notranslate"><span class="pre">visualize_fit()</span></code> plot, pass a per-term CI table (with a
+<code class="docutils literal notranslate"><span class="pre">term</span></code> column) to shade each facet from its own interval.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShadeSpec</span></code></span></p>
@@ -1058,14 +1076,14 @@ full list.</p>
         
         <div class="related-pages">
           
-          <a class="prev-page" href="index.html">
+          <a class="prev-page" href="guides/plotting.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Home</div>
+                <div class="title">Plotting: plotly &amp; plotnine</div>
                 
               </div>
             </a>

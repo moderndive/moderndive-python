@@ -2,11 +2,12 @@
 <html class="no-js" lang="en" data-content_root="../">
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Bootstrapping &amp; confidence intervals" href="confidence-intervals.html"><link rel="prev" title="Datasets" href="../datasets.html">
         <link rel="prefetch" href="../_static/moderndive-logo.png" as="image">
 
     <link rel="shortcut icon" href="../_static/moderndive-logo.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Overview: module code - moderndive 0.1.0</title>
+        <title>Sampling - moderndive 0.1.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -173,7 +174,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
@@ -201,13 +202,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../datasets.html">Datasets</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../guides/sampling.html">Sampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/confidence-intervals.html">Bootstrapping &amp; confidence intervals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/hypothesis-testing.html">Hypothesis testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/regression.html">Regression</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/theory-based.html">Theory-based inference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../guides/plotting.html">Plotting: plotly &amp; plotnine</a></li>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="confidence-intervals.html">Bootstrapping &amp; confidence intervals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hypothesis-testing.html">Hypothesis testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regression.html">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="theory-based.html">Theory-based inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting: plotly &amp; plotnine</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
@@ -231,7 +232,13 @@
           <span>Back to top</span>
         </a>
         <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/guides/sampling.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
@@ -239,33 +246,101 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>All modules for which code is available</h1>
-<ul><li><a href="moderndive/correlation.html">moderndive.correlation</a></li>
-<li><a href="moderndive/data.html">moderndive.data</a></li>
-<li><a href="moderndive/infer/core.html">moderndive.infer.core</a></li>
-<li><a href="moderndive/infer/intervals.html">moderndive.infer.intervals</a></li>
-<li><a href="moderndive/infer/pvalue.html">moderndive.infer.pvalue</a></li>
-<li><a href="moderndive/infer/theoretical.html">moderndive.infer.theoretical</a></li>
-<li><a href="moderndive/infer/viz.html">moderndive.infer.viz</a></li>
-<li><a href="moderndive/infer/wrappers.html">moderndive.infer.wrappers</a></li>
-<li><a href="moderndive/modeling.html">moderndive.modeling</a></li>
-<li><a href="moderndive/plots.html">moderndive.plots</a></li>
-<ul><li><a href="moderndive/plots/models.html">moderndive.plots.models</a></li>
-</ul><li><a href="moderndive/sampling.html">moderndive.sampling</a></li>
-<li><a href="moderndive/theory.html">moderndive.theory</a></li>
-</ul>
+          <section id="sampling">
+<h1>Sampling<a class="headerlink" href="#sampling" title="Link to this heading">¶</a></h1>
+<p>Sampling activities (the “bowl” of balls, tactile samples) are how ModernDive
+builds intuition for sampling variation. <code class="docutils literal notranslate"><span class="pre">rep_slice_sample</span></code> takes repeated samples
+and stacks them with a <code class="docutils literal notranslate"><span class="pre">replicate</span></code> column — the analog of R
+<code class="docutils literal notranslate"><span class="pre">moderndive::rep_slice_sample()</span></code> / <code class="docutils literal notranslate"><span class="pre">infer::rep_sample_n()</span></code>.</p>
+<section id="the-bowl">
+<h2>The bowl<a class="headerlink" href="#the-bowl" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+
+<span class="n">bowl</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_bowl</span><span class="p">()</span>      <span class="c1"># 2400 red/white balls</span>
+<span class="n">bowl</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="one-virtual-sample">
+<h2>One virtual sample<a class="headerlink" href="#one-virtual-sample" title="Link to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">rep_slice_sample</span>
+
+<span class="n">sample</span> <span class="o">=</span> <span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># proportion red in this sample</span>
+<span class="n">sample</span><span class="o">.</span><span class="n">select</span><span class="p">((</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;red&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;prop_red&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="many-samples-a-sampling-distribution">
+<h2>Many samples → a sampling distribution<a class="headerlink" href="#many-samples-a-sampling-distribution" title="Link to this heading">¶</a></h2>
+<p>Take 1000 samples of size 50 and compute the proportion red in each:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">samples</span> <span class="o">=</span> <span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">prop_red</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">samples</span>
+    <span class="o">.</span><span class="n">group_by</span><span class="p">(</span><span class="s2">&quot;replicate&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">agg</span><span class="p">((</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;red&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;prop_red&quot;</span><span class="p">))</span>
+<span class="p">)</span>
+<span class="n">prop_red</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>That <code class="docutils literal notranslate"><span class="pre">prop_red</span></code> column is a <strong>sampling distribution</strong>. Visualize its spread the
+same way you would any distribution (see <a class="reference internal" href="confidence-intervals.html"><span class="doc">Bootstrapping &amp; confidence intervals</span></a> for building
+one with the inference pipeline instead).</p>
+</section>
+<section id="with-vs-without-replacement">
+<h2>With vs. without replacement<a class="headerlink" href="#with-vs-without-replacement" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">rep_slice_sample</span></code> samples <strong>without</strong> replacement by default (like dealing from a
+deck). Pass <code class="docutils literal notranslate"><span class="pre">replace=True</span></code> for bootstrap-style resampling:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="tactile-samples">
+<h2>Tactile samples<a class="headerlink" href="#tactile-samples" title="Link to this heading">¶</a></h2>
+<p>The hand-collected counterparts are bundled too:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">md</span><span class="o">.</span><span class="n">load_tactile_prop_red</span><span class="p">()</span>   <span class="c1"># 33 groups&#39; samples of 50 balls</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="docutils literal notranslate"><span class="pre">rep_sample_n</span></code> is an alias of <code class="docutils literal notranslate"><span class="pre">rep_slice_sample</span></code> (the older infer name). Both are
+documented in the <a class="reference internal" href="../api.html"><span class="doc">API reference</span></a>.</p>
+</div>
+</section>
+</section>
+
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          
-          
+          <a class="next-page" href="confidence-intervals.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Bootstrapping &amp; confidence intervals</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../datasets.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Datasets</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -284,8 +359,31 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Sampling</a><ul>
+<li><a class="reference internal" href="#the-bowl">The bowl</a></li>
+<li><a class="reference internal" href="#one-virtual-sample">One virtual sample</a></li>
+<li><a class="reference internal" href="#many-samples-a-sampling-distribution">Many samples → a sampling distribution</a></li>
+<li><a class="reference internal" href="#with-vs-without-replacement">With vs. without replacement</a></li>
+<li><a class="reference internal" href="#tactile-samples">Tactile samples</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

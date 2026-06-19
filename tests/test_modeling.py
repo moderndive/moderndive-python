@@ -7,7 +7,12 @@ import polars as pl
 import pytest
 import statsmodels.formula.api as smf
 
-from moderndive import get_regression_points, get_regression_table, tidy_summary
+from moderndive import (
+    count_missing,
+    get_regression_points,
+    get_regression_table,
+    tidy_summary,
+)
 
 
 def _linear_frame():
@@ -71,3 +76,27 @@ def test_tidy_summary_layout_and_values():
     assert b_row["type"][0] == "categorical"
     assert b_row["n"][0] == 4
     assert b_row["mean"][0] is None
+
+
+def test_count_missing_counts_and_sorts():
+    df = pl.DataFrame(
+        {
+            "a": [1, None, 3, None],  # 2 missing
+            "b": [None, None, None, 4],  # 3 missing
+            "c": [1, 2, 3, 4],  # 0 missing
+        }
+    )
+    out = count_missing(df)
+    assert out.columns == ["column", "n_missing"]
+    # sorted most-missing first
+    assert out["column"].to_list() == ["b", "a", "c"]
+    assert out["n_missing"].to_list() == [3, 2, 0]
+
+
+def test_count_missing_columns_subset_and_pandas_input():
+    df = pl.DataFrame({"a": [1, None], "b": [None, None]})
+    sub = count_missing(df, columns=["a"])
+    assert sub["column"].to_list() == ["a"] and sub["n_missing"].to_list() == [1]
+    # pandas input is accepted too
+    out = count_missing(df.to_pandas())
+    assert dict(zip(out["column"], out["n_missing"], strict=True)) == {"a": 1, "b": 2}

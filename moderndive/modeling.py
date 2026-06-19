@@ -21,6 +21,7 @@ __all__ = [
     "get_regression_points",
     "get_regression_summaries",
     "tidy_summary",
+    "count_missing",
 ]
 
 
@@ -182,3 +183,29 @@ def tidy_summary(data, columns: list[str] | None = None, digits: int = 3) -> pl.
         "sd": pl.Float64,
     }
     return pl.DataFrame(rows, schema=schema)
+
+
+def count_missing(data, columns: list[str] | None = None) -> pl.DataFrame:
+    """Count missing (``null``) values in each column.
+
+    A beginner-friendly alternative to ``df.select(pl.all().is_null().sum())``:
+    it returns a tidy two-column data frame with one row per column
+    (``column``, ``n_missing``), sorted from most to fewest missing values so the
+    columns needing attention surface first.
+
+    Parameters
+    ----------
+    data:
+        A polars (or pandas) data frame.
+    columns:
+        Optional list of column names to check; defaults to every column.
+    """
+    df = data if isinstance(data, pl.DataFrame) else pl.from_pandas(data)
+    columns = columns or df.columns
+    return pl.DataFrame(
+        {
+            "column": columns,
+            "n_missing": [int(df[col].null_count()) for col in columns],
+        },
+        schema={"column": pl.Utf8, "n_missing": pl.Int64},
+    ).sort("n_missing", descending=True)

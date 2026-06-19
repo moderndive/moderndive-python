@@ -4,6 +4,9 @@
 
 Full parity with the R `moderndive` and `infer` packages.
 
+- **`count_missing()`**: a beginner-friendly helper that counts `null` values per
+  column and returns a tidy `column`/`n_missing` data frame sorted from most to
+  fewest missing — a gentler alternative to `df.select(pl.all().is_null().sum())`.
 - **`InferPlot` now renders in Jupyter/Quarto for both engines**: added
   `_repr_mimebundle_`, which delegates to the wrapped figure. Previously only
   `_repr_html_` was implemented, so plotnine-engine plots

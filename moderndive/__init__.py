@@ -43,6 +43,7 @@ from .infer import (
     visualize,
 )
 from .modeling import (
+    count_missing,
     get_regression_points,
     get_regression_summaries,
     get_regression_table,
@@ -84,6 +85,7 @@ __all__ = [
     "get_correlation",
     "pop_sd",
     "tidy_summary",
+    "count_missing",
     "pairplot",
     "gg_parallel_slopes",
     "geom_parallel_slopes",

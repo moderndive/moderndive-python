@@ -329,7 +329,7 @@ for p-values without simulating:</p>
 curve, or both:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">visualize</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize</span>
 
 <span class="n">boot</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">age</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">)</span>
@@ -338,7 +338,16 @@ curve, or both:</p>
 <span class="p">)</span>
 
 <span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">)</span>          <span class="c1"># histogram + normal-approximation curve</span>
-<span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;theoretical&quot;</span><span class="p">)</span>   <span class="c1"># just the curve</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/177581b8d9573bde4a4ceaa582de7a5dccf9960de5b0497702711636bef64d2c.png" src="../_images/177581b8d9573bde4a4ceaa582de7a5dccf9960de5b0497702711636bef64d2c.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;theoretical&quot;</span><span class="p">)</span>   <span class="c1"># just the curve</span>
 </pre></div>
 </div>
 </div>

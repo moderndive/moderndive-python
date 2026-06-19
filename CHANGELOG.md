@@ -4,6 +4,13 @@
 
 Full parity with the R `moderndive` and `infer` packages.
 
+- **Per-facet shading for regression-fit plots**: `shade_p_value` and
+  `shade_confidence_interval` now accept per-term values (an observed `FitResult`,
+  a `term`-keyed CI/p-value table, or a dict) so each facet of a faceted
+  `visualize_fit()` plot is shaded from its own observed statistic / interval —
+  in both the plotly and plotnine engines. (Previously shading was scalar-only
+  and couldn't shade per facet, so faceted multiple-regression inference plots
+  rendered without the overlay.)
 - **Dual-engine plotting**: every plotting function (`visualize`,
   `shade_p_value`, `shade_confidence_interval`, `pairplot`, and the new model
   plots) now takes `engine="plotly"` (the new default) or `engine="plotnine"`.

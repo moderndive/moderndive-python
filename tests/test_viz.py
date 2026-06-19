@@ -18,7 +18,21 @@ from moderndive import (
     specify,
     visualize,
 )
-from moderndive.infer.viz import InferPlot, ShadeSpec
+from moderndive.infer.viz import InferPlot, ShadeSpec, visualize_fit
+
+
+def _fit_obs_null_ci():
+    sar = md.load_saratoga_houses()
+    f = "price ~ living_area + bedrooms"
+    obs = specify(sar, formula=f).fit()
+    dist = specify(sar, formula=f).generate(reps=60, type="bootstrap", seed=1).fit()
+    null = (
+        specify(sar, formula=f)
+        .hypothesize(null="independence")
+        .generate(reps=60, type="permute", seed=1)
+        .fit()
+    )
+    return obs, dist, null, dist.get_confidence_interval(level=0.95)
 
 
 def _boot():
@@ -192,3 +206,85 @@ def test_apply_shade_on_empty_plotly_figure():
     empty = InferPlot(go.Figure(), "plotly")
     shaded = empty + shade_confidence_interval((1.0, 2.0))
     assert isinstance(shaded.figure, go.Figure)
+
+
+# ---- per-facet shading for faceted regression-fit plots (both engines) ----
+
+
+@pytest.mark.parametrize("direction", ["right", "left", "two-sided"])
+def test_fit_per_facet_pvalue_plotly(direction):
+    obs, _dist, null, _ci = _fit_obs_null_ci()
+    p = visualize_fit(null, engine="plotly") + shade_p_value(obs_stat=obs, direction=direction)
+    assert p.terms == ["intercept", "living_area", "bedrooms"]
+    # one shaded region per term (plus vlines); shapes scale with the 3 facets
+    assert len(p.figure.layout.shapes) >= 3 * 3 if direction == "two-sided" else 3 * 2
+
+
+def test_fit_per_facet_ci_plotly():
+    _obs, dist, _null, ci = _fit_obs_null_ci()
+    p = visualize_fit(dist, engine="plotly") + shade_confidence_interval(ci)
+    # 3 terms x (1 vrect + 2 vlines) = 9 shapes
+    assert len(p.figure.layout.shapes) == 9
+
+
+def test_fit_per_facet_pvalue_plotnine():
+    obs, _dist, null, _ci = _fit_obs_null_ci()
+    base = visualize_fit(null, engine="plotnine")
+    shaded = base + shade_p_value(obs_stat=obs, direction="two-sided")
+    assert len(shaded.gg.layers) > len(base.gg.layers)
+    assert isinstance(shaded.gg, ggplot)
+
+
+def test_fit_per_facet_ci_plotnine_keyword():
+    _obs, dist, _null, ci = _fit_obs_null_ci()
+    # keyword form on FitResult.visualize, custom color
+    g = dist.visualize(engine="plotnine", shade_ci=ci)
+    base = visualize_fit(dist, engine="plotnine")
+    assert len(g.gg.layers) > len(base.gg.layers)
+
+
+def test_fit_shade_pvalue_keyword_dict_form():
+    obs, _dist, null, _ci = _fit_obs_null_ci()
+    p = null.visualize(engine="plotly", shade_pvalue={"obs_stat": obs, "direction": "right"})
+    assert len(p.figure.layout.shapes) >= 3
+
+
+def test_per_term_obs_accepts_table_and_dict():
+    obs, _dist, _null, _ci = _fit_obs_null_ci()
+    # term/estimate frame, term/stat frame, and dict all yield per-term specs
+    spec_df = shade_p_value(obs.data, direction="right")
+    spec_stat = shade_p_value(obs.data.rename({"estimate": "stat"}), direction="right")
+    spec_dict = shade_p_value({"living_area": 90.0, "bedrooms": -7000.0}, direction="right")
+    for spec in (spec_df, spec_stat, spec_dict):
+        assert spec.per_term is not None and spec.obs_stat is None
+
+
+def test_per_term_shade_on_nonfacet_raises():
+    obs, _dist, _null, _ci = _fit_obs_null_ci()
+    boot = _boot()
+    with pytest.raises(TypeError):
+        visualize(boot, engine="plotly") + shade_p_value(obs_stat=obs, direction="right")
+
+
+def test_per_facet_skips_unknown_terms():
+    import polars as pl
+
+    _obs, dist, _null, ci = _fit_obs_null_ci()
+    # add a term not present in the facets; it must be silently skipped (both engines)
+    extra = pl.concat([ci, ci.head(1).with_columns(pl.lit("ghost").alias("term"))])
+    p = visualize_fit(dist, engine="plotly") + shade_confidence_interval(extra)
+    assert len(p.figure.layout.shapes) == 9  # ghost term ignored
+    g = visualize_fit(dist, engine="plotnine") + shade_confidence_interval(extra)
+    assert isinstance(g.gg, ggplot)
+    # p-value path: a dict with a term not among the facets is skipped too
+    obs_with_ghost = {"living_area": 90.0, "ghost": 1.0}
+    pp = visualize_fit(dist, engine="plotly") + shade_p_value(obs_with_ghost, direction="right")
+    assert len(pp.figure.layout.shapes) == 2  # only living_area shaded (1 vline + 1 rect)
+    gp = visualize_fit(dist, engine="plotnine") + shade_p_value(obs_with_ghost, direction="right")
+    assert isinstance(gp.gg, ggplot)
+
+
+def test_subplot_xrange_fallback():
+    from moderndive.infer.viz._plotly import _subplot_xrange
+
+    assert _subplot_xrange(go.Figure(), 1) == (-1.0, 1.0)

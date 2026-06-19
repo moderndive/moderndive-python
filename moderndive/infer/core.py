@@ -422,10 +422,12 @@ class FitResult:
 
         return get_fit_p_value(self, obs_stat=obs_stat, direction=direction)
 
-    def visualize(self, bins: int = 20, *, engine: str = "plotly"):
+    def visualize(self, bins: int = 20, *, engine: str = "plotly", shade_pvalue=None, shade_ci=None):
         from .viz import visualize_fit
 
-        return visualize_fit(self, bins=bins, engine=engine)
+        return visualize_fit(
+            self, bins=bins, engine=engine, shade_pvalue=shade_pvalue, shade_ci=shade_ci
+        )
 
 
 def specify(

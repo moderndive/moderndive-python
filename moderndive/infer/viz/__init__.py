@@ -40,7 +40,14 @@ __all__ = [
 
 @dataclass(frozen=True)
 class ShadeSpec:
-    """Engine-neutral description of a shading layer (p-value tail or CI)."""
+    """Engine-neutral description of a shading layer (p-value tail or CI).
+
+    For a single-panel plot the scalar fields are used. For a faceted
+    regression-fit plot (:func:`visualize_fit`), ``per_term`` holds one value per
+    term so each facet is shaded independently — a tuple of ``(term, payload)``
+    pairs where ``payload`` is the observed statistic (p-value) or a
+    ``(lower, upper)`` pair (confidence interval).
+    """
 
     kind: str  # "p_value" | "confidence_interval"
     obs_stat: float | None = None
@@ -48,6 +55,7 @@ class ShadeSpec:
     lower: float | None = None
     upper: float | None = None
     color: str | None = None
+    per_term: tuple | None = None
 
 
 class InferPlot:
@@ -58,11 +66,15 @@ class InferPlot:
     raw ``ggplot`` is also available via :attr:`gg`.
     """
 
-    def __init__(self, figure, engine: str):
+    def __init__(self, figure, engine: str, terms: list[str] | None = None):
         self.figure = figure
         self.engine = engine
+        # Facet terms for a regression-fit plot (enables per-facet shading).
+        self.terms = terms
 
     def __add__(self, other):
+        if isinstance(other, ShadeSpec) and other.per_term is not None:
+            return self._add_per_facet(other)
         if self.engine == "plotnine":
             from . import _plotnine as P
 
@@ -72,18 +84,33 @@ class InferPlot:
                     if other.kind == "p_value"
                     else P.shade_ci_layers(other)
                 )
-                return InferPlot(self.figure + layers, "plotnine")
+                return InferPlot(self.figure + layers, "plotnine", self.terms)
             # Any other plotnine object/layer/list.
-            return InferPlot(self.figure + other, "plotnine")
+            return InferPlot(self.figure + other, "plotnine", self.terms)
 
         from . import _plotly as PX
 
         if isinstance(other, ShadeSpec):
-            return InferPlot(PX.apply_shade_px(self.figure, other), "plotly")
+            return InferPlot(PX.apply_shade_px(self.figure, other), "plotly", self.terms)
         raise TypeError(
             "Only a ShadeSpec (from shade_p_value/shade_confidence_interval) can be "
             "added to a plotly InferPlot."
         )
+
+    def _add_per_facet(self, spec: ShadeSpec):
+        """Apply per-term shading to a faceted regression-fit plot (both engines)."""
+        if self.terms is None:
+            raise TypeError(
+                "Per-term shading requires a faceted fit plot from visualize_fit(); "
+                "pass a per-term obs_stat/endpoints (a FitResult or a term-keyed table)."
+            )
+        if self.engine == "plotnine":
+            from . import _plotnine as P
+
+            return InferPlot(P.apply_fit_shade_gg(self.figure, spec, self.terms), "plotnine", self.terms)
+        from . import _plotly as PX
+
+        return InferPlot(PX.apply_fit_shade_px(self.figure, spec, self.terms), "plotly", self.terms)
 
     @property
     def gg(self):
@@ -166,16 +193,32 @@ def visualize(
     return plot
 
 
-def visualize_fit(fit, bins: int = 20, *, engine: str = "plotly") -> InferPlot:
-    """Faceted histogram of a regression fit distribution, one panel per term."""
+def visualize_fit(
+    fit, bins: int = 20, *, engine: str = "plotly", shade_pvalue=None, shade_ci=None
+) -> InferPlot:
+    """Faceted histogram of a regression fit distribution, one panel per term.
+
+    Pass ``shade_pvalue=``/``shade_ci=`` to shade each facet from per-term values
+    (a ``FitResult`` of observed estimates, or a term-keyed CI/p-value table), or
+    compose the same per-term :class:`ShadeSpec` with ``+``.
+    """
     engine = C.resolve_engine(engine)
+    terms = fit.data["term"].unique(maintain_order=True).to_list()
     if engine == "plotnine":
         from . import _plotnine as P
 
-        return InferPlot(P.visualize_fit_gg(fit, bins), engine)
-    from . import _plotly as PX
+        fig = P.visualize_fit_gg(fit, bins)
+    else:
+        from . import _plotly as PX
 
-    return InferPlot(PX.visualize_fit_px(fit, bins), engine)
+        fig = PX.visualize_fit_px(fit, bins)
+
+    plot = InferPlot(fig, engine, terms)
+    if shade_pvalue is not None:
+        plot = plot + _coerce_pvalue_spec(shade_pvalue)
+    if shade_ci is not None:
+        plot = plot + _coerce_ci_spec(shade_ci)
+    return plot
 
 
 def visualize_theoretical(theoretical, bins: int = 100, *, engine: str = "plotly") -> InferPlot:
@@ -195,20 +238,63 @@ def visualize_theoretical(theoretical, bins: int = 100, *, engine: str = "plotly
     return InferPlot(PX.density_curve_px(x, density, title), engine)
 
 
+def _per_term_obs(obs_stat) -> dict | None:
+    """Extract a ``{term: observed}`` mapping for per-facet p-value shading.
+
+    Accepts an observed ``FitResult`` (term/estimate), a term-keyed polars frame
+    (``term`` + ``estimate`` or ``stat``), or a dict. Returns ``None`` for a scalar.
+    """
+    import polars as pl
+
+    if isinstance(obs_stat, pl.DataFrame) and "term" in obs_stat.columns:
+        valcol = "estimate" if "estimate" in obs_stat.columns else "stat"
+        return {r["term"]: float(r[valcol]) for r in obs_stat.iter_rows(named=True)}
+    data = getattr(obs_stat, "data", None)
+    if isinstance(data, pl.DataFrame) and {"term", "estimate"} <= set(data.columns):
+        return {r["term"]: float(r["estimate"]) for r in data.iter_rows(named=True)}
+    if isinstance(obs_stat, dict):
+        return {k: float(v) for k, v in obs_stat.items()}
+    return None
+
+
+def _per_term_ci(endpoints) -> dict | None:
+    """Extract a ``{term: (lower, upper)}`` mapping for per-facet CI shading."""
+    import polars as pl
+
+    if isinstance(endpoints, pl.DataFrame) and "term" in endpoints.columns:
+        return {
+            r["term"]: (float(r["lower_ci"]), float(r["upper_ci"]))
+            for r in endpoints.iter_rows(named=True)
+        }
+    return None
+
+
 def shade_p_value(obs_stat, direction: str, *, color: str | None = None) -> ShadeSpec:
     """A p-value shading spec; add it to a ``visualize()`` plot with ``+``.
 
-    ``direction`` ∈ {right/greater, left/less, two-sided}.
+    ``direction`` ∈ {right/greater, left/less, two-sided}. For a faceted
+    :func:`visualize_fit` plot, pass a per-term ``obs_stat`` — an observed
+    ``FitResult``, a ``term``-keyed frame, or a dict — to shade each facet.
     """
-    return ShadeSpec(
-        kind="p_value", obs_stat=float(obs_stat), direction=direction, color=color
-    )
+    per = _per_term_obs(obs_stat)
+    if per is not None:
+        return ShadeSpec(
+            kind="p_value", direction=direction, color=color, per_term=tuple(sorted(per.items()))
+        )
+    return ShadeSpec(kind="p_value", obs_stat=float(obs_stat), direction=direction, color=color)
 
 
 def shade_confidence_interval(endpoints, color: str | None = None) -> ShadeSpec:
     """A confidence-interval shading spec; add it to a ``visualize()`` plot with ``+``.
 
-    ``endpoints`` is a CI DataFrame (``lower_ci``/``upper_ci``) or a ``(lower, upper)`` tuple.
+    ``endpoints`` is a CI DataFrame (``lower_ci``/``upper_ci``) or a ``(lower, upper)``
+    tuple. For a faceted :func:`visualize_fit` plot, pass a per-term CI table (with a
+    ``term`` column) to shade each facet from its own interval.
     """
+    per = _per_term_ci(endpoints)
+    if per is not None:
+        return ShadeSpec(
+            kind="confidence_interval", color=color, per_term=tuple(sorted(per.items()))
+        )
     lower, upper = C.ci_endpoints(endpoints)
     return ShadeSpec(kind="confidence_interval", lower=lower, upper=upper, color=color)

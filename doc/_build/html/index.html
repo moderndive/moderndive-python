@@ -3,7 +3,7 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="API reference" href="api.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Getting started" href="getting-started.html">
         <link rel="prefetch" href="_static/moderndive-logo.png" as="image">
 
     <link rel="shortcut icon" href="_static/moderndive-logo.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
@@ -11,6 +11,7 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -195,9 +196,23 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
-<ul class="current">
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">moderndive (Python)</a></li>
+  <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coming-from-r.html">Coming from R</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/sampling.html">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/confidence-intervals.html">Bootstrapping &amp; confidence intervals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/hypothesis-testing.html">Hypothesis testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/regression.html">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/theory-based.html">Theory-based inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/plotting.html">Plotting: plotly &amp; plotnine</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a></li>
 </ul>
 
@@ -237,15 +252,139 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="moderndive-python">
+          <div class="cell tag_remove-input docutils container">
+</div>
+<section id="moderndive-python">
 <h1>moderndive (Python)<a class="headerlink" href="#moderndive-python" title="Link to this heading">¶</a></h1>
 <p>The Python companion package for <strong>ModernDive: Statistical Inference via Data
-Science</strong> — a faithful port of the R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code> and <code class="docutils literal notranslate"><span class="pre">infer</span></code> packages to a
-modern Python data-science stack (polars, plotnine, statsmodels).</p>
+Science</strong> — a faithful port of the R <a class="reference external" href="https://moderndive.github.io/moderndive/"><code class="docutils literal notranslate"><span class="pre">moderndive</span></code></a>
+and <a class="reference external" href="https://infer.tidymodels.org"><code class="docutils literal notranslate"><span class="pre">infer</span></code></a> packages to a modern Python
+data-science stack (<a class="reference external" href="https://pola.rs">polars</a>, <a class="reference external" href="https://plotly.com/python/">plotly</a>,
+<a class="reference external" href="https://plotnine.org">plotnine</a>, <a class="reference external" href="https://www.statsmodels.org">statsmodels</a>).</p>
+<p>If you teach or learn statistical inference the <em>tidy</em> way — <code class="docutils literal notranslate"><span class="pre">specify</span></code> →
+<code class="docutils literal notranslate"><span class="pre">hypothesize</span></code> → <code class="docutils literal notranslate"><span class="pre">generate</span></code> → <code class="docutils literal notranslate"><span class="pre">calculate</span></code> → <code class="docutils literal notranslate"><span class="pre">visualize</span></code> — this package gives you
+the same grammar in Python, plus regression helpers and the book’s datasets.</p>
+<section id="why-moderndive">
+<h2>Why moderndive?<a class="headerlink" href="#why-moderndive" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>A tidy inference grammar.</strong> Bootstrap confidence intervals and
+permutation/​simulation hypothesis tests read like sentences, mirroring R <code class="docutils literal notranslate"><span class="pre">infer</span></code>.</p></li>
+<li><p><strong>Regression helpers</strong> that return tidy tables: <code class="docutils literal notranslate"><span class="pre">get_regression_table</span></code>,
+<code class="docutils literal notranslate"><span class="pre">get_regression_points</span></code>, <code class="docutils literal notranslate"><span class="pre">get_regression_summaries</span></code>, <code class="docutils literal notranslate"><span class="pre">get_correlation</span></code>.</p></li>
+<li><p><strong>Dual-engine plots.</strong> Every plot takes <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code> (default, interactive)
+or <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> (grammar-of-graphics) — same code, your choice of output.</p></li>
+<li><p><strong>58 bundled datasets</strong> via <code class="docutils literal notranslate"><span class="pre">load_*()</span></code> loaders returning polars DataFrames.</p></li>
+<li><p><strong>polars-first</strong>, works with pandas too.</p></li>
+</ul>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>moderndive
+</pre></div>
+</div>
+<p>Optional extra for saving plotly figures as static images (PNG/SVG):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;moderndive[image]&quot;</span><span class="w">   </span><span class="c1"># adds kaleido</span>
+</pre></div>
+</div>
+</section>
+<section id="second-example">
+<h2>30-second example<a class="headerlink" href="#second-example" title="Link to this heading">¶</a></h2>
+<p>Are tracks more likely to be popular in <em>metal</em> than in <em>deep house</em>? Compute the
+observed difference in “popular” rates, then shuffle the genre labels 1000 times
+to build a null distribution and read off a p-value.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">observe</span><span class="p">,</span> <span class="n">get_p_value</span><span class="p">,</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_p_value</span>
+
+<span class="n">spotify</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_spotify_metal_deephouse</span><span class="p">()</span>
+
+<span class="c1"># Observed difference in &quot;popular&quot; proportions (metal − deep-house)</span>
+<span class="n">obs</span> <span class="o">=</span> <span class="n">observe</span><span class="p">(</span>
+    <span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">,</span>
+    <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">obs</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ObservedStatistic(stat=&#39;diff in props&#39;, value=0.034)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Null distribution under &quot;genre doesn&#39;t matter&quot; (permutation)</span>
+<span class="n">null</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">spotify</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;independence&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">76</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">))</span>
+<span class="p">)</span>
+<span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.075</td></tr></tbody></table></div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualize it (interactive plotly by default; engine=&quot;plotnine&quot; also works)</span>
+<span class="n">visualize</span><span class="p">(</span><span class="n">null</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/57bcfc0de676a5294afac27836489f257436cfdc208aba5a2907c8b2aa95d9f8.png" src="_images/57bcfc0de676a5294afac27836489f257436cfdc208aba5a2907c8b2aa95d9f8.png" />
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Plots throughout this documentation are rendered as <strong>static images</strong>. When you
+run the code yourself, the default <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code> produces <strong>interactive</strong>
+figures (hover, zoom, pan); <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> gives static grammar-of-graphics
+plots.</p>
+</div>
+</section>
+<section id="where-to-next">
+<h2>Where to next<a class="headerlink" href="#where-to-next" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>New here? Start with <a class="reference internal" href="getting-started.html"><span class="doc">Getting started</span></a>.</p></li>
+<li><p>Coming from R? See <a class="reference internal" href="coming-from-r.html"><span class="doc">Coming from R</span></a> for a function-by-function map.</p></li>
+<li><p>Browse the task guides below, or jump to the <a class="reference internal" href="api.html"><span class="doc">API reference</span></a>.</p></li>
+</ul>
 <div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents</span></p>
-<ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">moderndive (Python)</a></li>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coming-from-r.html">Coming from R</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/sampling.html">Sampling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/confidence-intervals.html">Bootstrapping &amp; confidence intervals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/hypothesis-testing.html">Hypothesis testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/regression.html">Regression</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/theory-based.html">Theory-based inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="guides/plotting.html">Plotting: plotly &amp; plotnine</a></li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#inference-grammar">Inference grammar</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html#getters-and-visualization">Getters and visualization</a></li>
@@ -257,32 +396,6 @@ modern Python data-science stack (polars, plotnine, statsmodels).</p>
 </li>
 </ul>
 </div>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>moderndive
-</pre></div>
-</div>
-</section>
-<section id="quick-start">
-<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">get_p_value</span><span class="p">,</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_p_value</span>
-
-<span class="n">spotify</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_spotify_metal_deephouse</span><span class="p">()</span>
-
-<span class="n">obs</span> <span class="o">=</span> <span class="n">specify</span><span class="p">(</span><span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span> \
-    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">))</span>
-
-<span class="n">null</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">specify</span><span class="p">(</span><span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;independence&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">76</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">))</span>
-<span class="p">)</span>
-<span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>See the <a class="reference internal" href="api.html"><span class="doc">API reference</span></a> for the full reference.</p>
 </section>
 </section>
 
@@ -291,12 +404,12 @@ modern Python data-science stack (polars, plotnine, statsmodels).</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="api.html">
+          <a class="next-page" href="getting-started.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">API reference</div>
+                <div class="title">Getting started</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -332,8 +445,12 @@ modern Python data-science stack (polars, plotnine, statsmodels).</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">moderndive (Python)</a><ul>
+<li><a class="reference internal" href="#why-moderndive">Why moderndive?</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li><a class="reference internal" href="#second-example">30-second example</a></li>
+<li><a class="reference internal" href="#where-to-next">Where to next</a><ul>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

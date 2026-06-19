@@ -1,0 +1,66 @@
+name: Parity drift
+
+# Detects when the upstream R packages (moderndive, infer) change in a way the
+# Python port hasn't caught up with — a version bump, an added/removed export, or
+# a dataset whose dimensions/columns changed — and opens (or comments on) an issue.
+on:
+  schedule:
+    - cron: "0 6 * * MON"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: parity-drift
+  cancel-in-progress: true
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install upstream R packages (latest from GitHub)
+        run: |
+          Rscript -e 'install.packages(c("remotes", "jsonlite"))'
+          Rscript -e 'remotes::install_github(c("moderndive/moderndive", "tidymodels/infer"), upgrade = "never")'
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install the Python package
+        run: uv sync
+
+      - name: Probe upstream
+        run: Rscript tools/parity_probe.R > upstream.json
+
+      - name: Check parity
+        id: check
+        run: |
+          set +e
+          uv run python tools/check_parity.py upstream.json | tee report.md
+          code=${PIPESTATUS[0]}
+          set -e
+          if [ "$code" -ne 0 ]; then echo "drift=1" >> "$GITHUB_OUTPUT"; else echo "drift=0" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Open or update a drift issue
+        if: steps.check.outputs.drift == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Upstream parity drift detected"
+          num=$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body-file report.md
+          else
+            gh issue create --title "$title" --body-file report.md
+          fi

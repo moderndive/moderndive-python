@@ -499,3 +499,30 @@ def observe(
     if null is not None:
         return spec.hypothesize(null=null, mu=mu, p=p, sigma=sigma).calculate(stat, order=order)
     return spec.calculate(stat, order=order, mu=mu, p=p, sigma=sigma)
+
+
+def _dataframe_specify(self, *, response=None, explanatory=None, formula=None, success=None):
+    """Start an inference pipeline from this DataFrame (see :func:`specify`)."""
+    return specify(
+        self, response=response, explanatory=explanatory, formula=formula, success=success
+    )
+
+
+def register_dataframe_accessor() -> None:
+    """Attach a ``.specify()`` method to polars and pandas DataFrames.
+
+    Lets you write ``df.specify(response="y")`` — mirroring the R
+    ``df %>% specify(...)`` flow — instead of ``specify(df, response="y")``.
+    Called once on import; skips a frame library that is not installed and never
+    overwrites an existing ``specify`` attribute.
+    """
+    import polars as pl
+
+    if not hasattr(pl.DataFrame, "specify"):
+        pl.DataFrame.specify = _dataframe_specify
+    try:
+        import pandas as pd
+    except ImportError:  # pragma: no cover - pandas is a dependency, always present
+        return
+    if not hasattr(pd.DataFrame, "specify"):
+        pd.DataFrame.specify = _dataframe_specify

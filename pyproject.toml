@@ -58,7 +58,9 @@ image = ["kaleido>=0.2"]
 doc = [
     "sphinx>=7.0",
     "furo>=2024.1",
-    "myst-parser>=3.0",
+    "myst-nb>=1.1",            # MyST markdown + executes {code-cell} blocks
+    "ipykernel>=6.29",         # kernel myst-nb runs the cells in
+    "kaleido>=0.2",            # static PNG export of plotly figures for the docs
     "sphinx-autodoc-typehints>=2.0",
     "sphinx-copybutton>=0.5",
 ]

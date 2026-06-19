@@ -1,0 +1,743 @@
+{
+  "infer": {
+    "datasets": {
+      "gss": {
+        "cols": 11,
+        "columns": [
+          "year",
+          "age",
+          "sex",
+          "college",
+          "partyid",
+          "hompop",
+          "hours",
+          "income",
+          "class",
+          "finrela",
+          "weight"
+        ],
+        "rows": 500
+      }
+    },
+    "exports": [
+      "%>%",
+      "assume",
+      "calculate",
+      "chisq_stat",
+      "chisq_test",
+      "conf_int",
+      "fit",
+      "fit.infer",
+      "generate",
+      "get_ci",
+      "get_confidence_interval",
+      "get_p_value",
+      "get_pvalue",
+      "ggplot_add",
+      "hypothesise",
+      "hypothesize",
+      "observe",
+      "p_value",
+      "prop_test",
+      "rep_sample_n",
+      "rep_slice_sample",
+      "shade_ci",
+      "shade_confidence_interval",
+      "shade_p_value",
+      "shade_pvalue",
+      "specify",
+      "t_stat",
+      "t_test",
+      "visualise",
+      "visualize"
+    ],
+    "version": "1.0.9"
+  },
+  "moderndive": {
+    "datasets": {
+      "DD_vs_SB": {
+        "cols": 6,
+        "columns": [
+          "county",
+          "FIPS",
+          "median_income",
+          "population",
+          "shop_type",
+          "shops"
+        ],
+        "rows": 2048
+      },
+      "MA_schools": {
+        "cols": 4,
+        "columns": [
+          "school_name",
+          "average_sat_math",
+          "perc_disadvan",
+          "size"
+        ],
+        "rows": 332
+      },
+      "alaska_flights": {
+        "cols": 19,
+        "columns": [
+          "year",
+          "month",
+          "day",
+          "dep_time",
+          "sched_dep_time",
+          "dep_delay",
+          "arr_time",
+          "sched_arr_time",
+          "arr_delay",
+          "carrier",
+          "flight",
+          "tailnum",
+          "origin",
+          "dest",
+          "air_time",
+          "distance",
+          "hour",
+          "minute",
+          "time_hour"
+        ],
+        "rows": 714
+      },
+      "almonds_bowl": {
+        "cols": 2,
+        "columns": [
+          "ID",
+          "weight"
+        ],
+        "rows": 5000
+      },
+      "almonds_sample": {
+        "cols": 3,
+        "columns": [
+          "replicate",
+          "ID",
+          "weight"
+        ],
+        "rows": 25
+      },
+      "almonds_sample_100": {
+        "cols": 3,
+        "columns": [
+          "replicate",
+          "ID",
+          "weight"
+        ],
+        "rows": 100
+      },
+      "amazon_books": {
+        "cols": 13,
+        "columns": [
+          "title",
+          "author",
+          "list_price",
+          "amazon_price",
+          "hard_paper",
+          "num_pages",
+          "publisher",
+          "pub_year",
+          "isbn_10",
+          "height",
+          "width",
+          "thick",
+          "weight_oz"
+        ],
+        "rows": 325
+      },
+      "avocados": {
+        "cols": 13,
+        "columns": [
+          "date",
+          "average_price",
+          "total_volume",
+          "small_hass_sold",
+          "large_hass_sold",
+          "xlarge_hass_sold",
+          "total_bags",
+          "small_bags",
+          "large_bags",
+          "x_large_bags",
+          "type",
+          "year",
+          "region"
+        ],
+        "rows": 18249
+      },
+      "babies": {
+        "cols": 24,
+        "columns": [
+          "id",
+          "pluralty",
+          "outcome",
+          "date",
+          "gestation",
+          "sex",
+          "wt",
+          "parity",
+          "race",
+          "age",
+          "ed",
+          "ht",
+          "wt_1",
+          "drace",
+          "dage",
+          "ded",
+          "dht",
+          "dwt",
+          "marital",
+          "inc",
+          "smoke",
+          "time",
+          "number",
+          "birthday"
+        ],
+        "rows": 1236
+      },
+      "bowl": {
+        "cols": 2,
+        "columns": [
+          "ball_ID",
+          "color"
+        ],
+        "rows": 2400
+      },
+      "bowl_sample_1": {
+        "cols": 1,
+        "columns": [
+          "color"
+        ],
+        "rows": 50
+      },
+      "bowl_samples": {
+        "cols": 5,
+        "columns": [
+          "group",
+          "red",
+          "white",
+          "green",
+          "n"
+        ],
+        "rows": 10
+      },
+      "coffee_quality": {
+        "cols": 30,
+        "columns": [
+          "country_of_origin",
+          "continent_of_origin",
+          "farm_name",
+          "lot_number",
+          "mill",
+          "company",
+          "altitude",
+          "region",
+          "producer",
+          "in_country_partner",
+          "harvest_year",
+          "grading_date",
+          "owner",
+          "variety",
+          "processing_method",
+          "aroma",
+          "flavor",
+          "aftertaste",
+          "acidity",
+          "body",
+          "balance",
+          "uniformity",
+          "clean_cup",
+          "sweetness",
+          "overall",
+          "total_cup_points",
+          "moisture_percentage",
+          "color",
+          "expiration",
+          "certification_body"
+        ],
+        "rows": 207
+      },
+      "coffee_ratings": {
+        "cols": 43,
+        "columns": [
+          "total_cup_points",
+          "species",
+          "owner",
+          "country_of_origin",
+          "farm_name",
+          "lot_number",
+          "mill",
+          "ico_number",
+          "company",
+          "altitude",
+          "region",
+          "producer",
+          "number_of_bags",
+          "bag_weight",
+          "in_country_partner",
+          "harvest_year",
+          "grading_date",
+          "owner_1",
+          "variety",
+          "processing_method",
+          "aroma",
+          "flavor",
+          "aftertaste",
+          "acidity",
+          "body",
+          "balance",
+          "uniformity",
+          "clean_cup",
+          "sweetness",
+          "cupper_points",
+          "moisture",
+          "category_one_defects",
+          "quakers",
+          "color",
+          "category_two_defects",
+          "expiration",
+          "certification_body",
+          "certification_address",
+          "certification_contact",
+          "unit_of_measurement",
+          "altitude_low_meters",
+          "altitude_high_meters",
+          "altitude_mean_meters"
+        ],
+        "rows": 1339
+      },
+      "early_january_2023_weather": {
+        "cols": 15,
+        "columns": [
+          "origin",
+          "year",
+          "month",
+          "day",
+          "hour",
+          "temp",
+          "dewp",
+          "humid",
+          "wind_dir",
+          "wind_speed",
+          "wind_gust",
+          "precip",
+          "pressure",
+          "visib",
+          "time_hour"
+        ],
+        "rows": 360
+      },
+      "early_january_weather": {
+        "cols": 15,
+        "columns": [
+          "origin",
+          "year",
+          "month",
+          "day",
+          "hour",
+          "temp",
+          "dewp",
+          "humid",
+          "wind_dir",
+          "wind_speed",
+          "wind_gust",
+          "precip",
+          "pressure",
+          "visib",
+          "time_hour"
+        ],
+        "rows": 358
+      },
+      "envoy_flights": {
+        "cols": 19,
+        "columns": [
+          "year",
+          "month",
+          "day",
+          "dep_time",
+          "sched_dep_time",
+          "dep_delay",
+          "arr_time",
+          "sched_arr_time",
+          "arr_delay",
+          "carrier",
+          "flight",
+          "tailnum",
+          "origin",
+          "dest",
+          "air_time",
+          "distance",
+          "hour",
+          "minute",
+          "time_hour"
+        ],
+        "rows": 357
+      },
+      "ev_charging": {
+        "cols": 24,
+        "columns": [
+          "session_id",
+          "kwh_total",
+          "dollars",
+          "created",
+          "ended",
+          "start_time",
+          "end_time",
+          "charge_time_hrs",
+          "weekday",
+          "platform",
+          "distance",
+          "user_id",
+          "station_id",
+          "location_id",
+          "manager_vehicle",
+          "mon",
+          "tues",
+          "wed",
+          "thurs",
+          "fri",
+          "sat",
+          "sun",
+          "reported_zip",
+          "facility_type"
+        ],
+        "rows": 3395
+      },
+      "evals": {
+        "cols": 14,
+        "columns": [
+          "ID",
+          "prof_ID",
+          "score",
+          "age",
+          "bty_avg",
+          "gender",
+          "ethnicity",
+          "language",
+          "rank",
+          "pic_outfit",
+          "pic_color",
+          "cls_did_eval",
+          "cls_students",
+          "cls_level"
+        ],
+        "rows": 463
+      },
+      "house_prices": {
+        "cols": 21,
+        "columns": [
+          "id",
+          "date",
+          "price",
+          "bedrooms",
+          "bathrooms",
+          "sqft_living",
+          "sqft_lot",
+          "floors",
+          "waterfront",
+          "view",
+          "condition",
+          "grade",
+          "sqft_above",
+          "sqft_basement",
+          "yr_built",
+          "yr_renovated",
+          "zipcode",
+          "lat",
+          "long",
+          "sqft_living15",
+          "sqft_lot15"
+        ],
+        "rows": 21613
+      },
+      "ipf_lifts": {
+        "cols": 16,
+        "columns": [
+          "name",
+          "sex",
+          "event",
+          "equipment",
+          "age",
+          "age_class",
+          "division",
+          "bodyweight_kg",
+          "weight_class_kg",
+          "best3squat_kg",
+          "best3bench_kg",
+          "best3deadlift_kg",
+          "place",
+          "date",
+          "federation",
+          "meet_name"
+        ],
+        "rows": 41152
+      },
+      "ma_traffic_2020_vs_2019": {
+        "cols": 5,
+        "columns": [
+          "community",
+          "functional_class",
+          "change_in_speed",
+          "change_in_volume",
+          "change_in_accidents"
+        ],
+        "rows": 264
+      },
+      "mario_kart_auction": {
+        "cols": 12,
+        "columns": [
+          "id",
+          "duration",
+          "n_bids",
+          "cond",
+          "start_pr",
+          "ship_pr",
+          "total_pr",
+          "ship_sp",
+          "seller_rate",
+          "stock_photo",
+          "wheels",
+          "title"
+        ],
+        "rows": 143
+      },
+      "mass_traffic_2020": {
+        "cols": 11,
+        "columns": [
+          "site_id",
+          "county",
+          "community",
+          "rural_urban",
+          "dir",
+          "functional_class",
+          "avg_speed",
+          "total_volume",
+          "crashes",
+          "nonfatal_injuries",
+          "fatal_injuries"
+        ],
+        "rows": 874
+      },
+      "movies_sample": {
+        "cols": 4,
+        "columns": [
+          "title",
+          "year",
+          "rating",
+          "genre"
+        ],
+        "rows": 68
+      },
+      "mythbusters_yawn": {
+        "cols": 3,
+        "columns": [
+          "subj",
+          "group",
+          "yawn"
+        ],
+        "rows": 50
+      },
+      "old_faithful_2024": {
+        "cols": 6,
+        "columns": [
+          "eruption_id",
+          "date",
+          "time",
+          "waiting",
+          "webcam",
+          "duration"
+        ],
+        "rows": 114
+      },
+      "orig_pennies_sample": {
+        "cols": 2,
+        "columns": [
+          "year",
+          "age_in_2011"
+        ],
+        "rows": 40
+      },
+      "pennies": {
+        "cols": 2,
+        "columns": [
+          "year",
+          "age_in_2011"
+        ],
+        "rows": 800
+      },
+      "pennies_resamples": {
+        "cols": 3,
+        "columns": [
+          "replicate",
+          "name",
+          "year"
+        ],
+        "rows": 1750
+      },
+      "pennies_sample": {
+        "cols": 2,
+        "columns": [
+          "ID",
+          "year"
+        ],
+        "rows": 50
+      },
+      "promotions": {
+        "cols": 3,
+        "columns": [
+          "id",
+          "decision",
+          "gender"
+        ],
+        "rows": 48
+      },
+      "promotions_shuffled": {
+        "cols": 3,
+        "columns": [
+          "id",
+          "decision",
+          "gender"
+        ],
+        "rows": 48
+      },
+      "saratoga_houses": {
+        "cols": 8,
+        "columns": [
+          "price",
+          "living_area",
+          "bathrooms",
+          "bedrooms",
+          "fireplaces",
+          "lot_size",
+          "age",
+          "fireplace"
+        ],
+        "rows": 1057
+      },
+      "spotify_52_original": {
+        "cols": 6,
+        "columns": [
+          "track_id",
+          "track_genre",
+          "artists",
+          "track_name",
+          "popularity",
+          "popular_or_not"
+        ],
+        "rows": 52
+      },
+      "spotify_52_shuffled": {
+        "cols": 6,
+        "columns": [
+          "track_id",
+          "track_genre",
+          "artists",
+          "track_name",
+          "popularity",
+          "popular_or_not"
+        ],
+        "rows": 52
+      },
+      "spotify_by_genre": {
+        "cols": 21,
+        "columns": [
+          "track_id",
+          "artists",
+          "album_name",
+          "track_name",
+          "popularity",
+          "duration_ms",
+          "explicit",
+          "danceability",
+          "energy",
+          "key",
+          "loudness",
+          "mode",
+          "speechiness",
+          "acousticness",
+          "instrumentalness",
+          "liveness",
+          "valence",
+          "tempo",
+          "time_signature",
+          "track_genre",
+          "popular_or_not"
+        ],
+        "rows": 6000
+      },
+      "tactile_prop_red": {
+        "cols": 4,
+        "columns": [
+          "group",
+          "replicate",
+          "red_balls",
+          "prop_red"
+        ],
+        "rows": 33
+      },
+      "un_member_states_2024": {
+        "cols": 39,
+        "columns": [
+          "country",
+          "iso",
+          "official_state_name",
+          "continent",
+          "region",
+          "capital_city",
+          "capital_population",
+          "capital_perc_of_country",
+          "capital_data_year",
+          "gdp_per_capita",
+          "gdp_per_capita_year",
+          "summers_competed_in",
+          "summer_golds",
+          "summer_silvers",
+          "summer_bronzes",
+          "summer_total",
+          "winters_competed_in",
+          "winter_golds",
+          "winter_silvers",
+          "winter_bronzes",
+          "winter_total",
+          "combined_competed_ins",
+          "combined_golds",
+          "combined_silvers",
+          "combined_bronzes",
+          "combined_total",
+          "driving_side",
+          "obesity_rate_2024",
+          "obesity_rate_2016",
+          "has_nuclear_weapons_2024",
+          "population_2024",
+          "area_in_square_km",
+          "area_in_square_miles",
+          "population_density_in_square_km",
+          "population_density_in_square_miles",
+          "income_group_2024",
+          "life_expectancy_2022",
+          "fertility_rate_2022",
+          "hdi_2022"
+        ],
+        "rows": 193
+      }
+    },
+    "exports": [
+      "%>%",
+      "geom_categorical_model",
+      "geom_parallel_slopes",
+      "get_correlation",
+      "get_regression_points",
+      "get_regression_summaries",
+      "get_regression_table",
+      "gg_parallel_slopes",
+      "plot_3d_regression",
+      "pop_sd",
+      "rep_sample_n",
+      "rep_slice_sample",
+      "tidy_summary",
+      "View"
+    ],
+    "version": "0.8.0.9000"
+  }
+}

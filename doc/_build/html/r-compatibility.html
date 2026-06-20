@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="R compatibility notes" href="r-compatibility.html"><link rel="prev" title="Coming from R" href="coming-from-r.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Sampling" href="guides/sampling.html"><link rel="prev" title="Datasets" href="datasets.html">
         <link rel="prefetch" href="_static/moderndive-logo.png" as="image">
 
     <link rel="shortcut icon" href="_static/moderndive-logo.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Datasets - moderndive 0.1.0</title>
+        <title>R compatibility notes - moderndive 0.1.0</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -200,8 +200,8 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coming-from-r.html">Coming from R</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="r-compatibility.html">R compatibility notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">R compatibility notes</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -237,7 +237,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/datasets.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/r-compatibility.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -255,65 +255,95 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <div class="cell tag_remove-input docutils container">
-</div>
-<section id="datasets">
-<h1>Datasets<a class="headerlink" href="#datasets" title="Link to this heading">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">moderndive</span></code> bundles 58 datasets (the R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code> + <code class="docutils literal notranslate"><span class="pre">infer</span></code> data, plus a few
-derived tables). Each loads with <code class="docutils literal notranslate"><span class="pre">load_&lt;name&gt;()</span></code> and returns a polars DataFrame.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
-
-<span class="n">md</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">()</span>          <span class="c1"># sorted list of every dataset name</span>
-<span class="n">md</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;pennies&quot;</span><span class="p">)</span>       <span class="c1"># load by name (string)</span>
-<span class="n">md</span><span class="o">.</span><span class="n">load_pennies</span><span class="p">()</span>                <span class="c1"># or via the generated loader</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div><style>
-.dataframe > thead > tr,
-.dataframe > tbody > tr {
-  text-align: right;
-  white-space: pre-wrap;
-}
-</style>
-<small>shape: (800, 2)</small><table border="1" class="dataframe"><thead><tr><th>year</th><th>age_in_2011</th></tr><tr><td>i64</td><td>i64</td></tr></thead><tbody><tr><td>1986</td><td>25</td></tr><tr><td>1996</td><td>15</td></tr><tr><td>1994</td><td>17</td></tr><tr><td>2008</td><td>3</td></tr><tr><td>1999</td><td>12</td></tr><tr><td>&hellip;</td><td>&hellip;</td></tr><tr><td>1975</td><td>36</td></tr><tr><td>1989</td><td>22</td></tr><tr><td>1981</td><td>30</td></tr><tr><td>1991</td><td>20</td></tr><tr><td>1993</td><td>18</td></tr></tbody></table></div></div></div>
-</div>
-<section id="by-topic">
-<h2>By topic<a class="headerlink" href="#by-topic" title="Link to this heading">¶</a></h2>
-<dl class="simple myst">
-<dt><strong>Sampling &amp; simulation</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">bowl</span></code>, <code class="docutils literal notranslate"><span class="pre">bowl_sample_1</span></code>, <code class="docutils literal notranslate"><span class="pre">bowl_samples</span></code>, <code class="docutils literal notranslate"><span class="pre">tactile_prop_red</span></code>,
-<code class="docutils literal notranslate"><span class="pre">almonds_bowl</span></code>, <code class="docutils literal notranslate"><span class="pre">almonds_sample</span></code>, <code class="docutils literal notranslate"><span class="pre">almonds_sample_100</span></code>,
-<code class="docutils literal notranslate"><span class="pre">pennies</span></code>, <code class="docutils literal notranslate"><span class="pre">pennies_sample</span></code>, <code class="docutils literal notranslate"><span class="pre">pennies_resamples</span></code>, <code class="docutils literal notranslate"><span class="pre">orig_pennies_sample</span></code></p>
-</dd>
-<dt><strong>Hypothesis testing &amp; CIs</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">mythbusters_yawn</span></code>, <code class="docutils literal notranslate"><span class="pre">movies_sample</span></code>, <code class="docutils literal notranslate"><span class="pre">spotify_by_genre</span></code>, <code class="docutils literal notranslate"><span class="pre">spotify_52_original</span></code>,
-<code class="docutils literal notranslate"><span class="pre">spotify_52_shuffled</span></code>, <code class="docutils literal notranslate"><span class="pre">spotify_metal_deephouse</span></code>, <code class="docutils literal notranslate"><span class="pre">offshore</span></code>, <code class="docutils literal notranslate"><span class="pre">age_at_marriage</span></code>,
-<code class="docutils literal notranslate"><span class="pre">zinc_tidy</span></code>, <code class="docutils literal notranslate"><span class="pre">cle_sac</span></code>, <code class="docutils literal notranslate"><span class="pre">gss</span></code></p>
-</dd>
-<dt><strong>Regression</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">evals</span></code>, <code class="docutils literal notranslate"><span class="pre">saratoga_houses</span></code>, <code class="docutils literal notranslate"><span class="pre">house_prices</span></code>, <code class="docutils literal notranslate"><span class="pre">coffee_quality</span></code>, <code class="docutils literal notranslate"><span class="pre">coffee_ratings</span></code>,
-<code class="docutils literal notranslate"><span class="pre">credit</span></code>, <code class="docutils literal notranslate"><span class="pre">MA_schools</span></code>, <code class="docutils literal notranslate"><span class="pre">un_member_states_2024</span></code>, <code class="docutils literal notranslate"><span class="pre">mario_kart_auction</span></code>,
-<code class="docutils literal notranslate"><span class="pre">amazon_books</span></code>, <code class="docutils literal notranslate"><span class="pre">old_faithful_2024</span></code></p>
-</dd>
-<dt><strong>Flights &amp; weather (nycflights23 / 13)</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">flights</span></code>, <code class="docutils literal notranslate"><span class="pre">weather</span></code>, <code class="docutils literal notranslate"><span class="pre">airlines</span></code>, <code class="docutils literal notranslate"><span class="pre">airports</span></code>, <code class="docutils literal notranslate"><span class="pre">planes</span></code>, <code class="docutils literal notranslate"><span class="pre">envoy_flights</span></code>,
-<code class="docutils literal notranslate"><span class="pre">alaska_flights</span></code>, <code class="docutils literal notranslate"><span class="pre">early_january_weather</span></code>, <code class="docutils literal notranslate"><span class="pre">early_january_2023_weather</span></code></p>
-</dd>
-<dt><strong>Other example data</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">gapminder</span></code>, <code class="docutils literal notranslate"><span class="pre">gapminder_2007</span></code>, <code class="docutils literal notranslate"><span class="pre">drinks</span></code>, <code class="docutils literal notranslate"><span class="pre">airline_safety</span></code>, <code class="docutils literal notranslate"><span class="pre">dem_score</span></code>,
-<code class="docutils literal notranslate"><span class="pre">us_births_1994_2003</span></code>, <code class="docutils literal notranslate"><span class="pre">steves_episodes</span></code>, <code class="docutils literal notranslate"><span class="pre">avocados</span></code>, <code class="docutils literal notranslate"><span class="pre">babies</span></code>, <code class="docutils literal notranslate"><span class="pre">ipf_lifts</span></code>,
-<code class="docutils literal notranslate"><span class="pre">ev_charging</span></code>, <code class="docutils literal notranslate"><span class="pre">DD_vs_SB</span></code>, <code class="docutils literal notranslate"><span class="pre">ma_traffic_2020_vs_2019</span></code>, <code class="docutils literal notranslate"><span class="pre">mass_traffic_2020</span></code></p>
-</dd>
-</dl>
-</section>
-<section id="tips">
-<h2>Tips<a class="headerlink" href="#tips" title="Link to this heading">¶</a></h2>
+          <section id="r-compatibility-notes">
+<h1>R compatibility notes<a class="headerlink" href="#r-compatibility-notes" title="Link to this heading">¶</a></h1>
+<p>This package aims to reproduce the <strong>numerical results</strong> of the R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code>
+and <code class="docutils literal notranslate"><span class="pre">infer</span></code> packages, not just their API. In several places that means making a
+deliberate choice that differs from the “default” or “typical” Python/SciPy/
+statsmodels behavior. They’re collected here so the differences are intentional
+and discoverable.</p>
+<section id="statistics">
+<h2>Statistics<a class="headerlink" href="#statistics" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Every loader returns a polars DataFrame; call <code class="docutils literal notranslate"><span class="pre">.to_pandas()</span></code> if a function
-(e.g. statsmodels) expects pandas.</p></li>
-<li><p>Datetime columns (e.g. <code class="docutils literal notranslate"><span class="pre">time_hour</span></code> in the weather/flights data) are stored in
-UTC.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">load_dataset(&quot;&lt;name&gt;&quot;)</span></code> raises a helpful <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> listing valid names if
-the dataset doesn’t exist.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">pop_sd</span></code> divides by <code class="docutils literal notranslate"><span class="pre">n</span></code></strong> (population SD, <code class="docutils literal notranslate"><span class="pre">ddof=0</span></code>), unlike the sample
+<code class="docutils literal notranslate"><span class="pre">sd</span></code>/<code class="docutils literal notranslate"><span class="pre">calculate(stat=&quot;sd&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy.std</span></code>’s default which use <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">−</span> <span class="pre">1</span></code>. This
+matches R <code class="docutils literal notranslate"><span class="pre">moderndive::pop_sd</span></code>.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">get_regression_summaries</span></code></strong>: <code class="docutils literal notranslate"><span class="pre">mse</span></code> is the mean squared residual using <code class="docutils literal notranslate"><span class="pre">n</span></code>
+in the denominator (so <code class="docutils literal notranslate"><span class="pre">rmse</span> <span class="pre">=</span> <span class="pre">sqrt(mse)</span></code>), while <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is the residual
+standard error using <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">−</span> <span class="pre">p</span></code>. Both match the R package; note <code class="docutils literal notranslate"><span class="pre">mse</span></code> is <em>not</em>
+statsmodels’ <code class="docutils literal notranslate"><span class="pre">mse_resid</span></code> (which uses <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">−</span> <span class="pre">p</span></code>).</p></li>
+<li><p><strong>GLM summaries</strong> use the log-likelihood-based BIC (<code class="docutils literal notranslate"><span class="pre">bic_llf</span></code>), not
+statsmodels’ deviance-based <code class="docutils literal notranslate"><span class="pre">bic</span></code>, to align with <code class="docutils literal notranslate"><span class="pre">broom::glance</span></code>.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">get_p_value</span></code> two-sided</strong> = <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">×</span> <span class="pre">min(left,</span> <span class="pre">right)</span></code> capped at 1 — the <code class="docutils literal notranslate"><span class="pre">infer</span></code>
+convention, which can differ slightly from a symmetric-tail p-value.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">F</span></code> and <code class="docutils literal notranslate"><span class="pre">Chisq</span></code></strong> are treated as inherently one-sided (right tail) for
+p-values regardless of the <code class="docutils literal notranslate"><span class="pre">direction</span></code> argument, matching <code class="docutils literal notranslate"><span class="pre">infer</span></code>.</p></li>
+</ul>
+</section>
+<section id="prop-test-mirrors-r-s-prop-test-not-a-plain-z-test">
+<h2><code class="docutils literal notranslate"><span class="pre">prop_test</span></code> (mirrors R’s <code class="docutils literal notranslate"><span class="pre">prop.test</span></code>, not a plain z-test)<a class="headerlink" href="#prop-test-mirrors-r-s-prop-test-not-a-plain-z-test" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Chi-square statistic by default</strong> (with a <code class="docutils literal notranslate"><span class="pre">chisq_df</span></code> column), like R’s
+<code class="docutils literal notranslate"><span class="pre">prop.test</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">z=True</span></code> for the signed z-statistic that a “typical” Python
+two-proportion test would report.</p></li>
+<li><p><strong>Yates’ continuity correction</strong> is on by default (<code class="docutils literal notranslate"><span class="pre">correct=True</span></code>), as in R.</p></li>
+<li><p><strong>Confidence intervals</strong> match R: a <strong>Wilson score</strong> interval for one
+proportion (not the Wald interval <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> returns by default), and a
+Wald interval <strong>widened by the continuity correction</strong> for a two-proportion
+difference.</p></li>
+</ul>
+</section>
+<section id="correlation">
+<h2>Correlation<a class="headerlink" href="#correlation" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">get_correlation</span></code> drops nulls by default</strong> (<code class="docutils literal notranslate"><span class="pre">na_rm=True</span></code>) so beginners get a
+number rather than <code class="docutils literal notranslate"><span class="pre">nan</span></code>. R’s <code class="docutils literal notranslate"><span class="pre">na.rm</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">FALSE</span></code>; pass <code class="docutils literal notranslate"><span class="pre">na_rm=False</span></code>
+to match R exactly.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">method=&quot;spearman&quot;</span></code>/<code class="docutils literal notranslate"><span class="pre">&quot;kendall&quot;</span></code> use the SciPy implementations and match R’s
+<code class="docutils literal notranslate"><span class="pre">cor(method=...)</span></code>.</p></li>
+</ul>
+</section>
+<section id="regression-points-tables">
+<h2>Regression points / tables<a class="headerlink" href="#regression-points-tables" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>In-formula transformations</strong> are reshaped to match R: a transformed outcome
+like <code class="docutils literal notranslate"><span class="pre">np.log(mpg)</span></code> is shown on the model scale as <code class="docutils literal notranslate"><span class="pre">log_mpg</span></code>/<code class="docutils literal notranslate"><span class="pre">log_mpg_hat</span></code>, and
+transformed predictors (<code class="docutils literal notranslate"><span class="pre">poly</span></code>, <code class="docutils literal notranslate"><span class="pre">scale</span></code>, <code class="docutils literal notranslate"><span class="pre">I</span></code>) show their original columns
+rather than the patsy basis matrix.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">get_regression_table</span></code></strong> prettifies categorical term names
+(<code class="docutils literal notranslate"><span class="pre">income[T.High]</span></code> → <code class="docutils literal notranslate"><span class="pre">income:</span> <span class="pre">High</span></code>) by default; <code class="docutils literal notranslate"><span class="pre">default_categorical_levels=True</span></code>
+keeps the raw statsmodels names.</p></li>
+</ul>
+</section>
+<section id="datasets">
+<h2>Datasets<a class="headerlink" href="#datasets" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Datetime columns are stored in UTC.</strong> R’s nycflights <code class="docutils literal notranslate"><span class="pre">time_hour</span></code> is stored in
+<code class="docutils literal notranslate"><span class="pre">America/New_York</span></code>; the bundled Parquet stores the identical instants in UTC, so
+a displayed hour differs by the UTC offset (the integer <code class="docutils literal notranslate"><span class="pre">hour</span></code> column matches R).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">early_january_2023_weather</span></code> is derived from <code class="docutils literal notranslate"><span class="pre">weather</span></code>.</strong> The R dataset ships
+<code class="docutils literal notranslate"><span class="pre">temp</span></code>/<code class="docutils literal notranslate"><span class="pre">dewp</span></code>/<code class="docutils literal notranslate"><span class="pre">humid</span></code>/<code class="docutils literal notranslate"><span class="pre">pressure</span></code> as all-<code class="docutils literal notranslate"><span class="pre">NA</span></code>; this package recomputes the table
+from <code class="docutils literal notranslate"><span class="pre">weather</span></code> (Newark, first 15 days of Jan 2023) so those columns hold real
+values.</p></li>
+</ul>
+</section>
+<section id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>plotly is the default engine</strong> (the book is moving to interactive plots);
+pass <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> anywhere for grammar-of-graphics output. R returns
+ggplot2 objects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visualize</span></code>’s default <code class="docutils literal notranslate"><span class="pre">bins</span></code> is 20 (R’s is 15).</p></li>
+<li><p>Two-sided p-value shading mirrors the observed statistic about 0, matching
+<code class="docutils literal notranslate"><span class="pre">infer</span></code>’s <code class="docutils literal notranslate"><span class="pre">shade_p_value</span></code>.</p></li>
+</ul>
+</section>
+<section id="reproducibility">
+<h2>Reproducibility<a class="headerlink" href="#reproducibility" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Pass <code class="docutils literal notranslate"><span class="pre">seed=</span></code> to <code class="docutils literal notranslate"><span class="pre">generate()</span></code> / <code class="docutils literal notranslate"><span class="pre">rep_slice_sample()</span></code> for reproducible draws
+(R uses <code class="docutils literal notranslate"><span class="pre">set.seed()</span></code>). Identical seeds will <strong>not</strong> reproduce R’s exact random
+draws — only the statistical behavior matches, not the specific RNG stream.</p></li>
 </ul>
 </section>
 </section>
@@ -323,23 +353,23 @@ the dataset doesn’t exist.</p></li>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="r-compatibility.html">
+          <a class="next-page" href="guides/sampling.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">R compatibility notes</div>
+                <div class="title">Sampling</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="coming-from-r.html">
+          <a class="prev-page" href="datasets.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Coming from R</div>
+                <div class="title">Datasets</div>
                 
               </div>
             </a>
@@ -373,9 +403,14 @@ the dataset doesn’t exist.</p></li>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Datasets</a><ul>
-<li><a class="reference internal" href="#by-topic">By topic</a></li>
-<li><a class="reference internal" href="#tips">Tips</a></li>
+<li><a class="reference internal" href="#">R compatibility notes</a><ul>
+<li><a class="reference internal" href="#statistics">Statistics</a></li>
+<li><a class="reference internal" href="#prop-test-mirrors-r-s-prop-test-not-a-plain-z-test"><code class="docutils literal notranslate"><span class="pre">prop_test</span></code> (mirrors R’s <code class="docutils literal notranslate"><span class="pre">prop.test</span></code>, not a plain z-test)</a></li>
+<li><a class="reference internal" href="#correlation">Correlation</a></li>
+<li><a class="reference internal" href="#regression-points-tables">Regression points / tables</a></li>
+<li><a class="reference internal" href="#datasets">Datasets</a></li>
+<li><a class="reference internal" href="#plotting">Plotting</a></li>
+<li><a class="reference internal" href="#reproducibility">Reproducibility</a></li>
 </ul>
 </li>
 </ul>

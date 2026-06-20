@@ -200,6 +200,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../coming-from-r.html">Coming from R</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../datasets.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../r-compatibility.html">R compatibility notes</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -334,17 +335,25 @@
         <span class="n">null</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">med</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Hypothesis</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">null</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="s2">&quot;independence&quot;</span><span class="p">,</span> <span class="s2">&quot;paired independence&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;null must be &#39;point&#39;, &#39;independence&#39;, or &#39;paired independence&#39;&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">Hypothesis</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="n">null</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Hypothesis</span><span class="p">(</span><span class="n">spec</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="n">null</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">med</span><span class="o">=</span><span class="n">med</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">reps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">variables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeneratedReplicates</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_generate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Specification.calculate">
 <a class="viewcode-back" href="../../../api.html#moderndive.Specification.calculate">[docs]</a>
@@ -382,8 +391,8 @@
 
 
     <span class="c1"># British-spelling alias (infer parity).</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">hypothesise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">null</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hypothesise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">null</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">med</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">med</span><span class="o">=</span><span class="n">med</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specification.fit">
 <a class="viewcode-back" href="../../../api.html#moderndive.Specification.fit">[docs]</a>
@@ -408,15 +417,23 @@
     <span class="n">spec</span><span class="p">:</span> <span class="n">Specification</span>
     <span class="n">null</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">med</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">reps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">variables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeneratedReplicates</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;bootstrap&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">null</span> <span class="o">==</span> <span class="s2">&quot;point&quot;</span> <span class="k">else</span> <span class="s2">&quot;permute&quot;</span>
-        <span class="k">return</span> <span class="n">_generate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_generate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="p">,</span> <span class="n">hypothesis</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">type</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="Hypothesis.calculate">
 <a class="viewcode-back" href="../../../api.html#moderndive.Hypothesis.calculate">[docs]</a>
@@ -452,6 +469,7 @@
     <span class="n">hyp_mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">hyp_p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">hyp_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="c1"># --- single-variable / two-group statistics ---------------------------</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">calculate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stat</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">order</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Distribution</span><span class="p">:</span>
@@ -471,8 +489,12 @@
                 <span class="n">resp</span> <span class="o">=</span> <span class="n">resp_full</span> <span class="o">*</span> <span class="n">plan</span>  <span class="c1"># randomly flip the sign of each difference</span>
                 <span class="n">expl</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;permute&quot;</span><span class="p">:</span>
-                <span class="n">resp</span> <span class="o">=</span> <span class="n">resp_full</span>
-                <span class="n">expl</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">expl_full</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">expl_full</span><span class="p">[</span><span class="n">plan</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">==</span> <span class="n">spec</span><span class="o">.</span><span class="n">response</span><span class="p">:</span>
+                    <span class="n">resp</span> <span class="o">=</span> <span class="n">resp_full</span><span class="p">[</span><span class="n">plan</span><span class="p">]</span>  <span class="c1"># permute the response instead of the explanatory</span>
+                    <span class="n">expl</span> <span class="o">=</span> <span class="n">expl_full</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">resp</span> <span class="o">=</span> <span class="n">resp_full</span>
+                    <span class="n">expl</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">expl_full</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">expl_full</span><span class="p">[</span><span class="n">plan</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># draw</span>
                 <span class="n">resp</span> <span class="o">=</span> <span class="n">plan</span>  <span class="c1"># the simulated response array</span>
                 <span class="n">expl</span> <span class="o">=</span> <span class="kc">None</span>
@@ -541,18 +563,22 @@
     <span class="n">hypothesis</span><span class="p">:</span> <span class="n">Hypothesis</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">reps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeneratedReplicates</span><span class="p">:</span>
     <span class="k">if</span> <span class="nb">type</span> <span class="o">==</span> <span class="s2">&quot;simulate&quot;</span><span class="p">:</span>  <span class="c1"># infer accepts &quot;simulate&quot; as an alias for &quot;draw&quot;</span>
         <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;draw&quot;</span>
     <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="s2">&quot;draw&quot;</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;type must be &#39;bootstrap&#39;, &#39;permute&#39;, &#39;draw&#39;, or &#39;simulate&#39;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">variables</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">response</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">explanatory</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;variables=</span><span class="si">{</span><span class="n">variables</span><span class="si">!r}</span><span class="s2"> must be the response or explanatory variable.&quot;</span><span class="p">)</span>
     <span class="n">rng</span> <span class="o">=</span> <span class="n">_resample</span><span class="o">.</span><span class="n">make_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">height</span>
     <span class="n">null</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">hypothesis</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">hypothesis</span><span class="o">.</span><span class="n">null</span>
     <span class="n">hyp_mu</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">hypothesis</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">hypothesis</span><span class="o">.</span><span class="n">mu</span>
     <span class="n">hyp_p</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">hypothesis</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">hypothesis</span><span class="o">.</span><span class="n">p</span>
     <span class="n">hyp_sigma</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">hypothesis</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">hypothesis</span><span class="o">.</span><span class="n">sigma</span>
+    <span class="n">hyp_med</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">hypothesis</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">hypothesis</span><span class="o">.</span><span class="n">med</span>
     <span class="n">shifted</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">plans</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -587,6 +613,10 @@
             <span class="n">shifted</span> <span class="o">=</span> <span class="n">_resample</span><span class="o">.</span><span class="n">shift_for_point_null</span><span class="p">(</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">_response_values</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">hypothesis</span><span class="o">.</span><span class="n">mu</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">None</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">hypothesis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">hypothesis</span><span class="o">.</span><span class="n">null</span> <span class="o">==</span> <span class="s2">&quot;point&quot;</span> <span class="ow">and</span> <span class="n">hyp_med</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">shifted</span> <span class="o">=</span> <span class="n">_resample</span><span class="o">.</span><span class="n">shift_for_point_null</span><span class="p">(</span>
+                <span class="n">spec</span><span class="o">.</span><span class="n">_response_values</span><span class="p">,</span> <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">hyp_med</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="kc">None</span>
+            <span class="p">)</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">reps</span><span class="p">):</span>
             <span class="n">plans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">))</span>
 
@@ -599,6 +629,7 @@
         <span class="n">hyp_mu</span><span class="o">=</span><span class="n">hyp_mu</span><span class="p">,</span>
         <span class="n">hyp_p</span><span class="o">=</span><span class="n">hyp_p</span><span class="p">,</span>
         <span class="n">hyp_sigma</span><span class="o">=</span><span class="n">hyp_sigma</span><span class="p">,</span>
+        <span class="n">variables</span><span class="o">=</span><span class="n">variables</span><span class="p">,</span>
     <span class="p">)</span>
 
 
@@ -779,6 +810,7 @@
     <span class="n">order</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">object</span><span class="p">,</span> <span class="nb">object</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">null</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">mu</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">med</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">p</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObservedStatistic</span><span class="p">:</span>
@@ -790,7 +822,9 @@
         <span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span> <span class="n">explanatory</span><span class="o">=</span><span class="n">explanatory</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="n">formula</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="n">success</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">null</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">spec</span><span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="n">null</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">spec</span><span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="n">null</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">med</span><span class="o">=</span><span class="n">med</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span>
+            <span class="n">stat</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">spec</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma</span><span class="p">)</span></div>
 
 

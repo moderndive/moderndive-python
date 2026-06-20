@@ -25,6 +25,7 @@ lint:
 
 readme:
 	QUARTO_PYTHON=$(CURDIR)/.venv/bin/python quarto render README.qmd
+	$(CURDIR)/.venv/bin/python tools/absolutize_readme_images.py
 
 build:
 	uv build

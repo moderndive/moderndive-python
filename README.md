@@ -77,7 +77,7 @@ print(get_p_value(null, obs_stat=obs, direction="right"))
 visualize(null) + shade_p_value(obs_stat=obs, direction="right")
 ```
 
-![](README_files/figure-commonmark/cell-5-output-1.png)
+![](https://raw.githubusercontent.com/moderndive/moderndive-python/main/README_files/figure-commonmark/cell-5-output-1.png)
 
 ## Development
 

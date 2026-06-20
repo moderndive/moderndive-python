@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0
+## 0.1.0 (2026-0-20)
 
 Initial release of the Python companion to **ModernDive: Statistical Inference
 via Data Science** — a faithful port of the R `moderndive` and `infer` packages,

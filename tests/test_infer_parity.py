@@ -41,10 +41,17 @@ def test_ratio_and_odds_props_manual():
 def test_chisq_equals_prop_test_z_squared():
     yawn = _yawn()
     chi = float(specify(yawn, formula="yawn ~ group").calculate(stat="Chisq"))
+    # prop_test now defaults to the chi-square statistic (R parity); ask for the
+    # z explicitly. Without continuity correction, chi-square == z**2.
     z = float(
-        prop_test(yawn, formula="yawn ~ group", success="yes", order=("seed", "control"))[
-            "statistic"
-        ][0]
+        prop_test(
+            yawn,
+            formula="yawn ~ group",
+            success="yes",
+            order=("seed", "control"),
+            z=True,
+            correct=False,
+        )["statistic"][0]
     )
     assert chi == pytest.approx(z**2, rel=1e-6)
 

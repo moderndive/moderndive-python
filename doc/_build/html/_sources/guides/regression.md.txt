@@ -52,16 +52,6 @@ get_regression_points(model).head()
 # columns: ID, price, living_area, bedrooms, price_hat, residual
 ```
 
-Pass `ID=` to label rows by a column, and `newdata=` to predict on a held-out set
-(a `residual` is included when the outcome is present in `newdata`):
-
-```{code-cell} python
-train = houses.head(800)
-test = houses.tail(200)
-model_train = smf.ols("price ~ living_area + bedrooms", data=train.to_pandas()).fit()
-get_regression_points(model_train, newdata=test).head()
-```
-
 ## Model-fit summaries
 
 ```{code-cell} python
@@ -74,12 +64,6 @@ get_regression_summaries(model)
 ```{code-cell} python
 get_correlation(houses, "price ~ living_area")   # ≈ 0.759
 # or: get_correlation(houses, x="living_area", y="price")
-```
-
-Use `method=` for rank correlations (`"spearman"` or `"kendall"`):
-
-```{code-cell} python
-get_correlation(houses, "price ~ living_area", method="spearman")
 ```
 
 Pass several predictors on the right-hand side to get one correlation per

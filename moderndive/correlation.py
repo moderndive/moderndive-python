@@ -1,6 +1,6 @@
 """Correlation and population-spread helpers mirroring the R ``moderndive`` package.
 
-- :func:`get_correlation` ~ ``moderndive::get_correlation`` (tidy 1-row ``cor`` frame)
+- :func:`get_correlation` ~ ``moderndive::get_correlation`` (one or more predictors)
 - :func:`pop_sd`          ~ ``moderndive::pop_sd`` (population standard deviation)
 """
 
@@ -9,23 +9,30 @@ from __future__ import annotations
 import numpy as np
 import polars as pl
 
+from ._messaging import helpful_error, inform
+
 __all__ = ["get_correlation", "pop_sd"]
 
 
-def _parse_pair(formula: str | None, x: str | None, y: str | None) -> tuple[str, str]:
-    """Resolve the (y, x) column pair from a ``"y ~ x"`` formula or x=/y= kwargs."""
-    if formula is not None:
-        if x is not None or y is not None:
-            raise ValueError("Pass either formula or x=/y=, not both.")
-        if "~" not in formula:
-            raise ValueError(f"formula must look like 'y ~ x', got {formula!r}.")
-        lhs, rhs = (part.strip() for part in formula.split("~", 1))
-        if not lhs or not rhs:
-            raise ValueError(f"formula must look like 'y ~ x', got {formula!r}.")
-        return lhs, rhs
-    if x is None or y is None:
-        raise ValueError("Provide a formula 'y ~ x' or both x= and y=.")
-    return y, x
+def _parse_formula(formula: str) -> tuple[str, list[str]]:
+    """Resolve ``"y ~ x1 + x2"`` into the outcome name and a list of predictors."""
+    if "~" not in formula:
+        raise ValueError(
+            helpful_error(
+                f"formula must look like 'y ~ x' (or 'y ~ x1 + x2'), got {formula!r}.",
+                "Put the outcome on the left of ~ and one or more predictors on the right.",
+            )
+        )
+    lhs, rhs = (part.strip() for part in formula.split("~", 1))
+    predictors = [v.strip() for v in rhs.split("+") if v.strip()]
+    if not lhs or not predictors:
+        raise ValueError(
+            helpful_error(
+                f"formula must name an outcome and at least one predictor, got {formula!r}.",
+                "Example: 'mpg ~ wt' or 'mpg ~ wt + hp'.",
+            )
+        )
+    return lhs, predictors
 
 
 def get_correlation(
@@ -34,21 +41,76 @@ def get_correlation(
     *,
     x: str | None = None,
     y: str | None = None,
+    wide: bool = False,
+    quiet: bool = False,
 ) -> pl.DataFrame:
-    """Pearson correlation as a tidy 1-row frame with a ``cor`` column.
+    """Pearson correlation between an outcome and one or more predictors.
 
-    Mirrors ``moderndive::get_correlation(data, y ~ x)``. Specify the variable
-    pair either as a formula string (``"y ~ x"``) or via the ``x=`` and ``y=``
-    keyword arguments. Rows with a null in either column are dropped.
+    Mirrors ``moderndive::get_correlation``. Give the variables either as a
+    formula (``"y ~ x"`` or ``"y ~ x1 + x2 + x3"``) or, for a single predictor,
+    via ``x=`` and ``y=``.
+
+    With **one** predictor the result is a 1-row frame with a ``cor`` column.
+    With **multiple** predictors the result is long by default — columns
+    ``predictor`` and ``cor`` (one row each) — or pass ``wide=True`` for one
+    column per predictor. Rows with a null in either column are dropped per pair.
+
+    A short note points to a full pairwise correlation matrix when there are
+    multiple predictors; silence it with ``quiet=True``.
     """
     df = data if isinstance(data, pl.DataFrame) else pl.from_pandas(data)
-    y_col, x_col = _parse_pair(formula, x, y)
-    for col in (y_col, x_col):
-        if col not in df.columns:
-            raise ValueError(f"Column {col!r} is not in the data.")
-    pair = df.select(x_col, y_col).drop_nulls()
-    value = float(np.corrcoef(pair[x_col].to_numpy(), pair[y_col].to_numpy())[0, 1])
-    return pl.DataFrame({"cor": [value]})
+
+    if formula is not None:
+        if x is not None or y is not None:
+            raise ValueError(
+                helpful_error(
+                    "Pass either a formula or x=/y=, not both.",
+                    "Use a formula ('y ~ x') for one or more predictors, or x=/y= for one.",
+                )
+            )
+        outcome, predictors = _parse_formula(formula)
+    else:
+        if x is None or y is None:
+            raise ValueError(
+                helpful_error(
+                    "Provide a formula ('y ~ x') or both x= and y=.",
+                    "For several predictors use a formula: 'y ~ x1 + x2'.",
+                )
+            )
+        outcome, predictors = y, [x]
+
+    missing = [c for c in [outcome, *predictors] if c not in df.columns]
+    if missing:
+        raise ValueError(
+            helpful_error(
+                f"Column(s) not found in the data: {', '.join(missing)}.",
+                f"Available columns: {', '.join(df.columns)}.",
+            )
+        )
+
+    cors: dict[str, float] = {}
+    for predictor in predictors:
+        pair = df.select(predictor, outcome).drop_nulls()
+        cors[predictor] = float(
+            np.corrcoef(pair[predictor].to_numpy(), pair[outcome].to_numpy())[0, 1]
+        )
+
+    if len(predictors) == 1:
+        return pl.DataFrame({"cor": [cors[predictors[0]]]})
+
+    if not quiet:
+        inform(
+            f"Computing correlations of `{outcome}` against {len(predictors)} predictors.",
+            "For a full pairwise matrix (incl. predictor–predictor correlations), "
+            "use `df.to_pandas().corr()`.",
+            "Pass quiet=True to silence this message.",
+        )
+
+    if wide:
+        return pl.DataFrame({predictor: [cors[predictor]] for predictor in predictors})
+    return pl.DataFrame(
+        {"predictor": predictors, "cor": [cors[predictor] for predictor in predictors]}
+    )
 
 
 def pop_sd(x) -> float:

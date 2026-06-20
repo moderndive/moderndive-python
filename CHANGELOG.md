@@ -4,6 +4,29 @@
 
 Full parity with the R `moderndive` and `infer` packages.
 
+- **Parity with R `moderndive` PR #144**:
+  - `get_correlation()` now accepts multiple right-hand-side predictors
+    (`"y ~ x1 + x2"`) — long output by default, `wide=True` for one column per
+    predictor; a suppressible (`quiet=True`) note points to a full pairwise matrix.
+  - `get_regression_table()`, `get_regression_points()`, and
+    `get_regression_summaries()` now accept fitted **`glm()`** models. GLM points
+    are on the response scale (e.g. probabilities), summaries are GLM-shaped
+    (`deviance`, `null_deviance`, `aic`, `bic`, `log_lik`, …), and the table gains
+    an `exponentiate=` argument for odds/rate ratios.
+  - `get_regression_points()` handles **in-formula transformations**: a
+    transformed outcome like `np.log(mpg)` is shown on the model scale as
+    `log_mpg`/`log_mpg_hat`, and transformed predictors (`poly()`, `scale()`,
+    `I()`) are shown as their original columns rather than leaking basis matrices.
+  - New **`plot_3d_regression(data, "z ~ x + y")`**: interactive 3D scatter with a
+    fitted regression plane (plotly).
+  - New **`View()`**: renders a data frame as an interactive, searchable table via
+    the optional `itables` package (`pip install "moderndive[view]"`) — the Python
+    counterpart of R's `DT::datatable()` — with a graceful fallback when itables
+    isn't installed.
+  - `geom_categorical_model()` is available as an alias of `gg_categorical_model()`.
+  - Messages and errors are now beginner-friendly, in the `infer` style (a short
+    summary line followed by `→` hint bullets); informational notes use a
+    dedicated, suppressible `ModernDiveMessage` category.
 - **`count_missing()`**: a beginner-friendly helper that counts `null` values per
   column and returns a tidy `column`/`n_missing` data frame sorted from most to
   fewest missing — a gentler alternative to `df.select(pl.all().is_null().sum())`.

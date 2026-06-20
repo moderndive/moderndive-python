@@ -65,6 +65,14 @@ All plotting helpers accept ``engine="plotly"`` (default) or ``engine="plotnine"
 .. autofunction:: moderndive.gg_parallel_slopes
 .. autofunction:: moderndive.geom_parallel_slopes
 .. autofunction:: moderndive.gg_categorical_model
+.. autofunction:: moderndive.geom_categorical_model
+.. autofunction:: moderndive.plot_3d_regression
+```
+
+## Viewing data
+
+```{eval-rst}
+.. autofunction:: moderndive.View
 ```
 
 ## Datasets

@@ -209,6 +209,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../guides/regression.html">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../guides/theory-based.html">Theory-based inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../guides/plotting.html">Plotting: plotly &amp; plotnine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../guides/messages.html">Helpful messages &amp; errors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
@@ -251,6 +252,7 @@
 <span class="sd">- :func:`gg_parallel_slopes`  ~ ``moderndive::gg_parallel_slopes`` (scatter + parallel lines)</span>
 <span class="sd">- :func:`geom_parallel_slopes` ~ ``moderndive::geom_parallel_slopes`` (plotnine layer)</span>
 <span class="sd">- :func:`gg_categorical_model` ~ ``moderndive::geom_categorical_model`` (categorical predictor)</span>
+<span class="sd">- :func:`plot_3d_regression` ~ ``moderndive::plot_3d_regression`` (3D scatter + plane)</span>
 
 <span class="sd">The non-plotly backend is plotnine. All functions accept polars or pandas frames.</span>
 <span class="sd">``gg_*`` return a figure (plotly ``go.Figure`` or plotnine ``ggplot``);</span>
@@ -259,7 +261,11 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.._messaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">helpful_error</span>
 
 <span class="c1"># Qualitative palette (matches plotly&#39;s default) so plotnine/plotly look alike.</span>
 <span class="n">_PALETTE</span> <span class="o">=</span> <span class="p">[</span>
@@ -425,6 +431,106 @@
 
 <span class="c1"># R-parity alias: R&#39;s helper is named geom_categorical_model(); expose both names.</span>
 <span class="n">geom_categorical_model</span> <span class="o">=</span> <span class="n">gg_categorical_model</span>
+
+
+<span class="n">_IDENTIFIER</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[A-Za-z_]\w*$&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="plot_3d_regression">
+<a class="viewcode-back" href="../../../api.html#moderndive.plot_3d_regression">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_3d_regression</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interactive 3D scatterplot with a fitted regression plane.</span>
+
+<span class="sd">    Mirrors ``moderndive::plot_3d_regression``. Pass a formula ``z ~ x + y`` —</span>
+<span class="sd">    one numeric outcome and exactly two numeric predictors — and get a plotly</span>
+<span class="sd">    ``go.Figure`` with the data points and the fitted ``lm`` plane.</span>
+
+<span class="sd">    In-formula transformations (e.g. ``log(z) ~ x + y``) are **not** supported,</span>
+<span class="sd">    since the plane and the raw points would be on different scales; transform</span>
+<span class="sd">    the columns of ``data`` first and pass plain names. ``n`` sets the plane&#39;s</span>
+<span class="sd">    grid resolution per axis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="k">else</span> <span class="n">pl</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;`n` must be an integer ≥ 2, got </span><span class="si">{</span><span class="n">n</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="s2">&quot;Try n=25 (the default).&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;~&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;formula must look like &#39;z ~ x + y&#39;, got </span><span class="si">{</span><span class="n">formula</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Put the outcome on the left of ~ and exactly two predictors on the right.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">predictors</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">rhs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_IDENTIFIER</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">_IDENTIFIER</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">predictors</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="s2">&quot;plot_3d_regression() does not support in-formula transformations &quot;</span>
+                <span class="s2">&quot;(e.g. &#39;log(z) ~ x + y&#39;).&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Transform the columns of `data` first, then pass plain names like &#39;z ~ x + y&#39;.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The right-hand side must name exactly two predictors (got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">predictors</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Use a formula like &#39;z ~ x + y&#39;.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="n">lhs</span><span class="p">,</span> <span class="o">*</span><span class="n">predictors</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Column(s) not found in the data: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Available columns: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="p">[</span><span class="n">lhs</span><span class="p">,</span> <span class="o">*</span><span class="n">predictors</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">schema</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">is_numeric</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">helpful_error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;`</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">` must be numeric — a regression plane needs three continuous &quot;</span>
+                    <span class="s2">&quot;variables.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;For a categorical predictor, see gg_categorical_model().&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="n">x_var</span><span class="p">,</span> <span class="n">y_var</span> <span class="o">=</span> <span class="n">predictors</span>
+    <span class="n">pdf</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">x_var</span><span class="p">,</span> <span class="n">y_var</span><span class="p">)</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lhs</span><span class="si">}</span><span class="s2"> ~ </span><span class="si">{</span><span class="n">x_var</span><span class="si">}</span><span class="s2"> + </span><span class="si">{</span><span class="n">y_var</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pdf</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+    <span class="n">x_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">pdf</span><span class="p">[</span><span class="n">x_var</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">pdf</span><span class="p">[</span><span class="n">x_var</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">y_seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">pdf</span><span class="p">[</span><span class="n">y_var</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">pdf</span><span class="p">[</span><span class="n">y_var</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">grid_x</span><span class="p">,</span> <span class="n">grid_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x_seq</span><span class="p">,</span> <span class="n">y_seq</span><span class="p">)</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">x_var</span><span class="p">:</span> <span class="n">grid_x</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">y_var</span><span class="p">:</span> <span class="n">grid_y</span><span class="o">.</span><span class="n">ravel</span><span class="p">()})</span>
+    <span class="n">z_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">grid_x</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span>
+        <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">pdf</span><span class="p">[</span><span class="n">x_var</span><span class="p">],</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">pdf</span><span class="p">[</span><span class="n">y_var</span><span class="p">],</span>
+            <span class="n">z</span><span class="o">=</span><span class="n">pdf</span><span class="p">[</span><span class="n">lhs</span><span class="p">],</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">add_surface</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">x_seq</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y_seq</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">z_pred</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">showscale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;regression plane&quot;</span>
+    <span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">template</span><span class="o">=</span><span class="s2">&quot;plotly_white&quot;</span><span class="p">,</span>
+        <span class="n">scene</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;xaxis_title&quot;</span><span class="p">:</span> <span class="n">x_var</span><span class="p">,</span> <span class="s2">&quot;yaxis_title&quot;</span><span class="p">:</span> <span class="n">y_var</span><span class="p">,</span> <span class="s2">&quot;zaxis_title&quot;</span><span class="p">:</span> <span class="n">lhs</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">fig</span></div>
+
 </pre></div>
         </article>
       </div>

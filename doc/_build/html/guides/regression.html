@@ -210,6 +210,7 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="theory-based.html">Theory-based inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting: plotly &amp; plotnine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="messages.html">Helpful messages &amp; errors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
@@ -262,7 +263,8 @@ model into tidy polars tables — the analog of R <code class="docutils literal 
 <p>Fit models with statsmodels’ formula API, then tidy them:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.formula.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">smf</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">get_regression_table</span><span class="p">,</span> <span class="n">get_regression_points</span><span class="p">,</span> <span class="n">get_regression_summaries</span><span class="p">,</span> <span class="n">get_correlation</span><span class="p">,</span>
@@ -352,6 +354,85 @@ model into tidy polars tables — the analog of R <code class="docutils literal 
 }
 </style>
 <small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>cor</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.758674</td></tr></tbody></table></div></div></div>
+</div>
+<p>Pass several predictors on the right-hand side to get one correlation per
+predictor (long by default; <code class="docutils literal notranslate"><span class="pre">wide=True</span></code> for one column each):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ living_area + bedrooms + bathrooms&quot;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (3, 2)</small><table border="1" class="dataframe"><thead><tr><th>predictor</th><th>cor</th></tr><tr><td>str</td><td>f64</td></tr></thead><tbody><tr><td>&quot;living_area&quot;</td><td>0.758674</td></tr><tr><td>&quot;bedrooms&quot;</td><td>0.462755</td></tr><tr><td>&quot;bathrooms&quot;</td><td>0.64952</td></tr></tbody></table></div></div></div>
+</div>
+</section>
+<section id="logistic-other-glms">
+<h2>Logistic &amp; other GLMs<a class="headerlink" href="#logistic-other-glms" title="Link to this heading">¶</a></h2>
+<p>The regression helpers also accept a fitted <code class="docutils literal notranslate"><span class="pre">glm()</span></code> model. For a logistic
+regression, <code class="docutils literal notranslate"><span class="pre">get_regression_points()</span></code> returns fitted <strong>probabilities</strong> and
+<code class="docutils literal notranslate"><span class="pre">get_regression_summaries()</span></code> returns a GLM-shaped summary (deviance, AIC, BIC, …).
+Pass <code class="docutils literal notranslate"><span class="pre">exponentiate=True</span></code> to <code class="docutils literal notranslate"><span class="pre">get_regression_table()</span></code> for <strong>odds ratios</strong>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+
+<span class="n">evals</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_evals</span><span class="p">()</span><span class="o">.</span><span class="n">with_columns</span><span class="p">((</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;gender&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;male&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;is_male&quot;</span><span class="p">))</span>
+<span class="n">logit</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="s2">&quot;is_male ~ score + age&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">evals</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">(),</span>
+                <span class="n">family</span><span class="o">=</span><span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Binomial</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">get_regression_table</span><span class="p">(</span><span class="n">logit</span><span class="p">,</span> <span class="n">exponentiate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (3, 7)</small><table border="1" class="dataframe"><thead><tr><th>term</th><th>estimate</th><th>std_error</th><th>statistic</th><th>p_value</th><th>lower_ci</th><th>upper_ci</th></tr><tr><td>str</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>&quot;intercept&quot;</td><td>0.003</td><td>1.029</td><td>-5.611</td><td>0.0</td><td>0.0</td><td>0.023</td></tr><tr><td>&quot;score&quot;</td><td>1.954</td><td>0.188</td><td>3.561</td><td>0.0</td><td>1.351</td><td>2.825</td></tr><tr><td>&quot;age&quot;</td><td>1.071</td><td>0.011</td><td>6.292</td><td>0.0</td><td>1.049</td><td>1.095</td></tr></tbody></table></div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_regression_summaries</span><span class="p">(</span><span class="n">logit</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 10)</small><table border="1" class="dataframe"><thead><tr><th>mse</th><th>rmse</th><th>deviance</th><th>null_deviance</th><th>aic</th><th>bic</th><th>log_lik</th><th>df_residual</th><th>df_null</th><th>nobs</th></tr><tr><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>i64</td><td>i64</td><td>i64</td></tr></thead><tbody><tr><td>0.219</td><td>0.468</td><td>578.298</td><td>630.296</td><td>584.298</td><td>596.711</td><td>-289.149</td><td>460</td><td>462</td><td>463</td></tr></tbody></table></div></div></div>
+</div>
+</section>
+<section id="d-regression-plane">
+<h2>3D regression plane<a class="headerlink" href="#d-regression-plane" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">plot_3d_regression()</span></code> draws an interactive 3D scatter of an outcome against two
+numeric predictors, with the fitted regression plane overlaid (a plotly figure):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_3d_regression</span>
+
+<span class="n">plot_3d_regression</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ living_area + bedrooms&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/8b54ea7be43ae3d659ee4cbf06d3ee5f39423bcfb5a220bab5f8e47a400c71ef.png" src="../_images/8b54ea7be43ae3d659ee4cbf06d3ee5f39423bcfb5a220bab5f8e47a400c71ef.png" />
+</div>
 </div>
 </section>
 <section id="visualizing-models">
@@ -479,6 +560,8 @@ from its own value.</p>
 <li><a class="reference internal" href="#fitted-values-residuals">Fitted values &amp; residuals</a></li>
 <li><a class="reference internal" href="#model-fit-summaries">Model-fit summaries</a></li>
 <li><a class="reference internal" href="#correlation">Correlation</a></li>
+<li><a class="reference internal" href="#logistic-other-glms">Logistic &amp; other GLMs</a></li>
+<li><a class="reference internal" href="#d-regression-plane">3D regression plane</a></li>
 <li><a class="reference internal" href="#visualizing-models">Visualizing models</a></li>
 <li><a class="reference internal" href="#inference-for-regression-coefficients">Inference for regression coefficients</a></li>
 </ul>

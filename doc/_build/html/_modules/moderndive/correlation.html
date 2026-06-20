@@ -209,6 +209,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guides/regression.html">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../guides/theory-based.html">Theory-based inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../guides/plotting.html">Plotting: plotly &amp; plotnine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/messages.html">Helpful messages &amp; errors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
@@ -248,7 +249,7 @@
           <h1>Source code for moderndive.correlation</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Correlation and population-spread helpers mirroring the R ``moderndive`` package.</span>
 
-<span class="sd">- :func:`get_correlation` ~ ``moderndive::get_correlation`` (tidy 1-row ``cor`` frame)</span>
+<span class="sd">- :func:`get_correlation` ~ ``moderndive::get_correlation`` (one or more predictors)</span>
 <span class="sd">- :func:`pop_sd`          ~ ``moderndive::pop_sd`` (population standard deviation)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -257,23 +258,30 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">._messaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">helpful_error</span><span class="p">,</span> <span class="n">inform</span>
+
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;get_correlation&quot;</span><span class="p">,</span> <span class="s2">&quot;pop_sd&quot;</span><span class="p">]</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_parse_pair</span><span class="p">(</span><span class="n">formula</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the (y, x) column pair from a ``&quot;y ~ x&quot;`` formula or x=/y= kwargs.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">formula</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pass either formula or x=/y=, not both.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;~&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;formula must look like &#39;y ~ x&#39;, got </span><span class="si">{</span><span class="n">formula</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">lhs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">rhs</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;formula must look like &#39;y ~ x&#39;, got </span><span class="si">{</span><span class="n">formula</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span>
-    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Provide a formula &#39;y ~ x&#39; or both x= and y=.&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">y</span><span class="p">,</span> <span class="n">x</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve ``&quot;y ~ x1 + x2&quot;`` into the outcome name and a list of predictors.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="s2">&quot;~&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;formula must look like &#39;y ~ x&#39; (or &#39;y ~ x1 + x2&#39;), got </span><span class="si">{</span><span class="n">formula</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Put the outcome on the left of ~ and one or more predictors on the right.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span> <span class="o">=</span> <span class="p">(</span><span class="n">part</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">formula</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;~&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">predictors</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">rhs</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lhs</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">predictors</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;formula must name an outcome and at least one predictor, got </span><span class="si">{</span><span class="n">formula</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Example: &#39;mpg ~ wt&#39; or &#39;mpg ~ wt + hp&#39;.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">predictors</span>
 
 
 <div class="viewcode-block" id="get_correlation">
@@ -284,21 +292,76 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">wide</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pearson correlation as a tidy 1-row frame with a ``cor`` column.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pearson correlation between an outcome and one or more predictors.</span>
 
-<span class="sd">    Mirrors ``moderndive::get_correlation(data, y ~ x)``. Specify the variable</span>
-<span class="sd">    pair either as a formula string (``&quot;y ~ x&quot;``) or via the ``x=`` and ``y=``</span>
-<span class="sd">    keyword arguments. Rows with a null in either column are dropped.</span>
+<span class="sd">    Mirrors ``moderndive::get_correlation``. Give the variables either as a</span>
+<span class="sd">    formula (``&quot;y ~ x&quot;`` or ``&quot;y ~ x1 + x2 + x3&quot;``) or, for a single predictor,</span>
+<span class="sd">    via ``x=`` and ``y=``.</span>
+
+<span class="sd">    With **one** predictor the result is a 1-row frame with a ``cor`` column.</span>
+<span class="sd">    With **multiple** predictors the result is long by default — columns</span>
+<span class="sd">    ``predictor`` and ``cor`` (one row each) — or pass ``wide=True`` for one</span>
+<span class="sd">    column per predictor. Rows with a null in either column are dropped per pair.</span>
+
+<span class="sd">    A short note points to a full pairwise correlation matrix when there are</span>
+<span class="sd">    multiple predictors; silence it with ``quiet=True``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="k">else</span> <span class="n">pl</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-    <span class="n">y_col</span><span class="p">,</span> <span class="n">x_col</span> <span class="o">=</span> <span class="n">_parse_pair</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">(</span><span class="n">y_col</span><span class="p">,</span> <span class="n">x_col</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Column </span><span class="si">{</span><span class="n">col</span><span class="si">!r}</span><span class="s2"> is not in the data.&quot;</span><span class="p">)</span>
-    <span class="n">pair</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">x_col</span><span class="p">,</span> <span class="n">y_col</span><span class="p">)</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
-    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="n">x_col</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">pair</span><span class="p">[</span><span class="n">y_col</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;cor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">value</span><span class="p">]})</span></div>
+
+    <span class="k">if</span> <span class="n">formula</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">helpful_error</span><span class="p">(</span>
+                    <span class="s2">&quot;Pass either a formula or x=/y=, not both.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Use a formula (&#39;y ~ x&#39;) for one or more predictors, or x=/y= for one.&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">outcome</span><span class="p">,</span> <span class="n">predictors</span> <span class="o">=</span> <span class="n">_parse_formula</span><span class="p">(</span><span class="n">formula</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">helpful_error</span><span class="p">(</span>
+                    <span class="s2">&quot;Provide a formula (&#39;y ~ x&#39;) or both x= and y=.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;For several predictors use a formula: &#39;y ~ x1 + x2&#39;.&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">outcome</span><span class="p">,</span> <span class="n">predictors</span> <span class="o">=</span> <span class="n">y</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
+
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="n">outcome</span><span class="p">,</span> <span class="o">*</span><span class="n">predictors</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Column(s) not found in the data: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Available columns: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">cors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">predictor</span> <span class="ow">in</span> <span class="n">predictors</span><span class="p">:</span>
+        <span class="n">pair</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">predictor</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
+        <span class="n">cors</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">pair</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;cor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">cors</span><span class="p">[</span><span class="n">predictors</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]})</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
+        <span class="n">inform</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Computing correlations of `</span><span class="si">{</span><span class="n">outcome</span><span class="si">}</span><span class="s2">` against </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">predictors</span><span class="p">)</span><span class="si">}</span><span class="s2"> predictors.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;For a full pairwise matrix (incl. predictor–predictor correlations), &quot;</span>
+            <span class="s2">&quot;use `df.to_pandas().corr()`.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Pass quiet=True to silence this message.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">wide</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">predictor</span><span class="p">:</span> <span class="p">[</span><span class="n">cors</span><span class="p">[</span><span class="n">predictor</span><span class="p">]]</span> <span class="k">for</span> <span class="n">predictor</span> <span class="ow">in</span> <span class="n">predictors</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">{</span><span class="s2">&quot;predictor&quot;</span><span class="p">:</span> <span class="n">predictors</span><span class="p">,</span> <span class="s2">&quot;cor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">cors</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span> <span class="k">for</span> <span class="n">predictor</span> <span class="ow">in</span> <span class="n">predictors</span><span class="p">]}</span>
+    <span class="p">)</span></div>
 
 
 

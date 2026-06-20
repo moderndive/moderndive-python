@@ -57,8 +57,10 @@ from .plots import (
     gg_categorical_model,
     gg_parallel_slopes,
     pairplot,
+    plot_3d_regression,
 )
 from .sampling import rep_sample_n, rep_slice_sample
+from .view import View
 
 __version__ = "0.1.0"
 
@@ -93,6 +95,8 @@ __all__ = [
     "geom_parallel_slopes",
     "gg_categorical_model",
     "geom_categorical_model",
+    "plot_3d_regression",
+    "View",
     "rep_sample_n",
     "rep_slice_sample",
     "theory",

@@ -45,6 +45,13 @@ yawn.head()
 List everything that's available with `md.available_datasets()` (58 datasets), and
 see {doc}`datasets` for a thematic tour.
 
+To explore a dataset in an interactive, searchable/sortable table, use `View()`
+(install the optional extra with `pip install "moderndive[view]"`):
+
+```python
+md.View(yawn)
+```
+
 ## A first summary
 
 `tidy_summary` gives a per-variable five-number summary (numeric) or counts

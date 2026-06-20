@@ -55,16 +55,20 @@ test = ["pytest>=8.0", "pytest-cov>=5.0"]
 # NOT a core dependency: kaleido ships a compiled Chromium and is unavailable
 # under Pyodide, so the package stays installable in-browser without it.
 image = ["kaleido>=0.2"]
+# Interactive DataTables for View(); the Python counterpart of R's DT::datatable.
+# Optional so the core stays light and Pyodide-friendly.
+view = ["itables>=2.0"]
 doc = [
     "sphinx>=7.0",
     "furo>=2024.1",
     "myst-nb>=1.1",            # MyST markdown + executes {code-cell} blocks
     "ipykernel>=6.29",         # kernel myst-nb runs the cells in
     "kaleido>=0.2",            # static PNG export of plotly figures for the docs
+    "itables>=2.0",            # interactive tables for View() examples
     "sphinx-autodoc-typehints>=2.0",
     "sphinx-copybutton>=0.5",
 ]
-dev = ["moderndive[test,doc]", "ruff>=0.6", "pre-commit>=3.0"]
+dev = ["moderndive[test,doc,view]", "ruff>=0.6", "pre-commit>=3.0"]
 
 [project.urls]
 Homepage = "https://github.com/moderndive/moderndive-python"

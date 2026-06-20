@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Hypothesis testing" href="hypothesis-testing.html"><link rel="prev" title="Sampling" href="sampling.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="API reference" href="../api.html"><link rel="prev" title="Plotting: plotly &amp; plotnine" href="plotting.html">
         <link rel="prefetch" href="../_static/moderndive-logo.png" as="image">
 
     <link rel="shortcut icon" href="../_static/moderndive-logo.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>Bootstrapping &amp; confidence intervals - moderndive 0.1.0</title>
+        <title>Helpful messages &amp; errors - moderndive 0.1.0</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
@@ -205,12 +205,12 @@
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="sampling.html">Sampling</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Bootstrapping &amp; confidence intervals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="confidence-intervals.html">Bootstrapping &amp; confidence intervals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="hypothesis-testing.html">Hypothesis testing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="regression.html">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="theory-based.html">Theory-based inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting: plotly &amp; plotnine</a></li>
-<li class="toctree-l1"><a class="reference internal" href="messages.html">Helpful messages &amp; errors</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Helpful messages &amp; errors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
@@ -235,7 +235,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/guides/confidence-intervals.md.txt" title="View this page">
+  <a class="muted-link" href="../_sources/guides/messages.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -255,153 +255,143 @@
         <article role="main" id="furo-main-content">
           <div class="cell tag_remove-input docutils container">
 </div>
-<section id="bootstrapping-confidence-intervals">
-<h1>Bootstrapping &amp; confidence intervals<a class="headerlink" href="#bootstrapping-confidence-intervals" title="Link to this heading">¶</a></h1>
-<p>Resample your data with replacement to build a <strong>bootstrap distribution</strong>, then
-read a confidence interval off it.</p>
-<section id="a-bootstrap-distribution-for-a-mean">
-<h2>A bootstrap distribution for a mean<a class="headerlink" href="#a-bootstrap-distribution-for-a-mean" title="Link to this heading">¶</a></h2>
+<section id="helpful-messages-errors">
+<h1>Helpful messages &amp; errors<a class="headerlink" href="#helpful-messages-errors" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">moderndive</span></code> is built for people <em>learning</em> statistics, so its messages and errors
+are written to teach, not just to report. They follow the same style as the R
+<code class="docutils literal notranslate"><span class="pre">infer</span></code> package: a short <strong>summary line</strong>, then one or more <code class="docutils literal notranslate"><span class="pre">→</span></code> <strong>hint bullets</strong>
+telling you what to do next.</p>
+<p>There are two kinds:</p>
+<ul class="simple">
+<li><p><strong>Errors</strong> (<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> / <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>) — something can’t proceed, raised with a
+fix-it hint.</p></li>
+<li><p><strong>Informational notes</strong> — a heads-up that doesn’t stop your code, emitted as a
+suppressible <code class="docutils literal notranslate"><span class="pre">ModernDiveMessage</span></code> warning.</p></li>
+</ul>
+<section id="errors-that-tell-you-how-to-fix-them">
+<h2>Errors that tell you how to fix them<a class="headerlink" href="#errors-that-tell-you-how-to-fix-them" title="Link to this heading">¶</a></h2>
+<p>Mistype a column name and you get the available columns back, not a cryptic
+<code class="docutils literal notranslate"><span class="pre">KeyError</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">get_confidence_interval</span><span class="p">,</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_confidence_interval</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_correlation</span>
 
-<span class="n">almonds</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_almonds_sample_100</span><span class="p">()</span>
+<span class="n">houses</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_saratoga_houses</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">get_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ livng_area&quot;</span><span class="p">)</span>  <span class="c1"># typo</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Column(s) not found in the data: livng_area.
+  → Available columns: price, living_area, bathrooms, bedrooms, fireplaces, lot_size, age, fireplace.
+</pre></div>
+</div>
+</div>
+</div>
+<p>Pass the wrong kind of object and the error names the fix:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_regression_table</span>
 
-<span class="n">boot</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">almonds</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
-<span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">get_regression_table</span><span class="p">(</span><span class="s2">&quot;not a fitted model&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Expected a fitted statsmodels model, got str.
+  → Fit one first, e.g. smf.ols(&quot;y ~ x&quot;, data).fit() or smf.glm(...).fit().
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_3d_regression</span>
+
+<span class="c1"># plot_3d_regression needs exactly two numeric predictors</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">plot_3d_regression</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ living_area&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>The right-hand side must name exactly two predictors (got 1).
+  → Use a formula like &#39;z ~ x + y&#39;.
 </pre></div>
 </div>
 </div>
 </div>
 </section>
-<section id="confidence-intervals-three-methods">
-<h2>Confidence intervals — three methods<a class="headerlink" href="#confidence-intervals-three-methods" title="Link to this heading">¶</a></h2>
+<section id="informational-notes-and-how-to-silence-them">
+<h2>Informational notes (and how to silence them)<a class="headerlink" href="#informational-notes-and-how-to-silence-them" title="Link to this heading">¶</a></h2>
+<p>Some functions point out something useful without stopping. For example, asking
+for correlations against several predictors notes that you’re getting
+predictor-vs-outcome correlations only (not a full pairwise matrix):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Percentile method (default)</span>
-<span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
-<span class="c1"># shape: (1, 2) → lower_ci ≈ 3.61, upper_ci ≈ 3.75</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">moderndive._messaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModernDiveMessage</span>
 
-<span class="c1"># Standard-error method (needs the point estimate)</span>
-<span class="n">point</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">almonds</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;mean&quot;</span><span class="p">))</span>
-<span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;se&quot;</span><span class="p">,</span> <span class="n">point_estimate</span><span class="o">=</span><span class="n">point</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">caught</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+    <span class="n">get_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ living_area + bedrooms + bathrooms&quot;</span><span class="p">)</span>
 
-<span class="c1"># Bias-corrected</span>
-<span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bias-corrected&quot;</span><span class="p">,</span> <span class="n">point_estimate</span><span class="o">=</span><span class="n">point</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">caught</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">ModernDiveMessage</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div><style>
-.dataframe > thead > tr,
-.dataframe > tbody > tr {
-  text-align: right;
-  white-space: pre-wrap;
-}
-</style>
-<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>3.613883</td><td>3.755272</td></tr></tbody></table></div></div></div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Computing correlations of `price` against 3 predictors.
+  → For a full pairwise matrix (incl. predictor–predictor correlations), use `df.to_pandas().corr()`.
+  → Pass quiet=True to silence this message.
+</pre></div>
 </div>
-<p>Distribution objects also expose the getter as a method:</p>
+</div>
+</div>
+<p>These notes are designed to be <strong>easy to turn off</strong> once you know what they mean.
+Many functions take a <code class="docutils literal notranslate"><span class="pre">quiet=True</span></code> flag:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">boot</span><span class="o">.</span><span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">caught</span><span class="p">:</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">)</span>
+    <span class="n">get_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ living_area + bedrooms&quot;</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;messages emitted:&quot;</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">category</span><span class="p">,</span> <span class="n">ModernDiveMessage</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">caught</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div><style>
-.dataframe > thead > tr,
-.dataframe > tbody > tr {
-  text-align: right;
-  white-space: pre-wrap;
-}
-</style>
-<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>3.606975</td><td>3.75</td></tr></tbody></table></div></div></div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>messages emitted: 0
+</pre></div>
+</div>
+</div>
+</div>
+<p>Or silence every moderndive note globally with a standard <code class="docutils literal notranslate"><span class="pre">warnings</span></code> filter:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">moderndive._messaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModernDiveMessage</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">ModernDiveMessage</span><span class="p">)</span>
+</pre></div>
 </div>
 </section>
-<section id="visualize-the-interval">
-<h2>Visualize the interval<a class="headerlink" href="#visualize-the-interval" title="Link to this heading">¶</a></h2>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ci</span> <span class="o">=</span> <span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
-
-<span class="c1"># plotly (default) — interactive</span>
-<span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_confidence_interval</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
-
-<span class="c1"># plotnine</span>
-<span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;plotnine&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_confidence_interval</span><span class="p">(</span><span class="n">ci</span><span class="p">)</span>
-
-<span class="c1"># one-call keyword form</span>
-<span class="n">visualize</span><span class="p">(</span><span class="n">boot</span><span class="p">,</span> <span class="n">shade_ci</span><span class="o">=</span><span class="n">ci</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/ac66f688faad576ec00fb6dfa22ab9d34977edb8a0a5ff3cadb158ce22be94fd.png" src="../_images/ac66f688faad576ec00fb6dfa22ab9d34977edb8a0a5ff3cadb158ce22be94fd.png" />
-</div>
-</div>
-</section>
-<section id="a-confidence-interval-for-a-proportion">
-<h2>A confidence interval for a proportion<a class="headerlink" href="#a-confidence-interval-for-a-proportion" title="Link to this heading">¶</a></h2>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
-
-<span class="n">mythbusters</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_mythbusters_yawn</span><span class="p">()</span>
-
-<span class="n">boot_prop</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">mythbusters</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;yawn&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;prop&quot;</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">boot_prop</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;percentile&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div><style>
-.dataframe > thead > tr,
-.dataframe > tbody > tr {
-  text-align: right;
-  white-space: pre-wrap;
-}
-</style>
-<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>0.1595</td><td>0.4</td></tr></tbody></table></div></div></div>
-</div>
-</section>
-<section id="a-confidence-interval-for-a-difference">
-<h2>A confidence interval for a difference<a class="headerlink" href="#a-confidence-interval-for-a-difference" title="Link to this heading">¶</a></h2>
-<p>Add an explanatory variable and an <code class="docutils literal notranslate"><span class="pre">order=</span></code> to compare two groups:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">boot_diff</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">mythbusters</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;yawn ~ group&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;yes&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="s2">&quot;control&quot;</span><span class="p">))</span>
-<span class="p">)</span>
-<span class="n">boot_diff</span><span class="o">.</span><span class="n">get_confidence_interval</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="mf">0.95</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div><style>
-.dataframe > thead > tr,
-.dataframe > tbody > tr {
-  text-align: right;
-  white-space: pre-wrap;
-}
-</style>
-<small>shape: (1, 2)</small><table border="1" class="dataframe"><thead><tr><th>lower_ci</th><th>upper_ci</th></tr><tr><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>-0.224934</td><td>0.316189</td></tr></tbody></table></div></div></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p>For <em>theory-based</em> intervals (the formula-based <code class="docutils literal notranslate"><span class="pre">t</span></code> interval) see
-<a class="reference internal" href="theory-based.html"><span class="doc">Theory-based inference</span></a>.</p>
-</div>
+<section id="why-this-matters">
+<h2>Why this matters<a class="headerlink" href="#why-this-matters" title="Link to this heading">¶</a></h2>
+<p>For a newcomer, the difference between <code class="docutils literal notranslate"><span class="pre">KeyError:</span> <span class="pre">'livng_area'</span></code> and “<em>Column(s)
+not found in the data: livng_area. → Available columns: …</em>” is the difference
+between getting stuck and fixing it in seconds. Because the informational notes
+are their own warning category, they’re equally easy to <strong>see</strong> while learning and
+to <strong>mute</strong> once you’re comfortable.</p>
 </section>
 </section>
 
@@ -410,23 +400,23 @@ read a confidence interval off it.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="hypothesis-testing.html">
+          <a class="next-page" href="../api.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Hypothesis testing</div>
+                <div class="title">API reference</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="sampling.html">
+          <a class="prev-page" href="plotting.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Sampling</div>
+                <div class="title">Plotting: plotly &amp; plotnine</div>
                 
               </div>
             </a>
@@ -460,12 +450,10 @@ read a confidence interval off it.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Bootstrapping &amp; confidence intervals</a><ul>
-<li><a class="reference internal" href="#a-bootstrap-distribution-for-a-mean">A bootstrap distribution for a mean</a></li>
-<li><a class="reference internal" href="#confidence-intervals-three-methods">Confidence intervals — three methods</a></li>
-<li><a class="reference internal" href="#visualize-the-interval">Visualize the interval</a></li>
-<li><a class="reference internal" href="#a-confidence-interval-for-a-proportion">A confidence interval for a proportion</a></li>
-<li><a class="reference internal" href="#a-confidence-interval-for-a-difference">A confidence interval for a difference</a></li>
+<li><a class="reference internal" href="#">Helpful messages &amp; errors</a><ul>
+<li><a class="reference internal" href="#errors-that-tell-you-how-to-fix-them">Errors that tell you how to fix them</a></li>
+<li><a class="reference internal" href="#informational-notes-and-how-to-silence-them">Informational notes (and how to silence them)</a></li>
+<li><a class="reference internal" href="#why-this-matters">Why this matters</a></li>
 </ul>
 </li>
 </ul>

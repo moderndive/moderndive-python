@@ -91,7 +91,7 @@ make build-data              # rebuild the bundled Parquet datasets (needs R; se
 make build                   # build the wheel/sdist
 ```
 
-The test suite is held at **100% statement coverage** (enforced in CI via `--cov-fail-under=100`).
+The test suite is held at **100% statement coverage** (enforced in CI via `--cov-fail-under=100`). Releases are automated on `v*` tags — see [RELEASING.md](RELEASING.md).
 
 ## License
 

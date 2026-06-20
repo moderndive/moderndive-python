@@ -284,6 +284,19 @@
     <span class="k">return</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">predictors</span>
 
 
+<span class="n">_CORR_METHODS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;pearson&quot;</span><span class="p">,</span> <span class="s2">&quot;spearman&quot;</span><span class="p">,</span> <span class="s2">&quot;kendall&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_correlate</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Correlation coefficient between two numpy arrays for the chosen method.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;pearson&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span> <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;spearman&quot;</span> <span class="k">else</span> <span class="n">stats</span><span class="o">.</span><span class="n">kendalltau</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">fn</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">)</span><span class="o">.</span><span class="n">statistic</span><span class="p">)</span>
+
+
 <div class="viewcode-block" id="get_correlation">
 <a class="viewcode-back" href="../../api.html#moderndive.get_correlation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_correlation</span><span class="p">(</span>
@@ -292,23 +305,37 @@
     <span class="o">*</span><span class="p">,</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pearson&quot;</span><span class="p">,</span>
+    <span class="n">na_rm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">wide</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pearson correlation between an outcome and one or more predictors.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Correlation between an outcome and one or more predictors.</span>
 
 <span class="sd">    Mirrors ``moderndive::get_correlation``. Give the variables either as a</span>
 <span class="sd">    formula (``&quot;y ~ x&quot;`` or ``&quot;y ~ x1 + x2 + x3&quot;``) or, for a single predictor,</span>
 <span class="sd">    via ``x=`` and ``y=``.</span>
 
+<span class="sd">    ``method`` is ``&quot;pearson&quot;`` (default), ``&quot;spearman&quot;`` (rank correlation), or</span>
+<span class="sd">    ``&quot;kendall&quot;`` (rank concordance). ``na_rm`` drops rows with a null in either</span>
+<span class="sd">    column before computing (per predictor pair); set ``na_rm=False`` to keep</span>
+<span class="sd">    them (yielding ``nan`` if any are present).</span>
+
 <span class="sd">    With **one** predictor the result is a 1-row frame with a ``cor`` column.</span>
 <span class="sd">    With **multiple** predictors the result is long by default — columns</span>
 <span class="sd">    ``predictor`` and ``cor`` (one row each) — or pass ``wide=True`` for one</span>
-<span class="sd">    column per predictor. Rows with a null in either column are dropped per pair.</span>
+<span class="sd">    column per predictor.</span>
 
 <span class="sd">    A short note points to a full pairwise correlation matrix when there are</span>
 <span class="sd">    multiple predictors; silence it with ``quiet=True``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_CORR_METHODS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;method must be one of </span><span class="si">{</span><span class="n">_CORR_METHODS</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">method</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Use &#39;pearson&#39; (linear), &#39;spearman&#39; (rank), or &#39;kendall&#39;.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="k">else</span> <span class="n">pl</span><span class="o">.</span><span class="n">from_pandas</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">formula</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -341,10 +368,10 @@
 
     <span class="n">cors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">predictor</span> <span class="ow">in</span> <span class="n">predictors</span><span class="p">:</span>
-        <span class="n">pair</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">predictor</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
-        <span class="n">cors</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">pair</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="p">)</span>
+        <span class="n">pair</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">predictor</span><span class="p">,</span> <span class="n">outcome</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">na_rm</span><span class="p">:</span>
+            <span class="n">pair</span> <span class="o">=</span> <span class="n">pair</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
+        <span class="n">cors</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span> <span class="o">=</span> <span class="n">_correlate</span><span class="p">(</span><span class="n">pair</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">pair</span><span class="p">[</span><span class="n">outcome</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">method</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">predictors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;cor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">cors</span><span class="p">[</span><span class="n">predictors</span><span class="p">[</span><span class="mi">0</span><span class="p">]]]})</span>

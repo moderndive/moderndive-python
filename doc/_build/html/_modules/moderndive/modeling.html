@@ -374,6 +374,11 @@
     <span class="k">return</span> <span class="n">ordered</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_intercept_only_term</span><span class="p">(</span><span class="n">term</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map only the intercept term to ``intercept``; leave everything else raw.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;intercept&quot;</span> <span class="k">if</span> <span class="n">term</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;Intercept&quot;</span><span class="p">,</span> <span class="s2">&quot;const&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">term</span>
+
+
 <div class="viewcode-block" id="get_regression_table">
 <a class="viewcode-back" href="../../api.html#moderndive.get_regression_table">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_regression_table</span><span class="p">(</span>
@@ -381,6 +386,7 @@
     <span class="n">digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
     <span class="n">conf_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.95</span><span class="p">,</span>
     <span class="n">exponentiate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">default_categorical_levels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Tidy regression table: term, estimate, std_error, statistic, p_value, lower/upper_ci.</span>
 
@@ -391,6 +397,10 @@
 <span class="sd">    coefficient estimate and its confidence interval as rate / odds ratios</span>
 <span class="sd">    (``std_error``, ``statistic``, and ``p_value`` stay on the model&#39;s link scale,</span>
 <span class="sd">    matching ``broom::tidy``).</span>
+
+<span class="sd">    By default, categorical-predictor terms are prettified (e.g.</span>
+<span class="sd">    ``income[T.High income]`` → ``income: High income``). Pass</span>
+<span class="sd">    ``default_categorical_levels=True`` to keep the raw statsmodels term names.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_check_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="n">conf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">conf_level</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -398,9 +408,10 @@
     <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">conf</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">exponentiate</span><span class="p">:</span>
         <span class="n">estimate</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">estimate</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lower</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span>
+    <span class="n">name_fn</span> <span class="o">=</span> <span class="n">_intercept_only_term</span> <span class="k">if</span> <span class="n">default_categorical_levels</span> <span class="k">else</span> <span class="n">_clean_term</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
         <span class="p">{</span>
-            <span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_clean_term</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">_term_names</span><span class="p">(</span><span class="n">model</span><span class="p">)],</span>
+            <span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name_fn</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">_term_names</span><span class="p">(</span><span class="n">model</span><span class="p">)],</span>
             <span class="s2">&quot;estimate&quot;</span><span class="p">:</span> <span class="n">estimate</span><span class="p">,</span>
             <span class="s2">&quot;std_error&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">bse</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
             <span class="s2">&quot;statistic&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tvalues</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
@@ -416,7 +427,9 @@
 
 <div class="viewcode-block" id="get_regression_points">
 <a class="viewcode-back" href="../../api.html#moderndive.get_regression_points">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_regression_points</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_regression_points</span><span class="p">(</span>
+    <span class="n">model</span><span class="p">,</span> <span class="n">digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">newdata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ID</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fitted values + residuals per observation (~ ``broom::augment``).</span>
 
 <span class="sd">    Columns: ``ID``, the outcome, each original predictor, ``&lt;outcome&gt;_hat``,</span>
@@ -426,8 +439,16 @@
 <span class="sd">    (``poly()``, ``scale()``, ``I()``) are shown as their original columns rather</span>
 <span class="sd">    than leaking basis matrices. For GLMs, fitted values and residuals are on the</span>
 <span class="sd">    response scale (e.g. probabilities for logistic regression).</span>
+
+<span class="sd">    Pass ``newdata`` (a polars/pandas frame) to apply the model to new</span>
+<span class="sd">    observations: predictions are returned, plus a ``residual`` if the outcome is</span>
+<span class="sd">    present in ``newdata``. ``ID`` names a column to use as the identifier (placed</span>
+<span class="sd">    first); without it, ``ID`` is ``1..n``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_check_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">newdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_points_newdata</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">newdata</span><span class="p">,</span> <span class="n">digits</span><span class="p">,</span> <span class="n">ID</span><span class="p">)</span>
+
     <span class="n">name</span><span class="p">,</span> <span class="n">name_hat</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">_points_columns_formula</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">_has_formula_frame</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
@@ -441,11 +462,77 @@
     <span class="n">out</span><span class="p">[</span><span class="n">name_hat</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitted</span>
     <span class="n">out</span><span class="p">[</span><span class="s2">&quot;residual&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">residual</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span><span class="o">.</span><span class="n">with_row_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">ID</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="n">ID</span><span class="p">:</span> <span class="n">_id_values</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ID</span><span class="p">),</span> <span class="o">**</span><span class="n">out</span><span class="p">}</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ID</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">with_row_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">))</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s2">&quot;ID&quot;</span><span class="p">])</span>
     <span class="n">float_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">is_float</span><span class="p">()]</span>
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">float_cols</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">digits</span><span class="p">))</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_id_values</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">ID</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pull the ID column from the model&#39;s source frame (formula API only).&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_has_formula_frame</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;ID=</span><span class="si">{</span><span class="n">ID</span><span class="si">!r}</span><span class="s2"> needs a formula-API model so the source data is available.&quot;</span><span class="p">,</span>
+                <span class="s1">&#39;Refit with smf.ols(&quot;y ~ x&quot;, data).fit(), or pass newdata=.&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span>
+    <span class="k">if</span> <span class="n">ID</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;ID column </span><span class="si">{</span><span class="n">ID</span><span class="si">!r}</span><span class="s2"> is not in the model&#39;s data.&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Available columns: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">ID</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_points_newdata</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">newdata</span><span class="p">,</span> <span class="n">digits</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ID</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply ``model`` to ``newdata``: predictions (+ residual if outcome present).&quot;&quot;&quot;</span>
+    <span class="n">nd</span> <span class="o">=</span> <span class="n">_to_pandas</span><span class="p">(</span><span class="n">newdata</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">name_hat</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_outcome_info</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">pvars</span> <span class="o">=</span> <span class="n">_predictor_vars</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">pvars</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nd</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;newdata is missing predictor column(s): </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;newdata has: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">nd</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="n">fitted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">nd</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">ID</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ID</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nd</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">helpful_error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;ID column </span><span class="si">{</span><span class="n">ID</span><span class="si">!r}</span><span class="s2"> is not in newdata.&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;newdata has: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="w"> </span><span class="n">nd</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">nd</span><span class="p">[</span><span class="n">ID</span><span class="p">])</span>
+    <span class="n">has_outcome</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">nd</span><span class="o">.</span><span class="n">columns</span>
+    <span class="k">if</span> <span class="n">has_outcome</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">nd</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">predictor</span> <span class="ow">in</span> <span class="n">pvars</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">nd</span><span class="p">[</span><span class="n">predictor</span><span class="p">])</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">name_hat</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitted</span>
+    <span class="k">if</span> <span class="n">has_outcome</span><span class="p">:</span>
+        <span class="n">out</span><span class="p">[</span><span class="s2">&quot;residual&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">fitted</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">drop_nulls</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">ID</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">with_row_index</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">))</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s2">&quot;ID&quot;</span><span class="p">])</span>
+    <span class="n">float_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">is_float</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">float_cols</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">digits</span><span class="p">))</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_points_columns_formula</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>

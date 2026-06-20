@@ -125,11 +125,17 @@ def _predictor_vars(model) -> list[str]:
     return ordered
 
 
+def _intercept_only_term(term: str) -> str:
+    """Map only the intercept term to ``intercept``; leave everything else raw."""
+    return "intercept" if term in ("Intercept", "const") else term
+
+
 def get_regression_table(
     model,
     digits: int = 3,
     conf_level: float = 0.95,
     exponentiate: bool = False,
+    default_categorical_levels: bool = False,
 ) -> pl.DataFrame:
     """Tidy regression table: term, estimate, std_error, statistic, p_value, lower/upper_ci.
 
@@ -140,6 +146,10 @@ def get_regression_table(
     coefficient estimate and its confidence interval as rate / odds ratios
     (``std_error``, ``statistic``, and ``p_value`` stay on the model's link scale,
     matching ``broom::tidy``).
+
+    By default, categorical-predictor terms are prettified (e.g.
+    ``income[T.High income]`` → ``income: High income``). Pass
+    ``default_categorical_levels=True`` to keep the raw statsmodels term names.
     """
     _check_model(model)
     conf = np.asarray(model.conf_int(alpha=1 - conf_level), dtype=float)
@@ -147,9 +157,10 @@ def get_regression_table(
     lower, upper = conf[:, 0], conf[:, 1]
     if exponentiate:
         estimate, lower, upper = np.exp(estimate), np.exp(lower), np.exp(upper)
+    name_fn = _intercept_only_term if default_categorical_levels else _clean_term
     table = pl.DataFrame(
         {
-            "term": [_clean_term(t) for t in _term_names(model)],
+            "term": [name_fn(t) for t in _term_names(model)],
             "estimate": estimate,
             "std_error": np.asarray(model.bse, dtype=float),
             "statistic": np.asarray(model.tvalues, dtype=float),
@@ -162,7 +173,9 @@ def get_regression_table(
     return table.with_columns(pl.col(numeric).round(digits))
 
 
-def get_regression_points(model, digits: int = 3) -> pl.DataFrame:
+def get_regression_points(
+    model, digits: int = 3, *, newdata=None, ID: str | None = None
+) -> pl.DataFrame:
     """Fitted values + residuals per observation (~ ``broom::augment``).
 
     Columns: ``ID``, the outcome, each original predictor, ``<outcome>_hat``,
@@ -172,8 +185,16 @@ def get_regression_points(model, digits: int = 3) -> pl.DataFrame:
     (``poly()``, ``scale()``, ``I()``) are shown as their original columns rather
     than leaking basis matrices. For GLMs, fitted values and residuals are on the
     response scale (e.g. probabilities for logistic regression).
+
+    Pass ``newdata`` (a polars/pandas frame) to apply the model to new
+    observations: predictions are returned, plus a ``residual`` if the outcome is
+    present in ``newdata``. ``ID`` names a column to use as the identifier (placed
+    first); without it, ``ID`` is ``1..n``.
     """
     _check_model(model)
+    if newdata is not None:
+        return _points_newdata(model, newdata, digits, ID)
+
     name, name_hat, out = (
         _points_columns_formula(model)
         if _has_formula_frame(model)
@@ -187,8 +208,74 @@ def get_regression_points(model, digits: int = 3) -> pl.DataFrame:
     out[name_hat] = fitted
     out["residual"] = residual
 
-    df = pl.DataFrame(out).drop_nulls().with_row_index("ID", offset=1)
-    df = df.with_columns(pl.col("ID").cast(pl.Int64))
+    if ID is not None:
+        out = {ID: _id_values(model, ID), **out}
+    df = pl.DataFrame(out).drop_nulls()
+    if ID is None:
+        df = df.with_row_index("ID", offset=1).with_columns(pl.col("ID").cast(pl.Int64))
+        df = df.select("ID", *[c for c in df.columns if c != "ID"])
+    float_cols = [c for c, dt in df.schema.items() if dt.is_float()]
+    return df.with_columns(pl.col(float_cols).round(digits))
+
+
+def _id_values(model, ID: str):
+    """Pull the ID column from the model's source frame (formula API only)."""
+    if not _has_formula_frame(model):
+        raise TypeError(
+            helpful_error(
+                f"ID={ID!r} needs a formula-API model so the source data is available.",
+                'Refit with smf.ols("y ~ x", data).fit(), or pass newdata=.',
+            )
+        )
+    frame = model.model.data.frame
+    if ID not in frame.columns:
+        raise ValueError(
+            helpful_error(
+                f"ID column {ID!r} is not in the model's data.",
+                f"Available columns: {', '.join(map(str, frame.columns))}.",
+            )
+        )
+    return np.asarray(frame[ID])
+
+
+def _points_newdata(model, newdata, digits: int, ID: str | None) -> pl.DataFrame:
+    """Apply ``model`` to ``newdata``: predictions (+ residual if outcome present)."""
+    nd = _to_pandas(newdata)
+    name, name_hat, _ = _outcome_info(model)
+    pvars = _predictor_vars(model)
+    missing = [c for c in pvars if c not in nd.columns]
+    if missing:
+        raise ValueError(
+            helpful_error(
+                f"newdata is missing predictor column(s): {', '.join(missing)}.",
+                f"newdata has: {', '.join(map(str, nd.columns))}.",
+            )
+        )
+    fitted = np.asarray(model.predict(nd), dtype=float)
+
+    out = {}
+    if ID is not None:
+        if ID not in nd.columns:
+            raise ValueError(
+                helpful_error(
+                    f"ID column {ID!r} is not in newdata.",
+                    f"newdata has: {', '.join(map(str, nd.columns))}.",
+                )
+            )
+        out[ID] = np.asarray(nd[ID])
+    has_outcome = name in nd.columns
+    if has_outcome:
+        out[name] = np.asarray(nd[name])
+    for predictor in pvars:
+        out[predictor] = np.asarray(nd[predictor])
+    out[name_hat] = fitted
+    if has_outcome:
+        out["residual"] = np.asarray(out[name], dtype=float) - fitted
+
+    df = pl.DataFrame(out).drop_nulls()
+    if ID is None:
+        df = df.with_row_index("ID", offset=1).with_columns(pl.col("ID").cast(pl.Int64))
+        df = df.select("ID", *[c for c in df.columns if c != "ID"])
     float_cols = [c for c, dt in df.schema.items() if dt.is_float()]
     return df.with_columns(pl.col(float_cols).round(digits))
 

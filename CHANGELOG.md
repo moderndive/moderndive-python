@@ -4,6 +4,8 @@
 
 Full parity with the R `moderndive` and `infer` packages.
 
+- **R argument parity (moderndive)**: `get_correlation(method=)` adds Spearman and Kendall rank correlations (plus `na_rm`); `get_regression_points(newdata=, ID=)` predicts on a held-out set and labels rows by a column; `get_regression_table(default_categorical_levels=)` can keep raw factor-level term names; `gg_parallel_slopes(alpha=)` sets point transparency.
+
 - **Chi-square goodness-of-fit** (closes the last `infer` vignette gap):
   `specify(response=cat).hypothesize(null="point", p={level: prob, ...})` with
   `generate(type="draw")` and `calculate(stat="Chisq")` now runs a one-variable

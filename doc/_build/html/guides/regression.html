@@ -315,6 +315,27 @@ model into tidy polars tables — the analog of R <code class="docutils literal 
 </style>
 <small>shape: (5, 6)</small><table border="1" class="dataframe"><thead><tr><th>ID</th><th>price</th><th>living_area</th><th>bedrooms</th><th>price_hat</th><th>residual</th></tr><tr><td>i64</td><td>i64</td><td>i64</td><td>i64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>1</td><td>142212</td><td>1982</td><td>3</td><td>184531.942</td><td>-42319.942</td></tr><tr><td>2</td><td>134865</td><td>1676</td><td>3</td><td>155816.245</td><td>-20951.245</td></tr><tr><td>3</td><td>118007</td><td>1694</td><td>3</td><td>157505.404</td><td>-39498.404</td></tr><tr><td>4</td><td>138297</td><td>1800</td><td>2</td><td>174935.767</td><td>-36638.767</td></tr><tr><td>5</td><td>129470</td><td>2088</td><td>3</td><td>194479.21</td><td>-65009.21</td></tr></tbody></table></div></div></div>
 </div>
+<p>Pass <code class="docutils literal notranslate"><span class="pre">ID=</span></code> to label rows by a column, and <code class="docutils literal notranslate"><span class="pre">newdata=</span></code> to predict on a held-out set
+(a <code class="docutils literal notranslate"><span class="pre">residual</span></code> is included when the outcome is present in <code class="docutils literal notranslate"><span class="pre">newdata</span></code>):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train</span> <span class="o">=</span> <span class="n">houses</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">800</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">houses</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">model_train</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="s2">&quot;price ~ living_area + bedrooms&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">train</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">())</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">get_regression_points</span><span class="p">(</span><span class="n">model_train</span><span class="p">,</span> <span class="n">newdata</span><span class="o">=</span><span class="n">test</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 6)</small><table border="1" class="dataframe"><thead><tr><th>ID</th><th>price</th><th>living_area</th><th>bedrooms</th><th>price_hat</th><th>residual</th></tr><tr><td>i64</td><td>i64</td><td>i64</td><td>i64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>1</td><td>113514</td><td>1142</td><td>2</td><td>113390.574</td><td>123.426</td></tr><tr><td>2</td><td>102530</td><td>1202</td><td>2</td><td>119122.741</td><td>-16592.741</td></tr><tr><td>3</td><td>75975</td><td>1300</td><td>3</td><td>121229.32</td><td>-45254.32</td></tr><tr><td>4</td><td>128434</td><td>1508</td><td>3</td><td>141100.831</td><td>-12666.831</td></tr><tr><td>5</td><td>185487</td><td>2271</td><td>3</td><td>213994.885</td><td>-28507.885</td></tr></tbody></table></div></div></div>
+</div>
 </section>
 <section id="model-fit-summaries">
 <h2>Model-fit summaries<a class="headerlink" href="#model-fit-summaries" title="Link to this heading">¶</a></h2>
@@ -354,6 +375,23 @@ model into tidy polars tables — the analog of R <code class="docutils literal 
 }
 </style>
 <small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>cor</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.758674</td></tr></tbody></table></div></div></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">method=</span></code> for rank correlations (<code class="docutils literal notranslate"><span class="pre">&quot;spearman&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;kendall&quot;</span></code>):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_correlation</span><span class="p">(</span><span class="n">houses</span><span class="p">,</span> <span class="s2">&quot;price ~ living_area&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;spearman&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>cor</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.770381</td></tr></tbody></table></div></div></div>
 </div>
 <p>Pass several predictors on the right-hand side to get one correlation per
 predictor (long by default; <code class="docutils literal notranslate"><span class="pre">wide=True</span></code> for one column each):</p>

@@ -1,10 +1,11 @@
-.PHONY: help install test cov lint build build-data clean
+.PHONY: help install test cov lint readme build build-data clean
 
 help:
 	@echo "install     Create the dev environment (uv sync --extra dev)"
 	@echo "test        Run the test suite (enforces 100% coverage)"
 	@echo "cov         Run tests and write an HTML coverage report"
 	@echo "lint        Run ruff"
+	@echo "readme      Re-render README.md from README.qmd (needs Quarto)"
 	@echo "build       Build the wheel and sdist"
 	@echo "build-data  Rebuild the bundled Parquet datasets from CSVs (see tools/)"
 	@echo "clean       Remove build/cache artifacts"
@@ -21,6 +22,9 @@ cov:
 
 lint:
 	uv run ruff check moderndive tests
+
+readme:
+	QUARTO_PYTHON=$(CURDIR)/.venv/bin/python quarto render README.qmd
 
 build:
 	uv build

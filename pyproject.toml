@@ -86,7 +86,7 @@ packages = ["moderndive"]
 artifacts = ["moderndive/data/*.parquet"]
 
 [tool.hatch.build.targets.sdist]
-include = ["moderndive", "tests", "tools", "README.md", "LICENSE", "CHANGELOG.md"]
+include = ["moderndive", "tests", "tools", "README.md", "README.qmd", "README_files", "LICENSE", "CHANGELOG.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

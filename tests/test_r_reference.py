@@ -70,9 +70,50 @@ def test_get_correlation_matches_r():
     assert md.get_correlation(_DF, "y ~ x").item() == pytest.approx(0.9154346, abs=1e-6)
 
 
+def test_get_correlation_rank_methods_match_r():
+    # R: cor(df$x, df$y, method = "spearman" / "kendall")
+    assert md.get_correlation(_DF, "y ~ x", method="spearman").item() == pytest.approx(
+        0.91465115, abs=1e-6
+    )
+    assert md.get_correlation(_DF, "y ~ x", method="kendall").item() == pytest.approx(
+        0.79566006, abs=1e-6
+    )
+
+
+def test_get_regression_points_newdata_matches_r():
+    # R: m <- lm(y ~ x + z, df[1:7,]); predict(m, df[8:10,])
+    train, test = _DF.head(7), _DF.tail(3)
+    model = smf.ols("y ~ x + z", data=train.to_pandas()).fit()
+    pts = md.get_regression_points(model, newdata=test)
+    assert pts["y_hat"].to_list() == pytest.approx([9.2737, 10.3158, 11.386], abs=1e-3)
+    assert pts["residual"].to_list() == pytest.approx([-1.2737, -3.3158, -1.386], abs=1e-3)
+
+
+def test_goodness_of_fit_matches_r():
+    # R: chisq.test(c(20, 10, 30), p = rep(1/3, 3))  ->  X-squared 10, df 2, p 0.00673795
+    cat = pl.DataFrame({"g": ["A"] * 20 + ["B"] * 10 + ["C"] * 30})
+    p = {"A": 1 / 3, "B": 1 / 3, "C": 1 / 3}
+    obs = cat.specify(response="g").hypothesize(null="point", p=p).calculate(stat="Chisq")
+    assert float(obs) == pytest.approx(10.0, abs=1e-6)
+    wrapper = md.chisq_test(cat, response="g", p=p)
+    assert wrapper["chisq_df"][0] == 2
+    assert wrapper["p_value"][0] == pytest.approx(0.00673795, abs=1e-7)
+
+
 def test_pop_sd_matches_r():
     # R: sqrt(sum((x-mean(x))^2)/length(x))  ->  2.872281
     assert md.pop_sd(_DF["x"]) == pytest.approx(2.872281, abs=1e-6)
+
+
+def test_prop_test_matches_r():
+    # R: prop.test(c(10, 4), c(34, 16)) — chi-square (Yates), p, and CI
+    rows = [("yes", "a")] * 10 + [("no", "a")] * 24 + [("yes", "b")] * 4 + [("no", "b")] * 12
+    df = pl.DataFrame({"r": [x[0] for x in rows], "g": [x[1] for x in rows]})
+    out = md.prop_test(df, formula="r ~ g", success="yes", order=("a", "b"))
+    assert out["statistic"][0] == pytest.approx(0.0, abs=1e-9)
+    assert out["p_value"][0] == pytest.approx(1.0)
+    assert out["lower_ci"][0] == pytest.approx(-0.26168, abs=1e-4)
+    assert out["upper_ci"][0] == pytest.approx(0.34991, abs=1e-4)
 
 
 def test_t_test_one_sample_matches_r():

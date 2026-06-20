@@ -55,17 +55,37 @@ def _clean_term(term: str) -> str:
     """Turn patsy term labels into the tidy names moderndive uses.
 
     Examples:
-        ``Intercept``                         -> ``intercept``
+        ``Intercept`` / ``const``             -> ``intercept``
         ``income[T.Lower middle income]``     -> ``income: Lower middle income``
         ``life_exp:income[T.High income]``    -> ``life_exp:income: High income``
         ``C(income, levels=[...])[T.High income]`` -> ``income: High income``
     """
+    if term == "const":  # the constant column from sm.add_constant (array API)
+        return "intercept"
     term = term.replace("Intercept", "intercept")
     # Drop any C(col, ...) wrapper down to just the column name.
     term = re.sub(r"C\(\s*([A-Za-z_]\w*)[^)]*\)", r"\1", term)
     # Turn a categorical level marker [T.level] into ": level".
     term = re.sub(r"\[T\.(.*?)\]", r": \1", term)
     return term
+
+
+def _term_names(model) -> list[str]:
+    """Coefficient names for the table. Works for formula/pandas (``params`` is a
+    Series with an index) and array-API numpy fits (``params`` is a bare array,
+    so fall back to ``exog_names``)."""
+    index = getattr(model.params, "index", None)
+    return list(index) if index is not None else list(model.model.exog_names)
+
+
+def _has_formula_frame(model) -> bool:
+    """Whether the model carries the original data + formula (the formula API).
+
+    True for ``smf.ols("y ~ x", data).fit()``; False for an array-API fit like
+    ``sm.OLS(y, X).fit()``, which exposes only the design matrix.
+    """
+    frame = getattr(getattr(model.model, "data", None), "frame", None)
+    return frame is not None and getattr(model.model, "formula", None) is not None
 
 
 def _clean_name(expr: str) -> str:
@@ -88,19 +108,6 @@ def _outcome_info(model) -> tuple[str, str, bool]:
         return endog, f"{endog}_hat", False
     name = _clean_name(endog)
     return name, f"{name}_hat", True
-
-
-def _require_formula_frame(model) -> None:
-    """``get_regression_points`` needs the original data + formula (the formula API)."""
-    frame = getattr(getattr(model.model, "data", None), "frame", None)
-    if frame is None or getattr(model.model, "formula", None) is None:
-        raise TypeError(
-            helpful_error(
-                "get_regression_points() needs a model fit with the formula API "
-                "so it can recover the original columns.",
-                'Refit with: smf.ols("y ~ x", data).fit() (or smf.glm(...)).',
-            )
-        )
 
 
 def _predictor_vars(model) -> list[str]:
@@ -136,17 +143,17 @@ def get_regression_table(
     """
     _check_model(model)
     conf = np.asarray(model.conf_int(alpha=1 - conf_level), dtype=float)
-    estimate = model.params.to_numpy().astype(float)
+    estimate = np.asarray(model.params, dtype=float)
     lower, upper = conf[:, 0], conf[:, 1]
     if exponentiate:
         estimate, lower, upper = np.exp(estimate), np.exp(lower), np.exp(upper)
     table = pl.DataFrame(
         {
-            "term": [_clean_term(t) for t in model.params.index],
+            "term": [_clean_term(t) for t in _term_names(model)],
             "estimate": estimate,
-            "std_error": model.bse.to_numpy(),
-            "statistic": model.tvalues.to_numpy(),
-            "p_value": model.pvalues.to_numpy(),
+            "std_error": np.asarray(model.bse, dtype=float),
+            "statistic": np.asarray(model.tvalues, dtype=float),
+            "p_value": np.asarray(model.pvalues, dtype=float),
             "lower_ci": lower,
             "upper_ci": upper,
         }
@@ -167,25 +174,16 @@ def get_regression_points(model, digits: int = 3) -> pl.DataFrame:
     response scale (e.g. probabilities for logistic regression).
     """
     _check_model(model)
-    _require_formula_frame(model)
-    frame = _to_pandas(model.model.data.frame)
-    name, name_hat, transformed = _outcome_info(model)
-    pvars = _predictor_vars(model)
+    name, name_hat, out = (
+        _points_columns_formula(model)
+        if _has_formula_frame(model)
+        else _points_columns_array(model)
+    )
     fitted = np.asarray(model.fittedvalues, dtype=float)
-
-    if transformed:
-        outcome_vals = np.asarray(model.model.endog, dtype=float)
-    else:
-        outcome_vals = np.asarray(frame[name])
-
     if _is_glm(model):
         residual = np.asarray(model.resid_response, dtype=float)
     else:
-        residual = np.asarray(outcome_vals, dtype=float) - fitted
-
-    out = {name: outcome_vals}
-    for predictor in pvars:
-        out[predictor] = np.asarray(frame[predictor])
+        residual = np.asarray(out[name], dtype=float) - fitted
     out[name_hat] = fitted
     out["residual"] = residual
 
@@ -193,6 +191,35 @@ def get_regression_points(model, digits: int = 3) -> pl.DataFrame:
     df = df.with_columns(pl.col("ID").cast(pl.Int64))
     float_cols = [c for c, dt in df.schema.items() if dt.is_float()]
     return df.with_columns(pl.col(float_cols).round(digits))
+
+
+def _points_columns_formula(model):
+    """Outcome + original predictor columns for a formula-API model (transform-aware)."""
+    frame = _to_pandas(model.model.data.frame)
+    name, name_hat, transformed = _outcome_info(model)
+    outcome_vals = (
+        np.asarray(model.model.endog, dtype=float) if transformed else np.asarray(frame[name])
+    )
+    out = {name: outcome_vals}
+    for predictor in _predictor_vars(model):
+        out[predictor] = np.asarray(frame[predictor])
+    return name, name_hat, out
+
+
+def _points_columns_array(model):
+    """Outcome + predictor columns for an array-API model (e.g. ``sm.OLS(y, X)``).
+
+    There are no in-formula transforms here, so each non-constant design-matrix
+    column is a predictor and the outcome is the endog array.
+    """
+    name = model.model.endog_names or "y"
+    out = {name: np.asarray(model.model.endog, dtype=float)}
+    exog = np.asarray(model.model.exog, dtype=float)
+    for j, raw in enumerate(model.model.exog_names):
+        if raw in ("const", "Intercept"):
+            continue
+        out[raw] = exog[:, j]
+    return name, f"{name}_hat", out
 
 
 def get_regression_summaries(model, digits: int = 3) -> pl.DataFrame:

@@ -209,6 +209,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../guides/regression.html">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../guides/theory-based.html">Theory-based inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../guides/plotting.html">Plotting: plotly &amp; plotnine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../guides/messages.html">Helpful messages &amp; errors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
 <ul>
@@ -303,17 +304,37 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Turn patsy term labels into the tidy names moderndive uses.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        ``Intercept``                         -&gt; ``intercept``</span>
+<span class="sd">        ``Intercept`` / ``const``             -&gt; ``intercept``</span>
 <span class="sd">        ``income[T.Lower middle income]``     -&gt; ``income: Lower middle income``</span>
 <span class="sd">        ``life_exp:income[T.High income]``    -&gt; ``life_exp:income: High income``</span>
 <span class="sd">        ``C(income, levels=[...])[T.High income]`` -&gt; ``income: High income``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">term</span> <span class="o">==</span> <span class="s2">&quot;const&quot;</span><span class="p">:</span>  <span class="c1"># the constant column from sm.add_constant (array API)</span>
+        <span class="k">return</span> <span class="s2">&quot;intercept&quot;</span>
     <span class="n">term</span> <span class="o">=</span> <span class="n">term</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;Intercept&quot;</span><span class="p">,</span> <span class="s2">&quot;intercept&quot;</span><span class="p">)</span>
     <span class="c1"># Drop any C(col, ...) wrapper down to just the column name.</span>
     <span class="n">term</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;C\(\s*([A-Za-z_]\w*)[^)]*\)&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">term</span><span class="p">)</span>
     <span class="c1"># Turn a categorical level marker [T.level] into &quot;: level&quot;.</span>
     <span class="n">term</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\[T\.(.*?)\]&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;: \1&quot;</span><span class="p">,</span> <span class="n">term</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">term</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_term_names</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coefficient names for the table. Works for formula/pandas (``params`` is a</span>
+<span class="sd">    Series with an index) and array-API numpy fits (``params`` is a bare array,</span>
+<span class="sd">    so fall back to ``exog_names``).&quot;&quot;&quot;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog_names</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_has_formula_frame</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether the model carries the original data + formula (the formula API).</span>
+
+<span class="sd">    True for ``smf.ols(&quot;y ~ x&quot;, data).fit()``; False for an array-API fit like</span>
+<span class="sd">    ``sm.OLS(y, X).fit()``, which exposes only the design matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;frame&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;formula&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_clean_name</span><span class="p">(</span><span class="n">expr</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -336,19 +357,6 @@
         <span class="k">return</span> <span class="n">endog</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">endog</span><span class="si">}</span><span class="s2">_hat&quot;</span><span class="p">,</span> <span class="kc">False</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">_clean_name</span><span class="p">(</span><span class="n">endog</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_hat&quot;</span><span class="p">,</span> <span class="kc">True</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_require_formula_frame</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;``get_regression_points`` needs the original data + formula (the formula API).&quot;&quot;&quot;</span>
-    <span class="n">frame</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;frame&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;formula&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="n">helpful_error</span><span class="p">(</span>
-                <span class="s2">&quot;get_regression_points() needs a model fit with the formula API &quot;</span>
-                <span class="s2">&quot;so it can recover the original columns.&quot;</span><span class="p">,</span>
-                <span class="s1">&#39;Refit with: smf.ols(&quot;y ~ x&quot;, data).fit() (or smf.glm(...)).&#39;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_predictor_vars</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -386,17 +394,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_check_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
     <span class="n">conf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">conf_int</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">conf_level</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">estimate</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">estimate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">conf</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">exponentiate</span><span class="p">:</span>
         <span class="n">estimate</span><span class="p">,</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">estimate</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lower</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">upper</span><span class="p">)</span>
     <span class="n">table</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
         <span class="p">{</span>
-            <span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_clean_term</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">index</span><span class="p">],</span>
+            <span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">_clean_term</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">_term_names</span><span class="p">(</span><span class="n">model</span><span class="p">)],</span>
             <span class="s2">&quot;estimate&quot;</span><span class="p">:</span> <span class="n">estimate</span><span class="p">,</span>
-            <span class="s2">&quot;std_error&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">bse</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-            <span class="s2">&quot;statistic&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">tvalues</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
-            <span class="s2">&quot;p_value&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">pvalues</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span>
+            <span class="s2">&quot;std_error&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">bse</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+            <span class="s2">&quot;statistic&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tvalues</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+            <span class="s2">&quot;p_value&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">pvalues</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
             <span class="s2">&quot;lower_ci&quot;</span><span class="p">:</span> <span class="n">lower</span><span class="p">,</span>
             <span class="s2">&quot;upper_ci&quot;</span><span class="p">:</span> <span class="n">upper</span><span class="p">,</span>
         <span class="p">}</span>
@@ -420,25 +428,16 @@
 <span class="sd">    response scale (e.g. probabilities for logistic regression).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_check_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="n">_require_formula_frame</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="n">frame</span> <span class="o">=</span> <span class="n">_to_pandas</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
-    <span class="n">name</span><span class="p">,</span> <span class="n">name_hat</span><span class="p">,</span> <span class="n">transformed</span> <span class="o">=</span> <span class="n">_outcome_info</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-    <span class="n">pvars</span> <span class="o">=</span> <span class="n">_predictor_vars</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">name_hat</span><span class="p">,</span> <span class="n">out</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">_points_columns_formula</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">_has_formula_frame</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">_points_columns_array</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="n">fitted</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">fittedvalues</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">transformed</span><span class="p">:</span>
-        <span class="n">outcome_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">outcome_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-
     <span class="k">if</span> <span class="n">_is_glm</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
         <span class="n">residual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">resid_response</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">residual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">outcome_vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">fitted</span>
-
-    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">outcome_vals</span><span class="p">}</span>
-    <span class="k">for</span> <span class="n">predictor</span> <span class="ow">in</span> <span class="n">pvars</span><span class="p">:</span>
-        <span class="n">out</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">predictor</span><span class="p">])</span>
+        <span class="n">residual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">fitted</span>
     <span class="n">out</span><span class="p">[</span><span class="n">name_hat</span><span class="p">]</span> <span class="o">=</span> <span class="n">fitted</span>
     <span class="n">out</span><span class="p">[</span><span class="s2">&quot;residual&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">residual</span>
 
@@ -447,6 +446,35 @@
     <span class="n">float_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">dt</span><span class="o">.</span><span class="n">is_float</span><span class="p">()]</span>
     <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">col</span><span class="p">(</span><span class="n">float_cols</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">digits</span><span class="p">))</span></div>
 
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_points_columns_formula</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Outcome + original predictor columns for a formula-API model (transform-aware).&quot;&quot;&quot;</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">_to_pandas</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">name_hat</span><span class="p">,</span> <span class="n">transformed</span> <span class="o">=</span> <span class="n">_outcome_info</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">outcome_vals</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="k">if</span> <span class="n">transformed</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">outcome_vals</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">predictor</span> <span class="ow">in</span> <span class="n">_predictor_vars</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">predictor</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">predictor</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">name_hat</span><span class="p">,</span> <span class="n">out</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_points_columns_array</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Outcome + predictor columns for an array-API model (e.g. ``sm.OLS(y, X)``).</span>
+
+<span class="sd">    There are no in-formula transforms here, so each non-constant design-matrix</span>
+<span class="sd">    column is a predictor and the outcome is the endog array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog_names</span> <span class="ow">or</span> <span class="s2">&quot;y&quot;</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">endog</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)}</span>
+    <span class="n">exog</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">raw</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">exog_names</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">raw</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;const&quot;</span><span class="p">,</span> <span class="s2">&quot;Intercept&quot;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">raw</span><span class="p">]</span> <span class="o">=</span> <span class="n">exog</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_hat&quot;</span><span class="p">,</span> <span class="n">out</span>
 
 
 <div class="viewcode-block" id="get_regression_summaries">

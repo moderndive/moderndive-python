@@ -13,6 +13,7 @@ from __future__ import annotations
 import warnings
 
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 import polars as pl
 import pytest
@@ -177,12 +178,32 @@ def test_points_ols_basic_and_ids(mtcars):
     assert pts["ID"].to_list() == list(range(1, pts.height + 1))
 
 
-def test_regression_points_requires_formula_model():
-    X = sm.add_constant(np.arange(1.0, 11.0))
-    y = np.arange(1.0, 11.0) * 2
+def test_regression_points_array_api_numpy():
+    # Array-API numpy fit: no formula/data frame, just the design matrix.
+    X = sm.add_constant(np.column_stack([np.arange(1.0, 7), np.array([2.0, 1, 4, 3, 6, 5])]))
+    y = np.array([2.0, 4, 5, 4, 6, 7])
     model = sm.OLS(y, X).fit()
-    with pytest.raises(TypeError, match="formula API"):
-        get_regression_points(model)
+    pts = get_regression_points(model)
+    # constant column dropped; design columns become predictors; "y" is the outcome
+    assert pts.columns == ["ID", "y", "x1", "x2", "y_hat", "residual"]
+    assert pts.height == 6
+    # table also works on the bare-array fit (params has no index)
+    tbl = get_regression_table(model)
+    assert tbl["term"].to_list() == ["intercept", "x1", "x2"]
+
+
+def test_regression_points_array_api_pandas_and_glm():
+    # Pandas array-API keeps the named columns.
+    Xp = sm.add_constant(pd.DataFrame({"wt": [1.0, 2, 3, 4, 5, 6], "hp": [2.0, 1, 4, 3, 6, 5]}))
+    yp = pd.Series([2.0, 4, 5, 4, 6, 7], name="mpg")
+    pts = get_regression_points(sm.OLS(yp, Xp).fit())
+    assert pts.columns == ["ID", "mpg", "wt", "hp", "mpg_hat", "residual"]
+    # Array-API GLM: fitted values on the response scale.
+    am = pd.Series([0.0, 1, 0, 1, 1, 0], name="am")
+    glm = sm.GLM(am, Xp, family=sm.families.Binomial()).fit()
+    gpts = get_regression_points(glm)
+    assert gpts.columns == ["ID", "am", "wt", "hp", "am_hat", "residual"]
+    assert gpts["am_hat"].min() >= 0.0 and gpts["am_hat"].max() <= 1.0
 
 
 def test_regression_helpers_reject_non_models():

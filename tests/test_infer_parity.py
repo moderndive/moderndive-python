@@ -163,3 +163,91 @@ def test_aliases_point_to_canonical():
     assert md.get_ci is md.get_confidence_interval
     assert md.visualise is md.visualize
     assert md.shade_pvalue is md.shade_p_value
+
+
+# --- chi-square goodness-of-fit -------------------------------------------
+
+
+def _finrela_uniform_p():
+    gss = md.load_gss()
+    levels = gss["finrela"].unique().to_list()
+    return gss, {lvl: 1 / len(levels) for lvl in levels}
+
+
+def test_gof_observed_matches_scipy():
+    from scipy.stats import chisquare
+
+    gss, p = _finrela_uniform_p()
+    obs = float(
+        specify(gss, response="finrela").hypothesize(null="point", p=p).calculate(stat="Chisq")
+    )
+    counts = gss.select("finrela").drop_nulls()["finrela"].value_counts()
+    observed = {r["finrela"]: r["count"] for r in counts.iter_rows(named=True)}
+    total = sum(observed.values())
+    f_obs = [observed[lvl] for lvl in p]
+    f_exp = [total * prob for prob in p.values()]
+    assert obs == pytest.approx(float(chisquare(f_obs, f_exp).statistic))
+
+
+def test_gof_null_distribution_and_pvalue():
+    gss, p = _finrela_uniform_p()
+    obs = specify(gss, response="finrela").hypothesize(null="point", p=p).calculate(stat="Chisq")
+    null = (
+        specify(gss, response="finrela")
+        .hypothesize(null="point", p=p)
+        .generate(reps=300, type="draw", seed=1)
+        .calculate(stat="Chisq")
+    )
+    assert null.data.height == 300
+    pv = float(md.get_p_value(null, obs_stat=obs, direction="greater")["p_value"][0])
+    assert 0.0 <= pv <= 1.0
+    # "simulate" alias produces the same draws as "draw"
+    null2 = (
+        specify(gss, response="finrela")
+        .hypothesize(null="point", p=p)
+        .generate(reps=300, type="simulate", seed=1)
+        .calculate(stat="Chisq")
+    )
+    assert null.data["stat"].to_list() == null2.data["stat"].to_list()
+
+
+def test_gof_chisq_test_wrapper_matches_pipeline():
+    gss, p = _finrela_uniform_p()
+    obs = float(
+        specify(gss, response="finrela").hypothesize(null="point", p=p).calculate(stat="Chisq")
+    )
+    out = chisq_test(gss, response="finrela", p=p)
+    assert out["statistic"][0] == pytest.approx(obs)
+    assert out["chisq_df"][0] == len(p) - 1
+    assert md.chisq_stat(gss, response="finrela", p=p) == pytest.approx(obs)
+
+
+def test_gof_observe_shortcut():
+    gss, p = _finrela_uniform_p()
+    val = observe(gss, response="finrela", stat="Chisq", null="point", p=p)
+    assert float(val) > 0
+
+
+def test_gof_errors():
+    from moderndive.infer.statistics import compute_statistic
+
+    gss, p = _finrela_uniform_p()
+    # univariate Chisq without a p dict
+    with pytest.raises(ValueError, match="goodness-of-fit"):
+        specify(gss, response="finrela").calculate(stat="Chisq")
+    # p must sum to 1
+    resp = gss["finrela"].drop_nulls().to_numpy()
+    bad = dict(p)
+    first = next(iter(bad))
+    bad[first] = bad[first] + 0.5
+    with pytest.raises(ValueError, match="sum to 1"):
+        compute_statistic(resp, None, "Chisq", p=bad)
+    # p missing a level present in the data
+    missing = {k: v for k, v in list(p.items())[:-1]}
+    total = sum(missing.values())
+    missing = {k: v / total for k, v in missing.items()}
+    with pytest.raises(ValueError, match="missing a probability"):
+        compute_statistic(resp, None, "Chisq", p=missing)
+    # wrapper needs explanatory or p
+    with pytest.raises(ValueError, match="goodness-of-fit"):
+        chisq_test(gss, response="finrela")

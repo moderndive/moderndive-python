@@ -82,7 +82,7 @@ class Specification:
         null: str,
         *,
         mu: float | None = None,
-        p: float | None = None,
+        p: float | dict | None = None,
         sigma: float | None = None,
     ) -> Hypothesis:
         if null not in ("point", "independence", "paired independence"):
@@ -100,7 +100,7 @@ class Specification:
         *,
         order: tuple[object, object] | None = None,
         mu: float | None = None,
-        p: float | None = None,
+        p: float | dict | None = None,
         sigma: float | None = None,
     ) -> ObservedStatistic:
         """Compute the observed statistic (no resampling)."""
@@ -144,7 +144,7 @@ class Hypothesis:
     spec: Specification
     null: str
     mu: float | None = None
-    p: float | None = None
+    p: float | dict | None = None
     sigma: float | None = None
 
     def generate(
@@ -180,7 +180,7 @@ class GeneratedReplicates:
     plans: list[np.ndarray] = field(repr=False)
     shifted_response: np.ndarray | None = field(default=None, repr=False)
     hyp_mu: float | None = None
-    hyp_p: float | None = None
+    hyp_p: float | dict | None = None
     hyp_sigma: float | None = None
 
     # --- single-variable / two-group statistics ---------------------------
@@ -294,12 +294,20 @@ def _generate(
     elif type == "draw":
         if hypothesis is None or hypothesis.p is None:
             raise ValueError("type='draw' requires hypothesize(null='point', p=...)")
-        success = spec.success
-        nonsuccess = "\x00not_success"
-        p0 = hypothesis.p
-        for _ in range(reps):
-            draws = rng.random(n) < p0
-            plans.append(np.where(draws, success, nonsuccess).astype(object))
+        if isinstance(hypothesis.p, dict):
+            # Multi-level draw for chi-square goodness-of-fit: sample each
+            # replicate's categories from the hypothesized proportions.
+            levels = list(hypothesis.p.keys())
+            probs = np.asarray(list(hypothesis.p.values()), dtype=float)
+            for _ in range(reps):
+                plans.append(rng.choice(levels, size=n, p=probs).astype(object))
+        else:
+            success = spec.success
+            nonsuccess = "\x00not_success"
+            p0 = hypothesis.p
+            for _ in range(reps):
+                draws = rng.random(n) < p0
+                plans.append(np.where(draws, success, nonsuccess).astype(object))
     else:  # bootstrap
         if hypothesis is not None and hypothesis.null == "point" and hypothesis.mu is not None:
             shifted = _resample.shift_for_point_null(
@@ -486,7 +494,7 @@ def observe(
     order: tuple[object, object] | None = None,
     null: str | None = None,
     mu: float | None = None,
-    p: float | None = None,
+    p: float | dict | None = None,
     sigma: float | None = None,
 ) -> ObservedStatistic:
     """Shortcut for ``specify() |> [hypothesize()] |> calculate()``.

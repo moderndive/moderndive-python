@@ -4,6 +4,12 @@
 
 Full parity with the R `moderndive` and `infer` packages.
 
+- **Chi-square goodness-of-fit** (closes the last `infer` vignette gap):
+  `specify(response=cat).hypothesize(null="point", p={level: prob, ...})` with
+  `generate(type="draw")` and `calculate(stat="Chisq")` now runs a one-variable
+  goodness-of-fit test, and `chisq_test(data, response=, p=)` is the one-line
+  wrapper. `hypothesize(p=...)` accepts a `{level: probability}` mapping.
+
 - **Parity with R `moderndive` PR #144**:
   - `get_correlation()` now accepts multiple right-hand-side predictors
     (`"y ~ x1 + x2"`) — long output by default, `wide=True` for one column per

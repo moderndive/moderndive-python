@@ -72,7 +72,9 @@ dev = ["moderndive[test,doc,view]", "ruff>=0.6", "pre-commit>=3.0"]
 
 [project.urls]
 Homepage = "https://github.com/moderndive/moderndive-python"
+Documentation = "https://moderndive.readthedocs.io"
 Repository = "https://github.com/moderndive/moderndive-python"
+Changelog = "https://github.com/moderndive/moderndive-python/blob/main/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/moderndive/moderndive-python/issues"
 "ModernDive book" = "https://moderndive.com"
 

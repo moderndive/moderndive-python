@@ -80,14 +80,16 @@ def compute_statistic(
     success: object | None = None,
     order: tuple[object, object] | None = None,
     mu: float | None = None,
-    p: float | None = None,
+    p: float | dict | None = None,
     sigma: float | None = None,
 ) -> float:
     """Compute a single statistic from response (+ optional explanatory) arrays.
 
     ``stat`` may also be a callable taking ``(response, explanatory)`` and
     returning a float (infer's custom-statistic feature). ``sigma`` is the known
-    population SD for a one-sample ``z`` statistic on a mean.
+    population SD for a one-sample ``z`` statistic on a mean. ``p`` is a float
+    (one-proportion null) or a ``{level: probability}`` dict (chi-square
+    goodness-of-fit).
     """
     if callable(stat):
         return float(stat(response, explanatory))
@@ -121,6 +123,15 @@ def compute_statistic(
             raise ValueError("stat 'z' (one proportion) requires hypothesize(p=...)")
         phat = _prop(response == success)
         return float((phat - p) / np.sqrt(p * (1 - p) / n))
+
+    # Chi-square goodness-of-fit: one categorical variable vs hypothesized props.
+    if stat == "Chisq" and explanatory is None:
+        if not isinstance(p, dict):
+            raise ValueError(
+                "stat 'Chisq' on one variable is a goodness-of-fit test and requires "
+                "hypothesize(null='point', p={level: probability, ...})."
+            )
+        return _chisq_gof(response, p)
 
     # --- bivariate statistics --------------------------------------------
     if explanatory is None:
@@ -182,6 +193,28 @@ def _anova_f(y: np.ndarray, group: np.ndarray) -> float:
     ss_within = sum(((y[group == g] - y[group == g].mean()) ** 2).sum() for g in levels)
     df_between, df_within = k - 1, n - k
     return float((ss_between / df_between) / (ss_within / df_within))
+
+
+def _chisq_gof(response: np.ndarray, p: dict) -> float:
+    """Chi-square goodness-of-fit statistic: observed counts vs ``n * p[level]``."""
+    total = float(np.sum(list(p.values())))
+    if not np.isclose(total, 1.0):
+        raise ValueError(f"hypothesized proportions p must sum to 1 (got {total:g}).")
+    observed_levels = set(np.unique(response).tolist())
+    missing = observed_levels - set(p)
+    if missing:
+        raise ValueError(
+            "p is missing a probability for level(s) present in the data: "
+            f"{', '.join(map(str, sorted(missing)))}."
+        )
+    n = response.shape[0]
+    stat = 0.0
+    for level, prob in p.items():
+        expected = n * prob
+        observed = float(np.sum(response == level))
+        if expected > 0:
+            stat += (observed - expected) ** 2 / expected
+    return float(stat)
 
 
 def _chisq_independence(response: np.ndarray, explanatory: np.ndarray) -> float:

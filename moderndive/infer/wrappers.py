@@ -126,13 +126,34 @@ def chisq_test(
     formula: str | None = None,
     response: str | None = None,
     explanatory: str | None = None,
+    p: dict | None = None,
 ) -> pl.DataFrame:
-    """Chi-squared test of independence (categorical response ~ categorical explanatory)."""
+    """Tidy chi-squared test.
+
+    With an explanatory variable, this is a **test of independence**. With only a
+    response and a ``p={level: probability, ...}`` mapping, it is a **goodness-of-fit**
+    test against those hypothesized proportions. Returns ``statistic``,
+    ``chisq_df``, ``p_value``.
+    """
     from scipy import stats
 
     resp, expl = _resolve(formula, response, explanatory)
     if expl is None:
-        raise ValueError("chisq_test needs an explanatory variable (test of independence)")
+        if p is None:
+            raise ValueError(
+                "chisq_test needs either an explanatory variable (test of independence) "
+                "or p={level: probability, ...} (goodness-of-fit)."
+            )
+        counts = data.select(resp).drop_nulls()[resp].value_counts()
+        observed = {row[resp]: row["count"] for row in counts.iter_rows(named=True)}
+        total = sum(observed.values())
+        levels = list(p.keys())
+        f_obs = [observed.get(lvl, 0) for lvl in levels]
+        f_exp = [total * p[lvl] for lvl in levels]
+        chi2, pval = stats.chisquare(f_obs, f_exp)
+        return pl.DataFrame(
+            {"statistic": [float(chi2)], "chisq_df": [len(levels) - 1], "p_value": [float(pval)]}
+        )
     sub = data.select(resp, expl).drop_nulls()
     table = sub.to_pandas().pivot_table(index=resp, columns=expl, aggfunc="size", fill_value=0)
     chi2, pval, dof, _ = stats.chi2_contingency(table.to_numpy(), correction=False)

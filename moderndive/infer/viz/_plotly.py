@@ -25,23 +25,24 @@ def _layout(fig, title: str, xlab: str, ylab: str):
     return fig
 
 
-def density_curve_px(x, density, title: str, xlab: str = "statistic"):
+def density_curve_px(x, density, title: str, xlab: str = "statistic", color: str | None = None):
     """A standalone theoretical density curve."""
     go = _go()
-    fig = go.Figure(go.Scatter(x=x, y=density, mode="lines", line={"color": C._OBS_COLOR}))
+    fig = go.Figure(go.Scatter(x=x, y=density, mode="lines", line={"color": color or C._OBS_COLOR}))
     return _layout(fig, title, xlab, "density")
 
 
-def visualize_px(distribution, bins: int, method: str):
+def visualize_px(distribution, bins: int, method: str, dens_color: str | None = None):
     """Histogram of simulated statistics, optionally overlaid with a normal curve."""
     go = _go()
     values = C.stat_values(distribution)
     xlab = C.stat_label(distribution.stat)
     title = C.dist_title(distribution.null)
+    curve_color = dens_color or C._OBS_COLOR
 
     if method == "theoretical":
         x, dens = C.normal_overlay(values)
-        return density_curve_px(x, dens, "Theoretical Distribution", xlab)
+        return density_curve_px(x, dens, "Theoretical Distribution", xlab, curve_color)
 
     histnorm = "probability density" if method == "both" else None
     fig = go.Figure(
@@ -54,7 +55,7 @@ def visualize_px(distribution, bins: int, method: str):
     )
     if method == "both":
         x, dens = C.normal_overlay(values)
-        fig.add_scatter(x=x, y=dens, mode="lines", line={"color": C._OBS_COLOR})
+        fig.add_scatter(x=x, y=dens, mode="lines", line={"color": curve_color})
     return _layout(fig, title, xlab, "density" if method == "both" else "count")
 
 
@@ -112,24 +113,27 @@ def apply_shade_px(fig, spec):
     lo, hi = _data_range(out)
 
     if spec.kind == "p_value":
+        lc = spec.color or C._OBS_COLOR
+        fc = spec.fill or spec.color or C._OBS_COLOR
         vlines, rects = C.pvalue_regions(spec.obs_stat, spec.direction)
         for x, dashed in vlines:
             out.add_vline(
-                x=x, line={"color": C._OBS_COLOR, "width": 2, "dash": "dash" if dashed else "solid"}
+                x=x, line={"color": lc, "width": 2, "dash": "dash" if dashed else "solid"}
             )
         for xmin, xmax in rects:
             out.add_vrect(
                 x0=_clip(xmin, lo, hi),
                 x1=_clip(xmax, lo, hi),
-                fillcolor=C._OBS_COLOR,
+                fillcolor=fc,
                 opacity=0.3,
                 line_width=0,
             )
     else:  # confidence_interval
-        color = spec.color or C._SHADE_COLOR
-        out.add_vrect(x0=spec.lower, x1=spec.upper, fillcolor=color, opacity=0.3, line_width=0)
-        out.add_vline(x=spec.lower, line={"color": color, "width": 2})
-        out.add_vline(x=spec.upper, line={"color": color, "width": 2})
+        lc = spec.color or C._SHADE_COLOR
+        fc = spec.fill or spec.color or C._SHADE_COLOR
+        out.add_vrect(x0=spec.lower, x1=spec.upper, fillcolor=fc, opacity=0.3, line_width=0)
+        out.add_vline(x=spec.lower, line={"color": lc, "width": 2})
+        out.add_vline(x=spec.upper, line={"color": lc, "width": 2})
     return out
 
 
@@ -157,6 +161,8 @@ def apply_fit_shade_px(fig, spec, terms):
     per = dict(spec.per_term)
 
     if spec.kind == "p_value":
+        lc = spec.color or C._OBS_COLOR
+        fc = spec.fill or spec.color or C._OBS_COLOR
         for term, obs in per.items():
             col = term_to_col.get(term)
             if col is None:
@@ -166,7 +172,7 @@ def apply_fit_shade_px(fig, spec, terms):
             for x, dashed in vlines:
                 out.add_vline(
                     x=x,
-                    line={"color": C._OBS_COLOR, "width": 2, "dash": "dash" if dashed else "solid"},
+                    line={"color": lc, "width": 2, "dash": "dash" if dashed else "solid"},
                     row=1,
                     col=col,
                 )
@@ -174,21 +180,22 @@ def apply_fit_shade_px(fig, spec, terms):
                 out.add_vrect(
                     x0=_clip(xmin, lo, hi),
                     x1=_clip(xmax, lo, hi),
-                    fillcolor=C._OBS_COLOR,
+                    fillcolor=fc,
                     opacity=0.3,
                     line_width=0,
                     row=1,
                     col=col,
                 )
     else:  # confidence_interval
-        color = spec.color or C._SHADE_COLOR
+        lc = spec.color or C._SHADE_COLOR
+        fc = spec.fill or spec.color or C._SHADE_COLOR
         for term, (lower, upper) in per.items():
             col = term_to_col.get(term)
             if col is None:
                 continue
             out.add_vrect(
-                x0=lower, x1=upper, fillcolor=color, opacity=0.3, line_width=0, row=1, col=col
+                x0=lower, x1=upper, fillcolor=fc, opacity=0.3, line_width=0, row=1, col=col
             )
-            out.add_vline(x=lower, line={"color": color, "width": 2}, row=1, col=col)
-            out.add_vline(x=upper, line={"color": color, "width": 2}, row=1, col=col)
+            out.add_vline(x=lower, line={"color": lc, "width": 2}, row=1, col=col)
+            out.add_vline(x=upper, line={"color": lc, "width": 2}, row=1, col=col)
     return out

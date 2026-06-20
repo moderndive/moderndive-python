@@ -76,6 +76,26 @@ def t_stat(data: pl.DataFrame, **kwargs) -> float:
     return float(t_test(data, **kwargs)["statistic"][0])
 
 
+def _wilson_cc(x: int, n: int, conf_level: float, correct: bool) -> tuple[float, float]:
+    """Wilson score interval for one proportion (R prop.test's CI; cc = Yates)."""
+    from scipy import stats
+
+    z = float(stats.norm.ppf((1 + conf_level) / 2))
+    phat = x / n
+    if correct:
+        lo = (
+            2 * x + z**2 - 1 - z * np.sqrt(z**2 - 2 - 1 / n + 4 * phat * (n * (1 - phat) + 1))
+        ) / (2 * (n + z**2))
+        hi = (
+            2 * x + z**2 + 1 + z * np.sqrt(z**2 + 2 - 1 / n + 4 * phat * (n * (1 - phat) - 1))
+        ) / (2 * (n + z**2))
+        return max(0.0, lo), min(1.0, hi)
+    denom = 1 + z**2 / n
+    center = (phat + z**2 / (2 * n)) / denom
+    half = z * np.sqrt(phat * (1 - phat) / n + z**2 / (4 * n**2)) / denom
+    return center - half, center + half
+
+
 def prop_test(
     data: pl.DataFrame,
     *,
@@ -86,19 +106,34 @@ def prop_test(
     order: tuple[object, object] | None = None,
     p: float | None = None,
     alternative: str = "two-sided",
+    z: bool = False,
+    correct: bool = True,
+    conf_int: bool = True,
+    conf_level: float = 0.95,
 ) -> pl.DataFrame:
-    """One- or two-proportion z-test (normal approximation), tidy output."""
+    """Tidy one- or two-proportion test, mirroring R ``infer::prop_test``.
+
+    By default reports the **chi-square** statistic (like R's ``prop.test``) with a
+    ``chisq_df`` column; pass ``z=True`` for the signed **z** statistic instead.
+    ``correct`` applies Yates' continuity correction. With ``conf_int=True``
+    (default) the output includes a ``conf_level`` confidence interval — on the
+    proportion (one-sample) or on the difference in proportions (two-sample).
+    """
     from scipy import stats
 
     resp, expl = _resolve(formula, response, explanatory)
+
     if expl is None:
         col = data[resp].drop_nulls()
         n = col.len()
         x = int((col == success).sum())
-        p0 = 0.5 if p is None else p
         phat = x / n
-        se = np.sqrt(p0 * (1 - p0) / n)
-        z = (phat - p0) / se
+        p0 = 0.5 if p is None else p
+        diff = phat - p0
+        cc = min(0.5 / n, abs(diff)) if correct else 0.0
+        zstat = np.sign(diff) * (abs(diff) - cc) / np.sqrt(p0 * (1 - p0) / n)
+        estimate = phat
+        ci_bounds = _wilson_cc(x, n, conf_level, correct)  # R uses Wilson for one proportion
     else:
         if order is None:
             raise ValueError("two-proportion prop_test requires order=(group1, group2)")
@@ -108,16 +143,35 @@ def prop_test(
         b = sub.filter(pl.col(expl) == g2)[resp]
         xa, xb = int((a == success).sum()), int((b == success).sum())
         na, nb = a.len(), b.len()
+        pa, pb = xa / na, xb / nb
+        diff = pa - pb
         ppool = (xa + xb) / (na + nb)
-        se = np.sqrt(ppool * (1 - ppool) * (1 / na + 1 / nb))
-        z = (xa / na - xb / nb) / se
+        cc = min(0.5 * (1 / na + 1 / nb), abs(diff)) if correct else 0.0
+        zstat = np.sign(diff) * (abs(diff) - cc) / np.sqrt(ppool * (1 - ppool) * (1 / na + 1 / nb))
+        se_est = np.sqrt(pa * (1 - pa) / na + pb * (1 - pb) / nb)
+        estimate = diff
+        crit = float(stats.norm.ppf(1 - (1 - conf_level) / 2))
+        half = crit * se_est + cc  # R's prop.test widens the 2-sample diff CI by the correction
+        ci_bounds = (diff - half, diff + half)
+
     if alternative in _GREATER:
-        pval = float(stats.norm.sf(z))
+        pval = float(stats.norm.sf(zstat))
     elif alternative in _LESS:
-        pval = float(stats.norm.cdf(z))
+        pval = float(stats.norm.cdf(zstat))
     else:
-        pval = float(2 * stats.norm.sf(abs(z)))
-    return pl.DataFrame({"statistic": [float(z)], "p_value": [pval], "alternative": [alternative]})
+        pval = float(2 * stats.norm.sf(abs(zstat)))
+
+    statistic = float(zstat) if z else float(zstat**2)
+    out = {"statistic": [statistic]}
+    if not z:
+        out["chisq_df"] = [1]
+    out["p_value"] = [pval]
+    out["estimate"] = [float(estimate)]
+    out["alternative"] = [alternative]
+    if conf_int:
+        out["lower_ci"] = [float(ci_bounds[0])]
+        out["upper_ci"] = [float(ci_bounds[1])]
+    return pl.DataFrame(out)
 
 
 def chisq_test(

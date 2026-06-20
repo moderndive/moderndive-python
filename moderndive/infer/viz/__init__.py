@@ -55,6 +55,7 @@ class ShadeSpec:
     lower: float | None = None
     upper: float | None = None
     color: str | None = None
+    fill: str | None = None
     per_term: tuple | None = None
 
 
@@ -182,6 +183,7 @@ def visualize(
     *,
     engine: str = "plotly",
     method: str = "simulation",
+    dens_color: str | None = None,
     shade_pvalue=None,
     shade_ci=None,
     **kwargs,
@@ -191,6 +193,7 @@ def visualize(
     ``method`` is ``"simulation"`` (histogram, default), ``"theoretical"`` (a
     normal-approximation density curve), or ``"both"`` (histogram in density units
     overlaid with the normal curve), mirroring R ``infer``'s ``visualize(method=)``.
+    ``dens_color`` sets the theoretical-curve color (for ``"theoretical"``/``"both"``).
     Pass ``shade_pvalue=``/``shade_ci=`` to shade in one call, or compose with ``+``.
     """
     engine = C.resolve_engine(engine)
@@ -198,11 +201,11 @@ def visualize(
     if engine == "plotnine":
         from . import _plotnine as P
 
-        fig = P.visualize_gg(distribution, bins, method)
+        fig = P.visualize_gg(distribution, bins, method, dens_color)
     else:
         from . import _plotly as PX
 
-        fig = PX.visualize_px(distribution, bins, method)
+        fig = PX.visualize_px(distribution, bins, method, dens_color)
 
     plot = InferPlot(fig, engine)
     if shade_pvalue is not None:
@@ -288,7 +291,9 @@ def _per_term_ci(endpoints) -> dict | None:
     return None
 
 
-def shade_p_value(obs_stat, direction: str, *, color: str | None = None) -> ShadeSpec:
+def shade_p_value(
+    obs_stat, direction: str, *, color: str | None = None, fill: str | None = None
+) -> ShadeSpec:
     """A p-value shading spec; add it to a ``visualize()`` plot with ``+``.
 
     ``direction`` ∈ {right/greater, left/less, two-sided}. For a faceted
@@ -298,12 +303,20 @@ def shade_p_value(obs_stat, direction: str, *, color: str | None = None) -> Shad
     per = _per_term_obs(obs_stat)
     if per is not None:
         return ShadeSpec(
-            kind="p_value", direction=direction, color=color, per_term=tuple(sorted(per.items()))
+            kind="p_value",
+            direction=direction,
+            color=color,
+            fill=fill,
+            per_term=tuple(sorted(per.items())),
         )
-    return ShadeSpec(kind="p_value", obs_stat=float(obs_stat), direction=direction, color=color)
+    return ShadeSpec(
+        kind="p_value", obs_stat=float(obs_stat), direction=direction, color=color, fill=fill
+    )
 
 
-def shade_confidence_interval(endpoints, color: str | None = None) -> ShadeSpec:
+def shade_confidence_interval(
+    endpoints, color: str | None = None, fill: str | None = None
+) -> ShadeSpec:
     """A confidence-interval shading spec; add it to a ``visualize()`` plot with ``+``.
 
     ``endpoints`` is a CI DataFrame (``lower_ci``/``upper_ci``) or a ``(lower, upper)``
@@ -313,7 +326,10 @@ def shade_confidence_interval(endpoints, color: str | None = None) -> ShadeSpec:
     per = _per_term_ci(endpoints)
     if per is not None:
         return ShadeSpec(
-            kind="confidence_interval", color=color, per_term=tuple(sorted(per.items()))
+            kind="confidence_interval",
+            color=color,
+            fill=fill,
+            per_term=tuple(sorted(per.items())),
         )
     lower, upper = C.ci_endpoints(endpoints)
-    return ShadeSpec(kind="confidence_interval", lower=lower, upper=upper, color=color)
+    return ShadeSpec(kind="confidence_interval", lower=lower, upper=upper, color=color, fill=fill)

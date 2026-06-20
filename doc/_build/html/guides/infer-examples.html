@@ -263,13 +263,6 @@
 vignette: the <code class="docutils literal notranslate"><span class="pre">calculate(stat=...)</span></code> forms organized by the <strong>types of variables</strong>
 involved, using the same <code class="docutils literal notranslate"><span class="pre">gss</span></code> dataset (a sample from the US General Social
 Survey) that ships with the package.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This covers the statistics the package currently supports. One example from the R
-vignette is <strong>not</strong> yet available here: the chi-square <strong>goodness-of-fit</strong> test
-(one categorical variable with 3+ levels against a vector of hypothesized
-proportions). See the note in the chi-square section below.</p>
-</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
@@ -441,13 +434,40 @@ ObservedStatistic(stat=&#39;count&#39;, value=237)
 </style>
 <small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.286</td></tr></tbody></table></div></div></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The chi-square <strong>goodness-of-fit</strong> test (one categorical variable with 3+ levels
-against a vector of hypothesized proportions) is the one infer example this
-package does not yet support — <code class="docutils literal notranslate"><span class="pre">calculate(stat=&quot;Chisq&quot;)</span></code> here requires an
-explanatory variable. Use a two-variable chi-square test of independence (below).</p>
+</section>
+<section id="one-categorical-variable-3-levels-chi-square-goodness-of-fit">
+<h2>One categorical variable (3+ levels): chi-square goodness-of-fit<a class="headerlink" href="#one-categorical-variable-3-levels-chi-square-goodness-of-fit" title="Link to this heading">¶</a></h2>
+<p>Test whether the counts across a variable’s levels match a set of hypothesized
+proportions. Pass <code class="docutils literal notranslate"><span class="pre">p</span></code> as a <code class="docutils literal notranslate"><span class="pre">{level:</span> <span class="pre">probability}</span></code> mapping to
+<code class="docutils literal notranslate"><span class="pre">hypothesize(null=&quot;point&quot;,</span> <span class="pre">...)</span></code>, then <code class="docutils literal notranslate"><span class="pre">generate(type=&quot;draw&quot;)</span></code> to simulate from
+those proportions:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">levels</span> <span class="o">=</span> <span class="n">gss</span><span class="p">[</span><span class="s2">&quot;finrela&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="n">uniform</span> <span class="o">=</span> <span class="p">{</span><span class="n">level</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">}</span>  <span class="c1"># &quot;all classes equally likely&quot;</span>
+
+<span class="n">obs_gof</span> <span class="o">=</span> <span class="n">gss</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;finrela&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">uniform</span><span class="p">)</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;Chisq&quot;</span><span class="p">)</span>
+<span class="n">null_gof</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">gss</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;finrela&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">uniform</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;draw&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;Chisq&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">get_p_value</span><span class="p">(</span><span class="n">null_gof</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs_gof</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;greater&quot;</span><span class="p">)</span>
+</pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.0</td></tr></tbody></table></div></div></div>
+</div>
+<p>The one-line wrapper is <code class="docutils literal notranslate"><span class="pre">chisq_test(gss,</span> <span class="pre">response=&quot;finrela&quot;,</span> <span class="pre">p=uniform)</span></code>.</p>
 </section>
 <section id="two-categorical-variables-2-levels-each">
 <h2>Two categorical variables (2 levels each)<a class="headerlink" href="#two-categorical-variables-2-levels-each" title="Link to this heading">¶</a></h2>
@@ -735,6 +755,7 @@ custom-statistic example in <a class="reference internal" href="hypothesis-testi
 <li><a class="reference internal" href="#">Pipeline examples (the infer “stat menu”)</a><ul>
 <li><a class="reference internal" href="#one-numerical-variable">One numerical variable</a></li>
 <li><a class="reference internal" href="#one-categorical-variable">One categorical variable</a></li>
+<li><a class="reference internal" href="#one-categorical-variable-3-levels-chi-square-goodness-of-fit">One categorical variable (3+ levels): chi-square goodness-of-fit</a></li>
 <li><a class="reference internal" href="#two-categorical-variables-2-levels-each">Two categorical variables (2 levels each)</a></li>
 <li><a class="reference internal" href="#two-categorical-variables-chi-square-test-of-independence">Two categorical variables (chi-square test of independence)</a></li>
 <li><a class="reference internal" href="#one-numerical-and-one-categorical-variable-2-levels">One numerical and one categorical variable (2 levels)</a></li>

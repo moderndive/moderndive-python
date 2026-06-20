@@ -24,13 +24,6 @@ vignette: the `calculate(stat=...)` forms organized by the **types of variables*
 involved, using the same `gss` dataset (a sample from the US General Social
 Survey) that ships with the package.
 
-```{note}
-This covers the statistics the package currently supports. One example from the R
-vignette is **not** yet available here: the chi-square **goodness-of-fit** test
-(one categorical variable with 3+ levels against a vector of hypothesized
-proportions). See the note in the chi-square section below.
-```
-
 ```{code-cell} python
 import moderndive as md
 from moderndive import get_p_value, get_confidence_interval, assume
@@ -116,12 +109,28 @@ null_prop = (
 get_p_value(null_prop, obs_stat=obs_prop, direction="two-sided")
 ```
 
-```{note}
-The chi-square **goodness-of-fit** test (one categorical variable with 3+ levels
-against a vector of hypothesized proportions) is the one infer example this
-package does not yet support — `calculate(stat="Chisq")` here requires an
-explanatory variable. Use a two-variable chi-square test of independence (below).
+## One categorical variable (3+ levels): chi-square goodness-of-fit
+
+Test whether the counts across a variable's levels match a set of hypothesized
+proportions. Pass `p` as a `{level: probability}` mapping to
+`hypothesize(null="point", ...)`, then `generate(type="draw")` to simulate from
+those proportions:
+
+```{code-cell} python
+levels = gss["finrela"].unique().to_list()
+uniform = {level: 1 / len(levels) for level in levels}  # "all classes equally likely"
+
+obs_gof = gss.specify(response="finrela").hypothesize(null="point", p=uniform).calculate(stat="Chisq")
+null_gof = (
+    gss.specify(response="finrela")
+    .hypothesize(null="point", p=uniform)
+    .generate(reps=1000, type="draw", seed=1)
+    .calculate(stat="Chisq")
+)
+get_p_value(null_gof, obs_stat=obs_gof, direction="greater")
 ```
+
+The one-line wrapper is `chisq_test(gss, response="finrela", p=uniform)`.
 
 ## Two categorical variables (2 levels each)
 

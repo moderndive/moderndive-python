@@ -5,6 +5,7 @@
 Full parity with the R `moderndive` and `infer` packages.
 
 - **R argument parity (moderndive)**: `get_correlation(method=)` adds Spearman and Kendall rank correlations (plus `na_rm`); `get_regression_points(newdata=, ID=)` predicts on a held-out set and labels rows by a column; `get_regression_table(default_categorical_levels=)` can keep raw factor-level term names; `gg_parallel_slopes(alpha=)` sets point transparency.
+- **R argument parity (infer)**: `hypothesize(med=)`/`observe(med=)` add a median point null; `prop_test()` gains `z`, `correct` (Yates), `conf_int`, and `conf_level` (now matching R's `prop.test` — chi-square by default, with a Wilson-score CI for one proportion); `rep_slice_sample(prop=, weight_by=)` and `rep_sample_n(prob=)` add fractional and weighted sampling; `generate(variables=)` chooses which column to permute; `shade_p_value`/`shade_confidence_interval` gain `fill`; `visualize(dens_color=)` sets the theoretical-curve color. (`shade_p_value` now also honors `color`.)
 
 - **Chi-square goodness-of-fit** (closes the last `infer` vignette gap):
   `specify(response=cat).hypothesize(null="point", p={level: prob, ...})` with

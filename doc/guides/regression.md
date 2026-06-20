@@ -109,6 +109,28 @@ get_regression_table(logit, exponentiate=True)
 get_regression_summaries(logit)
 ```
 
+## Array-API models
+
+You don't have to use the formula API. The helpers also accept models fit with
+statsmodels' array API (`sm.OLS(y, X)` / `sm.GLM(...)`), which is handy when your
+design matrix is already built. `get_regression_points()` reconstructs the
+per-observation table from the design matrix (the constant column becomes the
+`intercept` term and is dropped from the points):
+
+```{code-cell} python
+import statsmodels.api as sm
+
+X = sm.add_constant(houses.select("living_area", "bedrooms").to_pandas())
+y = houses["price"].to_pandas()
+array_model = sm.OLS(y, X).fit()
+
+get_regression_table(array_model)
+```
+
+```{code-cell} python
+get_regression_points(array_model).head()
+```
+
 ## 3D regression plane
 
 `plot_3d_regression()` draws an interactive 3D scatter of an outcome against two
@@ -122,19 +144,26 @@ plot_3d_regression(houses, "price ~ living_area + bedrooms")
 
 ## Visualizing models
 
-Two ports of R `moderndive`'s ggplot helpers, both dual-engine:
+Two ports of R `moderndive`'s ggplot helpers, both dual-engine. A
+**parallel-slopes** model — one common slope with a separate intercept per group:
 
 ```{code-cell} python
 from moderndive import gg_parallel_slopes, gg_categorical_model
 
 evals = md.load_evals()
+gg_parallel_slopes(evals, response="score", explanatory="age", by="gender")  # plotly
+```
 
-# Parallel-slopes model: one common slope, a separate intercept per group
-gg_parallel_slopes(evals, response="score", explanatory="age", by="gender")            # plotly
-gg_parallel_slopes(evals, response="score", explanatory="age", by="gender",
-                   engine="plotnine")
+The same plot via the plotnine engine:
 
-# Regression with a single categorical predictor
+```{code-cell} python
+gg_parallel_slopes(evals, response="score", explanatory="age", by="gender", engine="plotnine")
+```
+
+A regression with a single **categorical** predictor (`geom_categorical_model()`
+is an alias of `gg_categorical_model()`):
+
+```{code-cell} python
 gg_categorical_model(evals, response="score", explanatory="rank")
 ```
 

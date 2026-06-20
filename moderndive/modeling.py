@@ -2,10 +2,12 @@
 
 Built on ``statsmodels`` (which, unlike scikit-learn, reports standard errors,
 test statistics, p-values, and confidence intervals — the inferential output the
-book teaches). Inputs may be polars or pandas frames; outputs are polars frames.
+book teaches). Both ``ols()`` (linear) and ``glm()`` (e.g. logistic) fitted
+models are supported. Inputs may be polars or pandas frames; outputs are polars.
 
 - :func:`get_regression_table`  ~ ``broom::tidy`` + CIs
 - :func:`get_regression_points` ~ ``broom::augment`` (fitted values + residuals)
+- :func:`get_regression_summaries` ~ ``broom::glance``
 - :func:`tidy_summary`          ~ per-variable summary statistics
 """
 
@@ -15,6 +17,8 @@ import re
 
 import numpy as np
 import polars as pl
+
+from ._messaging import helpful_error
 
 __all__ = [
     "get_regression_table",
@@ -29,6 +33,22 @@ def _to_pandas(data):
     if isinstance(data, pl.DataFrame):
         return data.to_pandas()
     return data
+
+
+def _check_model(model) -> None:
+    """Beginner-friendly guard: ``model`` must be a fitted statsmodels result."""
+    if not (hasattr(model, "params") and hasattr(model, "model")):
+        raise TypeError(
+            helpful_error(
+                f"Expected a fitted statsmodels model, got {type(model).__name__}.",
+                'Fit one first, e.g. smf.ols("y ~ x", data).fit() or smf.glm(...).fit().',
+            )
+        )
+
+
+def _is_glm(model) -> bool:
+    """A fitted statsmodels GLM result (logistic, Poisson, …) exposes ``family``."""
+    return hasattr(model, "family")
 
 
 def _clean_term(term: str) -> str:
@@ -48,23 +68,87 @@ def _clean_term(term: str) -> str:
     return term
 
 
-def get_regression_table(model, digits: int = 3, conf_level: float = 0.95) -> pl.DataFrame:
+def _clean_name(expr: str) -> str:
+    """Sanitize a transformed term into a tidy column name.
+
+    ``np.log(mpg)`` -> ``log_mpg``; ``np.sqrt(price)`` -> ``sqrt_price``.
+    """
+    expr = expr.replace("np.", "")
+    return re.sub(r"[^0-9A-Za-z]+", "_", expr).strip("_").lower()
+
+
+def _outcome_info(model) -> tuple[str, str, bool]:
+    """Resolve the outcome's tidy column name (and whether the LHS is transformed).
+
+    An untransformed LHS like ``mpg`` keeps its name; a transformed LHS like
+    ``np.log(mpg)`` becomes ``log_mpg`` (with ``log_mpg_hat`` for fitted values).
+    """
+    endog = model.model.endog_names
+    if endog in model.model.data.frame.columns:
+        return endog, f"{endog}_hat", False
+    name = _clean_name(endog)
+    return name, f"{name}_hat", True
+
+
+def _require_formula_frame(model) -> None:
+    """``get_regression_points`` needs the original data + formula (the formula API)."""
+    frame = getattr(getattr(model.model, "data", None), "frame", None)
+    if frame is None or getattr(model.model, "formula", None) is None:
+        raise TypeError(
+            helpful_error(
+                "get_regression_points() needs a model fit with the formula API "
+                "so it can recover the original columns.",
+                'Refit with: smf.ols("y ~ x", data).fit() (or smf.glm(...)).',
+            )
+        )
+
+
+def _predictor_vars(model) -> list[str]:
+    """Original predictor variable names from the RHS, in formula order.
+
+    For ``y ~ poly(hp, 2) + wt`` this returns ``["hp", "wt"]`` — the original
+    columns, never the patsy basis/transform columns.
+    """
+    frame_cols = list(model.model.data.frame.columns)
+    rhs = model.model.formula.split("~", 1)[1]
+    ordered: list[str] = []
+    for token in re.findall(r"[A-Za-z_]\w*", rhs):
+        if token in frame_cols and token not in ordered:
+            ordered.append(token)
+    return ordered
+
+
+def get_regression_table(
+    model,
+    digits: int = 3,
+    conf_level: float = 0.95,
+    exponentiate: bool = False,
+) -> pl.DataFrame:
     """Tidy regression table: term, estimate, std_error, statistic, p_value, lower/upper_ci.
 
-    ``model`` is a fitted ``statsmodels`` results object (e.g. from
-    ``statsmodels.formula.api.ols("y ~ x", data).fit()``).
+    ``model`` is a fitted ``statsmodels`` results object — either OLS
+    (``smf.ols("y ~ x", data).fit()``) or GLM (``smf.glm(...).fit()``).
+
+    For GLMs with a log or logit link, pass ``exponentiate=True`` to report the
+    coefficient estimate and its confidence interval as rate / odds ratios
+    (``std_error``, ``statistic``, and ``p_value`` stay on the model's link scale,
+    matching ``broom::tidy``).
     """
-    conf = model.conf_int(alpha=1 - conf_level)
-    terms = [_clean_term(t) for t in model.params.index]
+    _check_model(model)
+    conf = np.asarray(model.conf_int(alpha=1 - conf_level), dtype=float)
+    estimate = model.params.to_numpy().astype(float)
+    lower, upper = conf[:, 0], conf[:, 1]
+    if exponentiate:
+        estimate, lower, upper = np.exp(estimate), np.exp(lower), np.exp(upper)
     table = pl.DataFrame(
         {
-            "term": terms,
-            "estimate": model.params.to_numpy(),
+            "term": [_clean_term(t) for t in model.params.index],
+            "estimate": estimate,
             "std_error": model.bse.to_numpy(),
             "statistic": model.tvalues.to_numpy(),
             "p_value": model.pvalues.to_numpy(),
-            "lower_ci": np.asarray(conf)[:, 0],
-            "upper_ci": np.asarray(conf)[:, 1],
+            "lower_ci": lower,
+            "upper_ci": upper,
         }
     )
     numeric = [c for c in table.columns if c != "term"]
@@ -74,55 +158,92 @@ def get_regression_table(model, digits: int = 3, conf_level: float = 0.95) -> pl
 def get_regression_points(model, digits: int = 3) -> pl.DataFrame:
     """Fitted values + residuals per observation (~ ``broom::augment``).
 
-    Columns: ``ID``, the response, each explanatory term, ``<response>_hat``,
-    ``residual``.
+    Columns: ``ID``, the outcome, each original predictor, ``<outcome>_hat``,
+    ``residual``. In-formula transformations are handled gracefully: a
+    transformed outcome (``np.log(mpg)``) is shown on the model's scale under a
+    sanitized name (``log_mpg`` / ``log_mpg_hat``), and transformed predictors
+    (``poly()``, ``scale()``, ``I()``) are shown as their original columns rather
+    than leaking basis matrices. For GLMs, fitted values and residuals are on the
+    response scale (e.g. probabilities for logistic regression).
     """
-    endog_name = model.model.endog_names
-    exog_names = [n for n in model.model.exog_names if n != "Intercept"]
+    _check_model(model)
+    _require_formula_frame(model)
     frame = _to_pandas(model.model.data.frame)
+    name, name_hat, transformed = _outcome_info(model)
+    pvars = _predictor_vars(model)
+    fitted = np.asarray(model.fittedvalues, dtype=float)
 
-    out = {
-        "ID": np.arange(1, len(frame) + 1, dtype=np.int64),
-        endog_name: np.asarray(frame[endog_name]),
-    }
-    for name in exog_names:
-        if name in frame.columns:
-            out[name] = np.asarray(frame[name])
-    out[f"{endog_name}_hat"] = np.asarray(model.fittedvalues)
-    out["residual"] = np.asarray(model.resid)
+    if transformed:
+        outcome_vals = np.asarray(model.model.endog, dtype=float)
+    else:
+        outcome_vals = np.asarray(frame[name])
 
-    df = pl.DataFrame(out)
-    round_cols = [endog_name, f"{endog_name}_hat", "residual"]
-    round_cols = [c for c in round_cols if df.schema[c].is_numeric()]
-    return df.with_columns(pl.col(round_cols).round(digits))
+    if _is_glm(model):
+        residual = np.asarray(model.resid_response, dtype=float)
+    else:
+        residual = np.asarray(outcome_vals, dtype=float) - fitted
+
+    out = {name: outcome_vals}
+    for predictor in pvars:
+        out[predictor] = np.asarray(frame[predictor])
+    out[name_hat] = fitted
+    out["residual"] = residual
+
+    df = pl.DataFrame(out).drop_nulls().with_row_index("ID", offset=1)
+    df = df.with_columns(pl.col("ID").cast(pl.Int64))
+    float_cols = [c for c, dt in df.schema.items() if dt.is_float()]
+    return df.with_columns(pl.col(float_cols).round(digits))
 
 
 def get_regression_summaries(model, digits: int = 3) -> pl.DataFrame:
-    """Model-fit summaries as a tidy 1-row frame (~ ``moderndive::get_regression_summaries``).
+    """Model-fit summaries as a tidy 1-row frame (~ ``broom::glance``).
 
-    Columns: ``r_squared``, ``adj_r_squared``, ``mse``, ``rmse``, ``sigma``,
-    ``statistic`` (overall F), ``p_value``, ``df`` (model degrees of freedom),
-    ``nobs``. ``model`` is a fitted ``statsmodels`` results object.
+    For an **OLS** model: ``r_squared``, ``adj_r_squared``, ``mse``, ``rmse``,
+    ``sigma``, ``statistic`` (overall F), ``p_value``, ``df``, ``nobs``.
+
+    For a **GLM** (no R² applies): ``mse``, ``rmse``, ``deviance``,
+    ``null_deviance``, ``aic``, ``bic``, ``log_lik``, ``df_residual``,
+    ``df_null``, ``nobs``. ``mse``/``rmse`` use response-scale residuals.
 
     ``mse`` is the mean squared residual using ``n`` in the denominator (so
-    ``rmse = sqrt(mse)``), while ``sigma`` is the residual standard error using
-    ``n - p`` — matching the R package.
+    ``rmse = sqrt(mse)``); for OLS ``sigma`` is the residual standard error
+    using ``n - p`` — matching the R package.
     """
+    _check_model(model)
     nobs = int(model.nobs)
-    mse = float(model.ssr) / nobs
-    table = pl.DataFrame(
-        {
-            "r_squared": [float(model.rsquared)],
-            "adj_r_squared": [float(model.rsquared_adj)],
-            "mse": [mse],
-            "rmse": [float(np.sqrt(mse))],
-            "sigma": [float(np.sqrt(model.mse_resid))],
-            "statistic": [float(model.fvalue)],
-            "p_value": [float(model.f_pvalue)],
-            "df": [int(model.df_model)],
-            "nobs": [nobs],
-        }
-    )
+
+    if _is_glm(model):
+        res = np.asarray(model.resid_response, dtype=float)
+        mse = float(np.mean(res**2))
+        table = pl.DataFrame(
+            {
+                "mse": [mse],
+                "rmse": [float(np.sqrt(mse))],
+                "deviance": [float(model.deviance)],
+                "null_deviance": [float(model.null_deviance)],
+                "aic": [float(model.aic)],
+                "bic": [float(model.bic_llf)],
+                "log_lik": [float(model.llf)],
+                "df_residual": [int(model.df_resid)],
+                "df_null": [nobs - 1],
+                "nobs": [nobs],
+            }
+        )
+    else:
+        mse = float(model.ssr) / nobs
+        table = pl.DataFrame(
+            {
+                "r_squared": [float(model.rsquared)],
+                "adj_r_squared": [float(model.rsquared_adj)],
+                "mse": [mse],
+                "rmse": [float(np.sqrt(mse))],
+                "sigma": [float(np.sqrt(model.mse_resid))],
+                "statistic": [float(model.fvalue)],
+                "p_value": [float(model.f_pvalue)],
+                "df": [int(model.df_model)],
+                "nobs": [nobs],
+            }
+        )
     float_cols = [c for c, dt in table.schema.items() if dt.is_float()]
     return table.with_columns(pl.col(float_cols).round(digits))
 

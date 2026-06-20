@@ -17,6 +17,7 @@ from .models import (
     geom_parallel_slopes,
     gg_categorical_model,
     gg_parallel_slopes,
+    plot_3d_regression,
 )
 
 __all__ = [
@@ -25,6 +26,7 @@ __all__ = [
     "geom_parallel_slopes",
     "gg_categorical_model",
     "geom_categorical_model",
+    "plot_3d_regression",
 ]
 
 

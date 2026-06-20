@@ -808,10 +808,14 @@ so the chapters can draw the simulation-vs-theory comparison.</p>
 <h2>Regression &amp; summary helpers<a class="headerlink" href="#regression-summary-helpers" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.get_regression_table">
-<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_regression_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/modeling.html#get_regression_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_regression_table" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_regression_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conf_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exponentiate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/modeling.html#get_regression_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_regression_table" title="Link to this definition">¶</a></dt>
 <dd><p>Tidy regression table: term, estimate, std_error, statistic, p_value, lower/upper_ci.</p>
-<p><code class="docutils literal notranslate"><span class="pre">model</span></code> is a fitted <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> results object (e.g. from
-<code class="docutils literal notranslate"><span class="pre">statsmodels.formula.api.ols(&quot;y</span> <span class="pre">~</span> <span class="pre">x&quot;,</span> <span class="pre">data).fit()</span></code>).</p>
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> is a fitted <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> results object — either OLS
+(<code class="docutils literal notranslate"><span class="pre">smf.ols(&quot;y</span> <span class="pre">~</span> <span class="pre">x&quot;,</span> <span class="pre">data).fit()</span></code>) or GLM (<code class="docutils literal notranslate"><span class="pre">smf.glm(...).fit()</span></code>).</p>
+<p>For GLMs with a log or logit link, pass <code class="docutils literal notranslate"><span class="pre">exponentiate=True</span></code> to report the
+coefficient estimate and its confidence interval as rate / odds ratios
+(<code class="docutils literal notranslate"><span class="pre">std_error</span></code>, <code class="docutils literal notranslate"><span class="pre">statistic</span></code>, and <code class="docutils literal notranslate"><span class="pre">p_value</span></code> stay on the model’s link scale,
+matching <code class="docutils literal notranslate"><span class="pre">broom::tidy</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
@@ -820,6 +824,7 @@ so the chapters can draw the simulation-vs-theory comparison.</p>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>digits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 <li><p><strong>conf_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>exponentiate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -829,8 +834,13 @@ so the chapters can draw the simulation-vs-theory comparison.</p>
 <dt class="sig sig-object py" id="moderndive.get_regression_points">
 <span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_regression_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/modeling.html#get_regression_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_regression_points" title="Link to this definition">¶</a></dt>
 <dd><p>Fitted values + residuals per observation (~ <code class="docutils literal notranslate"><span class="pre">broom::augment</span></code>).</p>
-<p>Columns: <code class="docutils literal notranslate"><span class="pre">ID</span></code>, the response, each explanatory term, <code class="docutils literal notranslate"><span class="pre">&lt;response&gt;_hat</span></code>,
-<code class="docutils literal notranslate"><span class="pre">residual</span></code>.</p>
+<p>Columns: <code class="docutils literal notranslate"><span class="pre">ID</span></code>, the outcome, each original predictor, <code class="docutils literal notranslate"><span class="pre">&lt;outcome&gt;_hat</span></code>,
+<code class="docutils literal notranslate"><span class="pre">residual</span></code>. In-formula transformations are handled gracefully: a
+transformed outcome (<code class="docutils literal notranslate"><span class="pre">np.log(mpg)</span></code>) is shown on the model’s scale under a
+sanitized name (<code class="docutils literal notranslate"><span class="pre">log_mpg</span></code> / <code class="docutils literal notranslate"><span class="pre">log_mpg_hat</span></code>), and transformed predictors
+(<code class="docutils literal notranslate"><span class="pre">poly()</span></code>, <code class="docutils literal notranslate"><span class="pre">scale()</span></code>, <code class="docutils literal notranslate"><span class="pre">I()</span></code>) are shown as their original columns rather
+than leaking basis matrices. For GLMs, fitted values and residuals are on the
+response scale (e.g. probabilities for logistic regression).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
@@ -844,13 +854,15 @@ so the chapters can draw the simulation-vs-theory comparison.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.get_regression_summaries">
 <span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_regression_summaries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">digits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/modeling.html#get_regression_summaries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_regression_summaries" title="Link to this definition">¶</a></dt>
-<dd><p>Model-fit summaries as a tidy 1-row frame (~ <code class="docutils literal notranslate"><span class="pre">moderndive::get_regression_summaries</span></code>).</p>
-<p>Columns: <code class="docutils literal notranslate"><span class="pre">r_squared</span></code>, <code class="docutils literal notranslate"><span class="pre">adj_r_squared</span></code>, <code class="docutils literal notranslate"><span class="pre">mse</span></code>, <code class="docutils literal notranslate"><span class="pre">rmse</span></code>, <code class="docutils literal notranslate"><span class="pre">sigma</span></code>,
-<code class="docutils literal notranslate"><span class="pre">statistic</span></code> (overall F), <code class="docutils literal notranslate"><span class="pre">p_value</span></code>, <code class="docutils literal notranslate"><span class="pre">df</span></code> (model degrees of freedom),
-<code class="docutils literal notranslate"><span class="pre">nobs</span></code>. <code class="docutils literal notranslate"><span class="pre">model</span></code> is a fitted <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> results object.</p>
+<dd><p>Model-fit summaries as a tidy 1-row frame (~ <code class="docutils literal notranslate"><span class="pre">broom::glance</span></code>).</p>
+<p>For an <strong>OLS</strong> model: <code class="docutils literal notranslate"><span class="pre">r_squared</span></code>, <code class="docutils literal notranslate"><span class="pre">adj_r_squared</span></code>, <code class="docutils literal notranslate"><span class="pre">mse</span></code>, <code class="docutils literal notranslate"><span class="pre">rmse</span></code>,
+<code class="docutils literal notranslate"><span class="pre">sigma</span></code>, <code class="docutils literal notranslate"><span class="pre">statistic</span></code> (overall F), <code class="docutils literal notranslate"><span class="pre">p_value</span></code>, <code class="docutils literal notranslate"><span class="pre">df</span></code>, <code class="docutils literal notranslate"><span class="pre">nobs</span></code>.</p>
+<p>For a <strong>GLM</strong> (no R² applies): <code class="docutils literal notranslate"><span class="pre">mse</span></code>, <code class="docutils literal notranslate"><span class="pre">rmse</span></code>, <code class="docutils literal notranslate"><span class="pre">deviance</span></code>,
+<code class="docutils literal notranslate"><span class="pre">null_deviance</span></code>, <code class="docutils literal notranslate"><span class="pre">aic</span></code>, <code class="docutils literal notranslate"><span class="pre">bic</span></code>, <code class="docutils literal notranslate"><span class="pre">log_lik</span></code>, <code class="docutils literal notranslate"><span class="pre">df_residual</span></code>,
+<code class="docutils literal notranslate"><span class="pre">df_null</span></code>, <code class="docutils literal notranslate"><span class="pre">nobs</span></code>. <code class="docutils literal notranslate"><span class="pre">mse</span></code>/<code class="docutils literal notranslate"><span class="pre">rmse</span></code> use response-scale residuals.</p>
 <p><code class="docutils literal notranslate"><span class="pre">mse</span></code> is the mean squared residual using <code class="docutils literal notranslate"><span class="pre">n</span></code> in the denominator (so
-<code class="docutils literal notranslate"><span class="pre">rmse</span> <span class="pre">=</span> <span class="pre">sqrt(mse)</span></code>), while <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is the residual standard error using
-<code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">-</span> <span class="pre">p</span></code> — matching the R package.</p>
+<code class="docutils literal notranslate"><span class="pre">rmse</span> <span class="pre">=</span> <span class="pre">sqrt(mse)</span></code>); for OLS <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is the residual standard error
+using <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">-</span> <span class="pre">p</span></code> — matching the R package.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
@@ -863,11 +875,17 @@ so the chapters can draw the simulation-vs-theory comparison.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="moderndive.get_correlation">
-<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/correlation.html#get_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_correlation" title="Link to this definition">¶</a></dt>
-<dd><p>Pearson correlation as a tidy 1-row frame with a <code class="docutils literal notranslate"><span class="pre">cor</span></code> column.</p>
-<p>Mirrors <code class="docutils literal notranslate"><span class="pre">moderndive::get_correlation(data,</span> <span class="pre">y</span> <span class="pre">~</span> <span class="pre">x)</span></code>. Specify the variable
-pair either as a formula string (<code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">x&quot;</span></code>) or via the <code class="docutils literal notranslate"><span class="pre">x=</span></code> and <code class="docutils literal notranslate"><span class="pre">y=</span></code>
-keyword arguments. Rows with a null in either column are dropped.</p>
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">get_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wide</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/correlation.html#get_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.get_correlation" title="Link to this definition">¶</a></dt>
+<dd><p>Pearson correlation between an outcome and one or more predictors.</p>
+<p>Mirrors <code class="docutils literal notranslate"><span class="pre">moderndive::get_correlation</span></code>. Give the variables either as a
+formula (<code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">x&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;y</span> <span class="pre">~</span> <span class="pre">x1</span> <span class="pre">+</span> <span class="pre">x2</span> <span class="pre">+</span> <span class="pre">x3&quot;</span></code>) or, for a single predictor,
+via <code class="docutils literal notranslate"><span class="pre">x=</span></code> and <code class="docutils literal notranslate"><span class="pre">y=</span></code>.</p>
+<p>With <strong>one</strong> predictor the result is a 1-row frame with a <code class="docutils literal notranslate"><span class="pre">cor</span></code> column.
+With <strong>multiple</strong> predictors the result is long by default — columns
+<code class="docutils literal notranslate"><span class="pre">predictor</span></code> and <code class="docutils literal notranslate"><span class="pre">cor</span></code> (one row each) — or pass <code class="docutils literal notranslate"><span class="pre">wide=True</span></code> for one
+column per predictor. Rows with a null in either column are dropped per pair.</p>
+<p>A short note points to a full pairwise correlation matrix when there are
+multiple predictors; silence it with <code class="docutils literal notranslate"><span class="pre">quiet=True</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
@@ -877,6 +895,8 @@ keyword arguments. Rows with a null in either column are dropped.</p>
 <li><p><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
 <li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>wide</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>quiet</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1058,6 +1078,63 @@ mean, drawn as a horizontal marker over the (jittered) data points.</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.geom_categorical_model">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">geom_categorical_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">explanatory</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'plotly'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#moderndive.geom_categorical_model" title="Link to this definition">¶</a></dt>
+<dd><p>Regression with one categorical predictor (~ <code class="docutils literal notranslate"><span class="pre">geom_categorical_model</span></code>).</p>
+<p>Fits <code class="docutils literal notranslate"><span class="pre">response</span> <span class="pre">~</span> <span class="pre">C(explanatory)</span></code>; each category’s fitted value is its group
+mean, drawn as a horizontal marker over the (jittered) data points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>response</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>explanatory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>engine</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.plot_3d_regression">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">plot_3d_regression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formula</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/plots/models.html#plot_3d_regression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.plot_3d_regression" title="Link to this definition">¶</a></dt>
+<dd><p>Interactive 3D scatterplot with a fitted regression plane.</p>
+<p>Mirrors <code class="docutils literal notranslate"><span class="pre">moderndive::plot_3d_regression</span></code>. Pass a formula <code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">~</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></code> —
+one numeric outcome and exactly two numeric predictors — and get a plotly
+<code class="docutils literal notranslate"><span class="pre">go.Figure</span></code> with the data points and the fitted <code class="docutils literal notranslate"><span class="pre">lm</span></code> plane.</p>
+<p>In-formula transformations (e.g. <code class="docutils literal notranslate"><span class="pre">log(z)</span> <span class="pre">~</span> <span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></code>) are <strong>not</strong> supported,
+since the plane and the raw points would be on different scales; transform
+the columns of <code class="docutils literal notranslate"><span class="pre">data</span></code> first and pass plain names. <code class="docutils literal notranslate"><span class="pre">n</span></code> sets the plane’s
+grid resolution per axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>formula</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="viewing-data">
+<h2>Viewing data<a class="headerlink" href="#viewing-data" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="moderndive.View">
+<span class="sig-prename descclassname"><span class="pre">moderndive.</span></span><span class="sig-name descname"><span class="pre">View</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/moderndive/view.html#View"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#moderndive.View" title="Link to this definition">¶</a></dt>
+<dd><p>Display a data frame as an interactive table (search, sort, paginate).</p>
+<p>In a notebook / Quarto context this renders an interactive table via the
+optional <code class="docutils literal notranslate"><span class="pre">itables</span></code> package (install with <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">&quot;moderndive[view]&quot;</span></code>).
+Without <code class="docutils literal notranslate"><span class="pre">itables</span></code> it returns the data frame so it still displays. Accepts a
+polars or pandas DataFrame (or anything coercible to one). <code class="docutils literal notranslate"><span class="pre">title</span></code> is shown
+as the table caption.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="datasets">
 <h2>Datasets<a class="headerlink" href="#datasets" title="Link to this heading">¶</a></h2>
@@ -1204,6 +1281,12 @@ full list.</p>
 <li><a class="reference internal" href="#moderndive.gg_parallel_slopes"><code class="docutils literal notranslate"><span class="pre">gg_parallel_slopes()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.geom_parallel_slopes"><code class="docutils literal notranslate"><span class="pre">geom_parallel_slopes()</span></code></a></li>
 <li><a class="reference internal" href="#moderndive.gg_categorical_model"><code class="docutils literal notranslate"><span class="pre">gg_categorical_model()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.geom_categorical_model"><code class="docutils literal notranslate"><span class="pre">geom_categorical_model()</span></code></a></li>
+<li><a class="reference internal" href="#moderndive.plot_3d_regression"><code class="docutils literal notranslate"><span class="pre">plot_3d_regression()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#viewing-data">Viewing data</a><ul>
+<li><a class="reference internal" href="#moderndive.View"><code class="docutils literal notranslate"><span class="pre">View()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#datasets">Datasets</a><ul>

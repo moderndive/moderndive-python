@@ -25,6 +25,7 @@ model into tidy polars tables — the analog of R `moderndive`'s
 Fit models with statsmodels' formula API, then tidy them:
 
 ```{code-cell} python
+import polars as pl
 import statsmodels.formula.api as smf
 import moderndive as md
 from moderndive import (
@@ -63,6 +64,44 @@ get_regression_summaries(model)
 ```{code-cell} python
 get_correlation(houses, "price ~ living_area")   # ≈ 0.759
 # or: get_correlation(houses, x="living_area", y="price")
+```
+
+Pass several predictors on the right-hand side to get one correlation per
+predictor (long by default; `wide=True` for one column each):
+
+```{code-cell} python
+get_correlation(houses, "price ~ living_area + bedrooms + bathrooms", quiet=True)
+```
+
+## Logistic & other GLMs
+
+The regression helpers also accept a fitted `glm()` model. For a logistic
+regression, `get_regression_points()` returns fitted **probabilities** and
+`get_regression_summaries()` returns a GLM-shaped summary (deviance, AIC, BIC, …).
+Pass `exponentiate=True` to `get_regression_table()` for **odds ratios**:
+
+```{code-cell} python
+import statsmodels.api as sm
+
+evals = md.load_evals().with_columns((pl.col("gender") == "male").cast(int).alias("is_male"))
+logit = smf.glm("is_male ~ score + age", data=evals.to_pandas(),
+                family=sm.families.Binomial()).fit()
+get_regression_table(logit, exponentiate=True)
+```
+
+```{code-cell} python
+get_regression_summaries(logit)
+```
+
+## 3D regression plane
+
+`plot_3d_regression()` draws an interactive 3D scatter of an outcome against two
+numeric predictors, with the fitted regression plane overlaid (a plotly figure):
+
+```{code-cell} python
+from moderndive import plot_3d_regression
+
+plot_3d_regression(houses, "price ~ living_area + bedrooms")
 ```
 
 ## Visualizing models

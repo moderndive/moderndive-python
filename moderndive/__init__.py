@@ -101,14 +101,33 @@ __all__ = [
 ]
 
 
-def _apply_pyodide_polars_shims():
-    """Patch polars for Pyodide's WebAssembly build.
+def _png_to_html_img(png) -> str | None:
+    """Wrap a PNG (raw bytes or base64 str) in an ``<img>`` data-URI tag."""
+    if not png:
+        return None
+    if isinstance(png, (bytes, bytearray)):
+        import base64
 
-    Pyodide's ``polars`` build has no Parquet IO and its Arrow/pandas export
-    panics, which breaks the dataset loaders (``load_*``) and any ``.to_pandas()``
-    call (e.g. feeding a plotnine plot). Route Parquet reads through ``pyarrow``
-    and ``to_pandas`` through a dict round-trip so interactive in-browser cells
-    work. Applied automatically under Pyodide; a no-op on a normal install.
+        png = base64.b64encode(png).decode()
+    return f'<img src="data:image/png;base64,{png}" style="max-width:100%;height:auto;">'
+
+
+def _apply_pyodide_shims():
+    """Patch polars and plotnine for Pyodide's WebAssembly build.
+
+    Two gaps break in-browser interactive cells:
+
+    1. Pyodide's ``polars`` build has no Parquet IO and its Arrow/pandas export
+       panics, which breaks the dataset loaders (``load_*``) and any
+       ``.to_pandas()`` call (e.g. feeding a plotnine plot). Route Parquet reads
+       through ``pyarrow`` and ``to_pandas`` through a dict round-trip.
+    2. A plotnine ``ggplot`` exposes its rendered image only via
+       ``_repr_mimebundle_`` (which returns a ``(data, metadata)`` tuple), but
+       quarto-live renders results through ``_repr_html_``/``_repr_png_`` — so
+       ggplot plots show blank. Give ``ggplot`` a ``_repr_html_`` that embeds the
+       PNG, which also fixes ``InferPlot`` (it delegates to the figure).
+
+    Applied automatically under Pyodide; a no-op on a normal install.
     """
     import polars as pl
 
@@ -131,6 +150,16 @@ def _apply_pyodide_polars_shims():
     pl.scan_parquet = _scan_parquet
     pl.DataFrame.to_pandas = _to_pandas
 
+    from plotnine import ggplot
+
+    def _ggplot_repr_html(self):
+        bundle = self._repr_mimebundle_()
+        data = bundle[0] if isinstance(bundle, tuple) else bundle
+        png = data.get("image/png") if isinstance(data, dict) else None
+        return _png_to_html_img(png)
+
+    ggplot._repr_html_ = _ggplot_repr_html
+
 
 if sys.platform == "emscripten":  # pragma: no cover - only runs under Pyodide
-    _apply_pyodide_polars_shims()
+    _apply_pyodide_shims()

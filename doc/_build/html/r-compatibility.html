@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Getting started" href="getting-started.html">
+<link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Sampling" href="guides/sampling.html"><link rel="prev" title="Datasets" href="datasets.html">
         <link rel="prefetch" href="_static/moderndive-logo.png" as="image">
 
     <link rel="shortcut icon" href="_static/moderndive-logo.png"><!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>moderndive 0.1.0</title>
+        <title>R compatibility notes - moderndive 0.1.0</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
@@ -164,7 +164,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">moderndive 0.1.0</div></a>
+      <a href="index.html"><div class="brand">moderndive 0.1.0</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -183,7 +183,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="_static/moderndive-logo.png" alt="Logo"/>
   </div>
@@ -197,11 +197,11 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Get started</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="coming-from-r.html">Coming from R</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="r-compatibility.html">R compatibility notes</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">R compatibility notes</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
 <ul>
@@ -236,7 +236,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="_sources/index.md.txt" title="View this page">
+  <a class="muted-link" href="_sources/r-compatibility.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -254,153 +254,96 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <div class="cell tag_remove-input docutils container">
-</div>
-<section id="moderndive-python">
-<h1>moderndive (Python)<a class="headerlink" href="#moderndive-python" title="Link to this heading">¶</a></h1>
-<p>The Python companion package for <strong>ModernDive: Statistical Inference via Data
-Science</strong> — a faithful port of the R <a class="reference external" href="https://moderndive.github.io/moderndive/"><code class="docutils literal notranslate"><span class="pre">moderndive</span></code></a>
-and <a class="reference external" href="https://infer.tidymodels.org"><code class="docutils literal notranslate"><span class="pre">infer</span></code></a> packages to a modern Python
-data-science stack (<a class="reference external" href="https://pola.rs">polars</a>, <a class="reference external" href="https://plotly.com/python/">plotly</a>,
-<a class="reference external" href="https://plotnine.org">plotnine</a>, <a class="reference external" href="https://www.statsmodels.org">statsmodels</a>).</p>
-<p>If you teach or learn statistical inference the <em>tidy</em> way — <code class="docutils literal notranslate"><span class="pre">specify</span></code> →
-<code class="docutils literal notranslate"><span class="pre">hypothesize</span></code> → <code class="docutils literal notranslate"><span class="pre">generate</span></code> → <code class="docutils literal notranslate"><span class="pre">calculate</span></code> → <code class="docutils literal notranslate"><span class="pre">visualize</span></code> — this package gives you
-the same grammar in Python, plus regression helpers and the book’s datasets.</p>
-<section id="why-moderndive">
-<h2>Why moderndive?<a class="headerlink" href="#why-moderndive" title="Link to this heading">¶</a></h2>
+          <section id="r-compatibility-notes">
+<h1>R compatibility notes<a class="headerlink" href="#r-compatibility-notes" title="Link to this heading">¶</a></h1>
+<p>This package aims to reproduce the <strong>numerical results</strong> of the R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code>
+and <code class="docutils literal notranslate"><span class="pre">infer</span></code> packages, not just their API. In several places that means making a
+deliberate choice that differs from the “default” or “typical” Python/SciPy/
+statsmodels behavior. They’re collected here so the differences are intentional
+and discoverable.</p>
+<section id="statistics">
+<h2>Statistics<a class="headerlink" href="#statistics" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p><strong>A tidy inference grammar.</strong> Bootstrap confidence intervals and
-permutation/​simulation hypothesis tests read like sentences, mirroring R <code class="docutils literal notranslate"><span class="pre">infer</span></code>.</p></li>
-<li><p><strong>Regression helpers</strong> that return tidy tables: <code class="docutils literal notranslate"><span class="pre">get_regression_table</span></code>,
-<code class="docutils literal notranslate"><span class="pre">get_regression_points</span></code>, <code class="docutils literal notranslate"><span class="pre">get_regression_summaries</span></code>, <code class="docutils literal notranslate"><span class="pre">get_correlation</span></code>.</p></li>
-<li><p><strong>Dual-engine plots.</strong> Every plot takes <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code> (default, interactive)
-or <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> (grammar-of-graphics) — same code, your choice of output.</p></li>
-<li><p><strong>58 bundled datasets</strong> via <code class="docutils literal notranslate"><span class="pre">load_*()</span></code> loaders returning polars DataFrames.</p></li>
-<li><p><strong>polars-first</strong>, works with pandas too.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">pop_sd</span></code> divides by <code class="docutils literal notranslate"><span class="pre">n</span></code></strong> (population SD, <code class="docutils literal notranslate"><span class="pre">ddof=0</span></code>), unlike the sample
+<code class="docutils literal notranslate"><span class="pre">sd</span></code>/<code class="docutils literal notranslate"><span class="pre">calculate(stat=&quot;sd&quot;)</span></code> and <code class="docutils literal notranslate"><span class="pre">numpy.std</span></code>’s default which use <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">−</span> <span class="pre">1</span></code>. This
+matches R <code class="docutils literal notranslate"><span class="pre">moderndive::pop_sd</span></code>.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">get_regression_summaries</span></code></strong>: <code class="docutils literal notranslate"><span class="pre">mse</span></code> is the mean squared residual using <code class="docutils literal notranslate"><span class="pre">n</span></code>
+in the denominator (so <code class="docutils literal notranslate"><span class="pre">rmse</span> <span class="pre">=</span> <span class="pre">sqrt(mse)</span></code>), while <code class="docutils literal notranslate"><span class="pre">sigma</span></code> is the residual
+standard error using <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">−</span> <span class="pre">p</span></code>. Both match the R package; note <code class="docutils literal notranslate"><span class="pre">mse</span></code> is <em>not</em>
+statsmodels’ <code class="docutils literal notranslate"><span class="pre">mse_resid</span></code> (which uses <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">−</span> <span class="pre">p</span></code>).</p></li>
+<li><p><strong>GLM summaries</strong> use the log-likelihood-based BIC (<code class="docutils literal notranslate"><span class="pre">bic_llf</span></code>), not
+statsmodels’ deviance-based <code class="docutils literal notranslate"><span class="pre">bic</span></code>, to align with <code class="docutils literal notranslate"><span class="pre">broom::glance</span></code>.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">get_p_value</span></code> two-sided</strong> = <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">×</span> <span class="pre">min(left,</span> <span class="pre">right)</span></code> capped at 1 — the <code class="docutils literal notranslate"><span class="pre">infer</span></code>
+convention, which can differ slightly from a symmetric-tail p-value.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">F</span></code> and <code class="docutils literal notranslate"><span class="pre">Chisq</span></code></strong> are treated as inherently one-sided (right tail) for
+p-values regardless of the <code class="docutils literal notranslate"><span class="pre">direction</span></code> argument, matching <code class="docutils literal notranslate"><span class="pre">infer</span></code>.</p></li>
 </ul>
 </section>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>moderndive
-</pre></div>
-</div>
-<p>Optional extra for saving plotly figures as static images (PNG/SVG):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;moderndive[image]&quot;</span><span class="w">   </span><span class="c1"># adds kaleido</span>
-</pre></div>
-</div>
-</section>
-<section id="second-example">
-<h2>30-second example<a class="headerlink" href="#second-example" title="Link to this heading">¶</a></h2>
-<p>Are tracks more likely to be popular in <em>metal</em> than in <em>deep house</em>? Compute the
-observed difference in “popular” rates, then shuffle the genre labels 1000 times
-to build a null distribution and read off a p-value.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">md</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">specify</span><span class="p">,</span> <span class="n">observe</span><span class="p">,</span> <span class="n">get_p_value</span><span class="p">,</span> <span class="n">visualize</span><span class="p">,</span> <span class="n">shade_p_value</span>
-
-<span class="n">spotify</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_spotify_metal_deephouse</span><span class="p">()</span>
-
-<span class="c1"># Observed difference in &quot;popular&quot; proportions (metal − deep-house)</span>
-<span class="n">obs</span> <span class="o">=</span> <span class="n">observe</span><span class="p">(</span>
-    <span class="n">spotify</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">,</span>
-    <span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">),</span>
-<span class="p">)</span>
-<span class="n">obs</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ObservedStatistic(stat=&#39;diff in props&#39;, value=0.034)
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Null distribution under &quot;genre doesn&#39;t matter&quot; (permutation)</span>
-<span class="n">null</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="n">spotify</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s2">&quot;popular_or_not ~ track_genre&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="s2">&quot;popular&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;independence&quot;</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;permute&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">76</span><span class="p">)</span>
-    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;diff in props&quot;</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;metal&quot;</span><span class="p">,</span> <span class="s2">&quot;deep-house&quot;</span><span class="p">))</span>
-<span class="p">)</span>
-<span class="n">get_p_value</span><span class="p">(</span><span class="n">null</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div><style>
-.dataframe > thead > tr,
-.dataframe > tbody > tr {
-  text-align: right;
-  white-space: pre-wrap;
-}
-</style>
-<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.075</td></tr></tbody></table></div></div></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Visualize it (interactive plotly by default; engine=&quot;plotnine&quot; also works)</span>
-<span class="n">visualize</span><span class="p">(</span><span class="n">null</span><span class="p">)</span> <span class="o">+</span> <span class="n">shade_p_value</span><span class="p">(</span><span class="n">obs_stat</span><span class="o">=</span><span class="n">obs</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="_images/57bcfc0de676a5294afac27836489f257436cfdc208aba5a2907c8b2aa95d9f8.png" src="_images/57bcfc0de676a5294afac27836489f257436cfdc208aba5a2907c8b2aa95d9f8.png" />
-</div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Plots throughout this documentation are rendered as <strong>static images</strong>. When you
-run the code yourself, the default <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotly&quot;</span></code> produces <strong>interactive</strong>
-figures (hover, zoom, pan); <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> gives static grammar-of-graphics
-plots.</p>
-</div>
-</section>
-<section id="where-to-next">
-<h2>Where to next<a class="headerlink" href="#where-to-next" title="Link to this heading">¶</a></h2>
+<section id="prop-test-mirrors-r-s-prop-test-not-a-plain-z-test">
+<h2><code class="docutils literal notranslate"><span class="pre">prop_test</span></code> (mirrors R’s <code class="docutils literal notranslate"><span class="pre">prop.test</span></code>, not a plain z-test)<a class="headerlink" href="#prop-test-mirrors-r-s-prop-test-not-a-plain-z-test" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>New here? Start with <a class="reference internal" href="getting-started.html"><span class="doc">Getting started</span></a>.</p></li>
-<li><p>Coming from R? See <a class="reference internal" href="coming-from-r.html"><span class="doc">Coming from R</span></a> for a function-by-function map.</p></li>
-<li><p>Browse the task guides below, or jump to the <a class="reference internal" href="api.html"><span class="doc">API reference</span></a>.</p></li>
+<li><p><strong>Chi-square statistic by default</strong> (with a <code class="docutils literal notranslate"><span class="pre">chisq_df</span></code> column), like R’s
+<code class="docutils literal notranslate"><span class="pre">prop.test</span></code>. Pass <code class="docutils literal notranslate"><span class="pre">z=True</span></code> for the signed z-statistic that a “typical” Python
+two-proportion test would report.</p></li>
+<li><p><strong>Yates’ continuity correction</strong> is on by default (<code class="docutils literal notranslate"><span class="pre">correct=True</span></code>), as in R.</p></li>
+<li><p><strong>Confidence intervals</strong> match R: a <strong>Wilson score</strong> interval for one
+proportion (not the Wald interval <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code> returns by default), and a
+Wald interval <strong>widened by the continuity correction</strong> for a two-proportion
+difference.</p></li>
 </ul>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="coming-from-r.html">Coming from R</a></li>
-<li class="toctree-l1"><a class="reference internal" href="datasets.html">Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="r-compatibility.html">R compatibility notes</a></li>
+</section>
+<section id="correlation">
+<h2>Correlation<a class="headerlink" href="#correlation" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">get_correlation</span></code> drops nulls by default</strong> (<code class="docutils literal notranslate"><span class="pre">na_rm=True</span></code>) so beginners get a
+number rather than <code class="docutils literal notranslate"><span class="pre">nan</span></code>. R’s <code class="docutils literal notranslate"><span class="pre">na.rm</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">FALSE</span></code>; pass <code class="docutils literal notranslate"><span class="pre">na_rm=False</span></code>
+to match R exactly.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">method=&quot;spearman&quot;</span></code>/<code class="docutils literal notranslate"><span class="pre">&quot;kendall&quot;</span></code> use the SciPy implementations and match R’s
+<code class="docutils literal notranslate"><span class="pre">cor(method=...)</span></code>.</p></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="guides/sampling.html">Sampling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/confidence-intervals.html">Bootstrapping &amp; confidence intervals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/hypothesis-testing.html">Hypothesis testing</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/regression.html">Regression</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/theory-based.html">Theory-based inference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/plotting.html">Plotting: plotly &amp; plotnine</a></li>
-<li class="toctree-l1"><a class="reference internal" href="guides/messages.html">Helpful messages &amp; errors</a></li>
+</section>
+<section id="regression-points-tables">
+<h2>Regression points / tables<a class="headerlink" href="#regression-points-tables" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>In-formula transformations</strong> are reshaped to match R: a transformed outcome
+like <code class="docutils literal notranslate"><span class="pre">np.log(mpg)</span></code> is shown on the model scale as <code class="docutils literal notranslate"><span class="pre">log_mpg</span></code>/<code class="docutils literal notranslate"><span class="pre">log_mpg_hat</span></code>, and
+transformed predictors (<code class="docutils literal notranslate"><span class="pre">poly</span></code>, <code class="docutils literal notranslate"><span class="pre">scale</span></code>, <code class="docutils literal notranslate"><span class="pre">I</span></code>) show their original columns
+rather than the patsy basis matrix.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">get_regression_table</span></code></strong> prettifies categorical term names
+(<code class="docutils literal notranslate"><span class="pre">income[T.High]</span></code> → <code class="docutils literal notranslate"><span class="pre">income:</span> <span class="pre">High</span></code>) by default; <code class="docutils literal notranslate"><span class="pre">default_categorical_levels=True</span></code>
+keeps the raw statsmodels names.</p></li>
 </ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="api.html">API reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="api.html#inference-grammar">Inference grammar</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#getters-and-visualization">Getters and visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#theory-based-tests">Theory-based tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#regression-summary-helpers">Regression &amp; summary helpers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#sampling-and-plots">Sampling and plots</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#viewing-data">Viewing data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#datasets">Datasets</a></li>
+</section>
+<section id="datasets">
+<h2>Datasets<a class="headerlink" href="#datasets" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>Datetime columns are stored in UTC.</strong> R’s nycflights <code class="docutils literal notranslate"><span class="pre">time_hour</span></code> is stored in
+<code class="docutils literal notranslate"><span class="pre">America/New_York</span></code>; the bundled Parquet stores the identical instants in UTC, so
+a displayed hour differs by the UTC offset (the integer <code class="docutils literal notranslate"><span class="pre">hour</span></code> column matches R).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">early_january_2023_weather</span></code> is derived from <code class="docutils literal notranslate"><span class="pre">weather</span></code>.</strong> The R dataset ships
+<code class="docutils literal notranslate"><span class="pre">temp</span></code>/<code class="docutils literal notranslate"><span class="pre">dewp</span></code>/<code class="docutils literal notranslate"><span class="pre">humid</span></code>/<code class="docutils literal notranslate"><span class="pre">pressure</span></code> as all-<code class="docutils literal notranslate"><span class="pre">NA</span></code>; this package recomputes the table
+from <code class="docutils literal notranslate"><span class="pre">weather</span></code> (Newark, first 15 days of Jan 2023) so those columns hold real
+values.</p></li>
 </ul>
-</li>
+</section>
+<section id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>plotly is the default engine</strong> (the book is moving to interactive plots);
+pass <code class="docutils literal notranslate"><span class="pre">engine=&quot;plotnine&quot;</span></code> anywhere for grammar-of-graphics output. R returns
+ggplot2 objects.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">visualize</span></code>’s default <code class="docutils literal notranslate"><span class="pre">bins</span></code> is 20 (R’s is 15).</p></li>
+<li><p>Two-sided p-value shading mirrors the observed statistic about 0, matching
+<code class="docutils literal notranslate"><span class="pre">infer</span></code>’s <code class="docutils literal notranslate"><span class="pre">shade_p_value</span></code>.</p></li>
 </ul>
-</div>
+</section>
+<section id="reproducibility">
+<h2>Reproducibility<a class="headerlink" href="#reproducibility" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Pass <code class="docutils literal notranslate"><span class="pre">seed=</span></code> to <code class="docutils literal notranslate"><span class="pre">generate()</span></code> / <code class="docutils literal notranslate"><span class="pre">rep_slice_sample()</span></code> for reproducible draws
+(R uses <code class="docutils literal notranslate"><span class="pre">set.seed()</span></code>). Identical seeds will <strong>not</strong> reproduce R’s exact random
+draws — only the statistical behavior matches, not the specific RNG stream.</p></li>
+</ul>
 </section>
 </section>
 
@@ -409,16 +352,26 @@ plots.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="getting-started.html">
+          <a class="next-page" href="guides/sampling.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Getting started</div>
+                <div class="title">Sampling</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          
+          <a class="prev-page" href="datasets.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Datasets</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -449,13 +402,14 @@ plots.</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">moderndive (Python)</a><ul>
-<li><a class="reference internal" href="#why-moderndive">Why moderndive?</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#second-example">30-second example</a></li>
-<li><a class="reference internal" href="#where-to-next">Where to next</a><ul>
-</ul>
-</li>
+<li><a class="reference internal" href="#">R compatibility notes</a><ul>
+<li><a class="reference internal" href="#statistics">Statistics</a></li>
+<li><a class="reference internal" href="#prop-test-mirrors-r-s-prop-test-not-a-plain-z-test"><code class="docutils literal notranslate"><span class="pre">prop_test</span></code> (mirrors R’s <code class="docutils literal notranslate"><span class="pre">prop.test</span></code>, not a plain z-test)</a></li>
+<li><a class="reference internal" href="#correlation">Correlation</a></li>
+<li><a class="reference internal" href="#regression-points-tables">Regression points / tables</a></li>
+<li><a class="reference internal" href="#datasets">Datasets</a></li>
+<li><a class="reference internal" href="#plotting">Plotting</a></li>
+<li><a class="reference internal" href="#reproducibility">Reproducibility</a></li>
 </ul>
 </li>
 </ul>

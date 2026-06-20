@@ -107,6 +107,7 @@ plots.
 getting-started
 coming-from-r
 datasets
+r-compatibility
 ```
 
 ```{toctree}

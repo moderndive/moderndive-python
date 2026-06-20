@@ -35,29 +35,56 @@ def _parse_formula(formula: str) -> tuple[str, list[str]]:
     return lhs, predictors
 
 
+_CORR_METHODS = ("pearson", "spearman", "kendall")
+
+
+def _correlate(x_vals, y_vals, method: str) -> float:
+    """Correlation coefficient between two numpy arrays for the chosen method."""
+    if method == "pearson":
+        return float(np.corrcoef(x_vals, y_vals)[0, 1])
+    from scipy import stats
+
+    fn = stats.spearmanr if method == "spearman" else stats.kendalltau
+    return float(fn(x_vals, y_vals).statistic)
+
+
 def get_correlation(
     data,
     formula: str | None = None,
     *,
     x: str | None = None,
     y: str | None = None,
+    method: str = "pearson",
+    na_rm: bool = True,
     wide: bool = False,
     quiet: bool = False,
 ) -> pl.DataFrame:
-    """Pearson correlation between an outcome and one or more predictors.
+    """Correlation between an outcome and one or more predictors.
 
     Mirrors ``moderndive::get_correlation``. Give the variables either as a
     formula (``"y ~ x"`` or ``"y ~ x1 + x2 + x3"``) or, for a single predictor,
     via ``x=`` and ``y=``.
 
+    ``method`` is ``"pearson"`` (default), ``"spearman"`` (rank correlation), or
+    ``"kendall"`` (rank concordance). ``na_rm`` drops rows with a null in either
+    column before computing (per predictor pair); set ``na_rm=False`` to keep
+    them (yielding ``nan`` if any are present).
+
     With **one** predictor the result is a 1-row frame with a ``cor`` column.
     With **multiple** predictors the result is long by default — columns
     ``predictor`` and ``cor`` (one row each) — or pass ``wide=True`` for one
-    column per predictor. Rows with a null in either column are dropped per pair.
+    column per predictor.
 
     A short note points to a full pairwise correlation matrix when there are
     multiple predictors; silence it with ``quiet=True``.
     """
+    if method not in _CORR_METHODS:
+        raise ValueError(
+            helpful_error(
+                f"method must be one of {_CORR_METHODS}, got {method!r}.",
+                "Use 'pearson' (linear), 'spearman' (rank), or 'kendall'.",
+            )
+        )
     df = data if isinstance(data, pl.DataFrame) else pl.from_pandas(data)
 
     if formula is not None:
@@ -90,10 +117,10 @@ def get_correlation(
 
     cors: dict[str, float] = {}
     for predictor in predictors:
-        pair = df.select(predictor, outcome).drop_nulls()
-        cors[predictor] = float(
-            np.corrcoef(pair[predictor].to_numpy(), pair[outcome].to_numpy())[0, 1]
-        )
+        pair = df.select(predictor, outcome)
+        if na_rm:
+            pair = pair.drop_nulls()
+        cors[predictor] = _correlate(pair[predictor].to_numpy(), pair[outcome].to_numpy(), method)
 
     if len(predictors) == 1:
         return pl.DataFrame({"cor": [cors[predictors[0]]]})

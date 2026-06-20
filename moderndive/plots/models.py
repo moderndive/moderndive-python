@@ -65,11 +65,14 @@ def _parallel_slopes_fit(pdf, response: str, explanatory: str, by: str):
     return intercepts, slope, levels
 
 
-def gg_parallel_slopes(data, response: str, explanatory: str, by: str, *, engine: str = "plotly"):
+def gg_parallel_slopes(
+    data, response: str, explanatory: str, by: str, *, alpha: float = 1.0, engine: str = "plotly"
+):
     """Scatterplot with a parallel-slopes regression model overlaid.
 
     Fits ``response ~ explanatory + C(by)`` (one common slope, a separate intercept
     per level of ``by``) and draws one fitted line per group over the data.
+    ``alpha`` sets the point transparency (0–1), useful when points overlap.
     """
     engine = _resolve_engine(engine)
     pdf = _to_pandas(data, [response, explanatory, by])
@@ -80,7 +83,7 @@ def gg_parallel_slopes(data, response: str, explanatory: str, by: str, *, engine
     if engine == "plotly":
         import plotly.express as px
 
-        fig = px.scatter(pdf, x=explanatory, y=response, color=by)
+        fig = px.scatter(pdf, x=explanatory, y=response, color=by, opacity=alpha)
         for i, lvl in enumerate(levels):
             b = intercepts[lvl]
             fig.add_scatter(
@@ -98,7 +101,7 @@ def gg_parallel_slopes(data, response: str, explanatory: str, by: str, *, engine
 
     return (
         ggplot(pdf, aes(x=explanatory, y=response, color=by))
-        + geom_point()
+        + geom_point(alpha=alpha)
         + geom_parallel_slopes(pdf, response, explanatory, by)
         + labs(x=explanatory, y=response, title="Parallel slopes model")
         + theme_light()

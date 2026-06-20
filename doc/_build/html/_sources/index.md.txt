@@ -120,6 +120,7 @@ guides/hypothesis-testing
 guides/regression
 guides/theory-based
 guides/plotting
+guides/infer-examples
 guides/messages
 ```
 

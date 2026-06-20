@@ -260,6 +260,9 @@ def test_view_renders_with_itables(un, monkeypatch):
         calls["title"] = title
         return "WIDGET"
 
+    # Force the render path so the test is deterministic whether or not the
+    # optional itables dependency is installed in this environment.
+    monkeypatch.setattr(md.view, "_itables_available", lambda: True)
     monkeypatch.setattr(md.view, "_render_datatable", fake_render)
     out = View(un.head(3), title="UN")
     assert out == "WIDGET" and calls["title"] == "UN"
@@ -267,6 +270,7 @@ def test_view_renders_with_itables(un, monkeypatch):
 
 def test_view_coerces_non_frame(monkeypatch):
     captured = {}
+    monkeypatch.setattr(md.view, "_itables_available", lambda: True)
     monkeypatch.setattr(
         md.view, "_render_datatable", lambda frame, title: captured.setdefault("f", frame)
     )
@@ -278,11 +282,17 @@ def test_view_accepts_pandas(monkeypatch):
     import pandas as pd
 
     captured = {}
+    monkeypatch.setattr(md.view, "_itables_available", lambda: True)
     monkeypatch.setattr(
         md.view, "_render_datatable", lambda frame, title: captured.setdefault("f", frame)
     )
     View(pd.DataFrame({"a": [1]}))
     assert isinstance(captured["f"], pd.DataFrame)
+
+
+def test_itables_available_returns_bool():
+    # Exercise the real detection (result depends on whether itables is installed).
+    assert isinstance(md.view._itables_available(), bool)
 
 
 def test_view_fallback_without_itables(un, monkeypatch):

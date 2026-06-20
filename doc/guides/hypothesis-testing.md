@@ -99,6 +99,31 @@ null_p = (
 `"diff in props"`, `"ratio of means"`, `"ratio of props"`, `"odds ratio"`,
 `"slope"`, `"correlation"`, `"t"`, `"z"`, `"F"`, `"Chisq"`.
 
+## Chi-square goodness-of-fit
+
+For a single categorical variable with several levels, test whether the observed
+counts match a set of hypothesized proportions: `hypothesize(null="point", p=...)`
+with `p` a `{level: probability}` mapping, then `generate(type="draw")` to simulate
+from those proportions.
+
+```{code-cell} python
+gss = md.load_gss()
+levels = gss["finrela"].unique().to_list()
+uniform = {level: 1 / len(levels) for level in levels}   # "all classes equally likely"
+
+obs_gof = gss.specify(response="finrela").hypothesize(null="point", p=uniform).calculate(stat="Chisq")
+
+null_gof = (
+    gss.specify(response="finrela")
+    .hypothesize(null="point", p=uniform)
+    .generate(reps=1000, type="draw", seed=1)
+    .calculate(stat="Chisq")
+)
+get_p_value(null_gof, obs_stat=obs_gof, direction="greater")
+```
+
+The one-line wrapper is `chisq_test(gss, response="finrela", p=uniform)`.
+
 ## Custom test statistics
 
 Beyond those strings, `stat=` accepts **any function** that takes the response

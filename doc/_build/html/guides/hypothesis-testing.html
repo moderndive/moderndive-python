@@ -370,6 +370,42 @@ The two-sided shading mirrors the observed statistic about 0.</p>
 <code class="docutils literal notranslate"><span class="pre">&quot;diff</span> <span class="pre">in</span> <span class="pre">props&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ratio</span> <span class="pre">of</span> <span class="pre">means&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ratio</span> <span class="pre">of</span> <span class="pre">props&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;odds</span> <span class="pre">ratio&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;slope&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;correlation&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;t&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;z&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;F&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Chisq&quot;</span></code>.</p>
 </section>
+<section id="chi-square-goodness-of-fit">
+<h2>Chi-square goodness-of-fit<a class="headerlink" href="#chi-square-goodness-of-fit" title="Link to this heading">¶</a></h2>
+<p>For a single categorical variable with several levels, test whether the observed
+counts match a set of hypothesized proportions: <code class="docutils literal notranslate"><span class="pre">hypothesize(null=&quot;point&quot;,</span> <span class="pre">p=...)</span></code>
+with <code class="docutils literal notranslate"><span class="pre">p</span></code> a <code class="docutils literal notranslate"><span class="pre">{level:</span> <span class="pre">probability}</span></code> mapping, then <code class="docutils literal notranslate"><span class="pre">generate(type=&quot;draw&quot;)</span></code> to simulate
+from those proportions.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gss</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_gss</span><span class="p">()</span>
+<span class="n">levels</span> <span class="o">=</span> <span class="n">gss</span><span class="p">[</span><span class="s2">&quot;finrela&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">to_list</span><span class="p">()</span>
+<span class="n">uniform</span> <span class="o">=</span> <span class="p">{</span><span class="n">level</span><span class="p">:</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">}</span>   <span class="c1"># &quot;all classes equally likely&quot;</span>
+
+<span class="n">obs_gof</span> <span class="o">=</span> <span class="n">gss</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;finrela&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">uniform</span><span class="p">)</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;Chisq&quot;</span><span class="p">)</span>
+
+<span class="n">null_gof</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">gss</span><span class="o">.</span><span class="n">specify</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s2">&quot;finrela&quot;</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">hypothesize</span><span class="p">(</span><span class="n">null</span><span class="o">=</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">uniform</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;draw&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">stat</span><span class="o">=</span><span class="s2">&quot;Chisq&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">get_p_value</span><span class="p">(</span><span class="n">null_gof</span><span class="p">,</span> <span class="n">obs_stat</span><span class="o">=</span><span class="n">obs_gof</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;greater&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (1, 1)</small><table border="1" class="dataframe"><thead><tr><th>p_value</th></tr><tr><td>f64</td></tr></thead><tbody><tr><td>0.0</td></tr></tbody></table></div></div></div>
+</div>
+<p>The one-line wrapper is <code class="docutils literal notranslate"><span class="pre">chisq_test(gss,</span> <span class="pre">response=&quot;finrela&quot;,</span> <span class="pre">p=uniform)</span></code>.</p>
+</section>
 <section id="custom-test-statistics">
 <h2>Custom test statistics<a class="headerlink" href="#custom-test-statistics" title="Link to this heading">¶</a></h2>
 <p>Beyond those strings, <code class="docutils literal notranslate"><span class="pre">stat=</span></code> accepts <strong>any function</strong> that takes the response
@@ -474,6 +510,7 @@ almond weights and read off a 95% interval:</p>
 <li><a class="reference internal" href="#shade-the-p-value">Shade the p-value</a></li>
 <li><a class="reference internal" href="#one-mean-one-proportion-point-null">One mean / one proportion (point null)</a></li>
 <li><a class="reference internal" href="#available-statistics">Available statistics</a></li>
+<li><a class="reference internal" href="#chi-square-goodness-of-fit">Chi-square goodness-of-fit</a></li>
 <li><a class="reference internal" href="#custom-test-statistics">Custom test statistics</a></li>
 </ul>
 </li>

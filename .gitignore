@@ -18,3 +18,6 @@ doc/reference/
 
 # OS
 .DS_Store
+
+# Local Claude Code settings (plugin toggles, etc.)
+.claude/

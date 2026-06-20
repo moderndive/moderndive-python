@@ -21,3 +21,6 @@ doc/reference/
 
 # Local Claude Code settings (plugin toggles, etc.)
 .claude/
+
+# Built Sphinx docs (RTD rebuilds from source; avoid generated-file merge conflicts)
+doc/_build/

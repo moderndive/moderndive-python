@@ -210,6 +210,7 @@
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Regression</a></li>
 <li class="toctree-l1"><a class="reference internal" href="theory-based.html">Theory-based inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting: plotly &amp; plotnine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infer-examples.html">Pipeline examples (the infer “stat menu”)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="messages.html">Helpful messages &amp; errors</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Reference</span></p>
@@ -418,6 +419,52 @@ Pass <code class="docutils literal notranslate"><span class="pre">exponentiate=T
 <small>shape: (1, 10)</small><table border="1" class="dataframe"><thead><tr><th>mse</th><th>rmse</th><th>deviance</th><th>null_deviance</th><th>aic</th><th>bic</th><th>log_lik</th><th>df_residual</th><th>df_null</th><th>nobs</th></tr><tr><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>i64</td><td>i64</td><td>i64</td></tr></thead><tbody><tr><td>0.219</td><td>0.468</td><td>578.298</td><td>630.296</td><td>584.298</td><td>596.711</td><td>-289.149</td><td>460</td><td>462</td><td>463</td></tr></tbody></table></div></div></div>
 </div>
 </section>
+<section id="array-api-models">
+<h2>Array-API models<a class="headerlink" href="#array-api-models" title="Link to this heading">¶</a></h2>
+<p>You don’t have to use the formula API. The helpers also accept models fit with
+statsmodels’ array API (<code class="docutils literal notranslate"><span class="pre">sm.OLS(y,</span> <span class="pre">X)</span></code> / <code class="docutils literal notranslate"><span class="pre">sm.GLM(...)</span></code>), which is handy when your
+design matrix is already built. <code class="docutils literal notranslate"><span class="pre">get_regression_points()</span></code> reconstructs the
+per-observation table from the design matrix (the constant column becomes the
+<code class="docutils literal notranslate"><span class="pre">intercept</span></code> term and is dropped from the points):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">statsmodels.api</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sm</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">add_constant</span><span class="p">(</span><span class="n">houses</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;living_area&quot;</span><span class="p">,</span> <span class="s2">&quot;bedrooms&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">())</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">houses</span><span class="p">[</span><span class="s2">&quot;price&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+<span class="n">array_model</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="n">get_regression_table</span><span class="p">(</span><span class="n">array_model</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (3, 7)</small><table border="1" class="dataframe"><thead><tr><th>term</th><th>estimate</th><th>std_error</th><th>statistic</th><th>p_value</th><th>lower_ci</th><th>upper_ci</th></tr><tr><td>str</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>&quot;intercept&quot;</td><td>20986.094</td><td>6816.251</td><td>3.079</td><td>0.002</td><td>7611.128</td><td>34361.06</td></tr><tr><td>&quot;living_area&quot;</td><td>93.842</td><td>3.109</td><td>30.183</td><td>0.0</td><td>87.741</td><td>99.943</td></tr><tr><td>&quot;bedrooms&quot;</td><td>-7483.095</td><td>2783.531</td><td>-2.688</td><td>0.007</td><td>-12944.988</td><td>-2021.203</td></tr></tbody></table></div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_regression_points</span><span class="p">(</span><span class="n">array_model</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><style>
+.dataframe > thead > tr,
+.dataframe > tbody > tr {
+  text-align: right;
+  white-space: pre-wrap;
+}
+</style>
+<small>shape: (5, 6)</small><table border="1" class="dataframe"><thead><tr><th>ID</th><th>price</th><th>living_area</th><th>bedrooms</th><th>price_hat</th><th>residual</th></tr><tr><td>i64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td><td>f64</td></tr></thead><tbody><tr><td>1</td><td>142212.0</td><td>1982.0</td><td>3.0</td><td>184531.942</td><td>-42319.942</td></tr><tr><td>2</td><td>134865.0</td><td>1676.0</td><td>3.0</td><td>155816.245</td><td>-20951.245</td></tr><tr><td>3</td><td>118007.0</td><td>1694.0</td><td>3.0</td><td>157505.404</td><td>-39498.404</td></tr><tr><td>4</td><td>138297.0</td><td>1800.0</td><td>2.0</td><td>174935.767</td><td>-36638.767</td></tr><tr><td>5</td><td>129470.0</td><td>2088.0</td><td>3.0</td><td>194479.21</td><td>-65009.21</td></tr></tbody></table></div></div></div>
+</div>
+</section>
 <section id="d-regression-plane">
 <h2>3D regression plane<a class="headerlink" href="#d-regression-plane" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">plot_3d_regression()</span></code> draws an interactive 3D scatter of an outcome against two
@@ -437,20 +484,38 @@ numeric predictors, with the fitted regression plane overlaid (a plotly figure):
 </section>
 <section id="visualizing-models">
 <h2>Visualizing models<a class="headerlink" href="#visualizing-models" title="Link to this heading">¶</a></h2>
-<p>Two ports of R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code>’s ggplot helpers, both dual-engine:</p>
+<p>Two ports of R <code class="docutils literal notranslate"><span class="pre">moderndive</span></code>’s ggplot helpers, both dual-engine. A
+<strong>parallel-slopes</strong> model — one common slope with a separate intercept per group:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">moderndive</span><span class="w"> </span><span class="kn">import</span> <span class="n">gg_parallel_slopes</span><span class="p">,</span> <span class="n">gg_categorical_model</span>
 
 <span class="n">evals</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">load_evals</span><span class="p">()</span>
-
-<span class="c1"># Parallel-slopes model: one common slope, a separate intercept per group</span>
-<span class="n">gg_parallel_slopes</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">explanatory</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s2">&quot;gender&quot;</span><span class="p">)</span>            <span class="c1"># plotly</span>
-<span class="n">gg_parallel_slopes</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">explanatory</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s2">&quot;gender&quot;</span><span class="p">,</span>
-                   <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;plotnine&quot;</span><span class="p">)</span>
-
-<span class="c1"># Regression with a single categorical predictor</span>
-<span class="n">gg_categorical_model</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">explanatory</span><span class="o">=</span><span class="s2">&quot;rank&quot;</span><span class="p">)</span>
+<span class="n">gg_parallel_slopes</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">explanatory</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s2">&quot;gender&quot;</span><span class="p">)</span>  <span class="c1"># plotly</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/1d823747e0f1ecebe3da106ec64b1ad73d4d55547d8814ff4c011efafc6354bc.png" src="../_images/1d823747e0f1ecebe3da106ec64b1ad73d4d55547d8814ff4c011efafc6354bc.png" />
+</div>
+</div>
+<p>The same plot via the plotnine engine:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gg_parallel_slopes</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">explanatory</span><span class="o">=</span><span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="s2">&quot;gender&quot;</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;plotnine&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<a class="reference internal image-reference" href="../_images/9e4477470715e05056026fa2f1c0d2d12d7f46e2ea8276cada8e7579f13f596b.png"><img alt="../_images/9e4477470715e05056026fa2f1c0d2d12d7f46e2ea8276cada8e7579f13f596b.png" height="480" src="../_images/9e4477470715e05056026fa2f1c0d2d12d7f46e2ea8276cada8e7579f13f596b.png" width="640" />
+</a>
+</div>
+</div>
+<p>A regression with a single <strong>categorical</strong> predictor (<code class="docutils literal notranslate"><span class="pre">geom_categorical_model()</span></code>
+is an alias of <code class="docutils literal notranslate"><span class="pre">gg_categorical_model()</span></code>):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gg_categorical_model</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">explanatory</span><span class="o">=</span><span class="s2">&quot;rank&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -561,6 +626,7 @@ from its own value.</p>
 <li><a class="reference internal" href="#model-fit-summaries">Model-fit summaries</a></li>
 <li><a class="reference internal" href="#correlation">Correlation</a></li>
 <li><a class="reference internal" href="#logistic-other-glms">Logistic &amp; other GLMs</a></li>
+<li><a class="reference internal" href="#array-api-models">Array-API models</a></li>
 <li><a class="reference internal" href="#d-regression-plane">3D regression plane</a></li>
 <li><a class="reference internal" href="#visualizing-models">Visualizing models</a></li>
 <li><a class="reference internal" href="#inference-for-regression-coefficients">Inference for regression coefficients</a></li>

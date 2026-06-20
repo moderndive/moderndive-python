@@ -252,9 +252,9 @@
 <span></span><span class="sd">&quot;&quot;&quot;Repeated sampling helpers for the sampling activities (Chapter 7).</span>
 
 <span class="sd">Mirrors the R ``moderndive`` functions ``rep_slice_sample()`` /</span>
-<span class="sd">``rep_sample_n()``: draw ``reps`` samples of size ``n`` from a data frame and</span>
-<span class="sd">stack them into one long data frame with a ``replicate`` column (1..reps), so a</span>
-<span class="sd">grouped summary computes one statistic per virtual sample.</span>
+<span class="sd">``rep_sample_n()``: draw ``reps`` samples from a data frame and stack them into</span>
+<span class="sd">one long data frame with a ``replicate`` column (1..reps), so a grouped summary</span>
+<span class="sd">computes one statistic per virtual sample.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
@@ -262,55 +262,90 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">polars</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">._messaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">helpful_error</span>
+
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rep_slice_sample&quot;</span><span class="p">,</span> <span class="s2">&quot;rep_sample_n&quot;</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_weights</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">weight_by</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize ``weight_by`` (a column name or a sequence) into probabilities.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">weight_by</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">weight_by</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight_by</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weight_by</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">total</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">helpful_error</span><span class="p">(</span><span class="s2">&quot;weight_by must contain positive weights that sum to &gt; 0.&quot;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">w</span> <span class="o">/</span> <span class="n">total</span>
 
 
 <div class="viewcode-block" id="rep_slice_sample">
 <a class="viewcode-back" href="../../api.html#moderndive.rep_slice_sample">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">rep_slice_sample</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">prop</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">reps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">weight_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Take ``reps`` samples of size ``n`` from ``data``.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Take ``reps`` samples from ``data``.</span>
 
-<span class="sd">    Returns a polars DataFrame with a leading ``replicate`` column identifying</span>
-<span class="sd">    which sample each row belongs to. Set ``replace=True`` for sampling with</span>
-<span class="sd">    replacement (e.g. bootstrap-style). Pass ``seed`` for reproducibility.</span>
+<span class="sd">    Give the sample size as either ``n`` (a count) or ``prop`` (a fraction of the</span>
+<span class="sd">    rows, e.g. ``prop=0.5``). Returns a polars DataFrame with a leading</span>
+<span class="sd">    ``replicate`` column identifying which sample each row belongs to. Set</span>
+<span class="sd">    ``replace=True`` for sampling with replacement (bootstrap-style). ``weight_by``</span>
+<span class="sd">    gives unequal selection probabilities — a column name or a sequence of</span>
+<span class="sd">    weights. Pass ``seed`` for reproducibility.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="n">prop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="n">helpful_error</span><span class="p">(</span>
+                <span class="s2">&quot;Specify exactly one of n= (a count) or prop= (a fraction).&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;e.g. rep_slice_sample(df, n=50) or rep_slice_sample(df, prop=0.5).&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
     <span class="n">n_rows</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">height</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">replace</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="n">n_rows</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;cannot take a sample of size </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> without replacement from </span><span class="si">{</span><span class="n">n_rows</span><span class="si">}</span><span class="s2"> rows&quot;</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">n</span> <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">prop</span> <span class="o">*</span> <span class="n">n_rows</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">replace</span> <span class="ow">and</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="n">n_rows</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;cannot take a sample of size </span><span class="si">{</span><span class="n">size</span><span class="si">}</span><span class="s2"> without replacement from </span><span class="si">{</span><span class="n">n_rows</span><span class="si">}</span><span class="s2"> rows&quot;</span>
+        <span class="p">)</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="n">_weights</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weight_by</span><span class="p">)</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
     <span class="n">samples</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">replicate</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">reps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probs</span><span class="p">)</span>
         <span class="n">sample</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="o">.</span><span class="n">tolist</span><span class="p">()]</span><span class="o">.</span><span class="n">with_columns</span><span class="p">(</span>
             <span class="n">pl</span><span class="o">.</span><span class="n">lit</span><span class="p">(</span><span class="n">replicate</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">pl</span><span class="o">.</span><span class="n">Int64</span><span class="p">)</span><span class="o">.</span><span class="n">alias</span><span class="p">(</span><span class="s2">&quot;replicate&quot;</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
 
     <span class="n">combined</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
-    <span class="c1"># Put `replicate` first.</span>
     <span class="k">return</span> <span class="n">combined</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">&quot;replicate&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span></div>
 
 
 
-<span class="c1"># The older moderndive name is a thin alias with the same behavior.</span>
 <div class="viewcode-block" id="rep_sample_n">
 <a class="viewcode-back" href="../../api.html#moderndive.rep_sample_n">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">rep_sample_n</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
     <span class="n">reps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">replace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">prob</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pl</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Alias for :func:`rep_slice_sample` (older moderndive name).&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Take ``reps`` samples of size ``n`` (older moderndive name).</span>
+
+<span class="sd">    Like :func:`rep_slice_sample`, but the sample size is always the count ``n``</span>
+<span class="sd">    and unequal selection weights are passed as ``prob`` (a column name or a</span>
+<span class="sd">    sequence), matching the R ``rep_sample_n`` signature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">rep_slice_sample</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="n">replace</span><span class="p">,</span> <span class="n">weight_by</span><span class="o">=</span><span class="n">prob</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

@@ -9,6 +9,11 @@
   Plotly/ggplot2 boxplots) instead of polars' default `"nearest"`. A new
   `interpolation=` parameter exposes the choice; pass `interpolation="nearest"`
   to restore the previous behavior.
+- `chisq_test()` now applies **Yates' continuity correction by default** for the
+  test of independence (`correct=True`), matching R's `chisq.test` and the
+  package's `prop_test`. As in R, the correction only affects 2x2 tables. Pass
+  `correct=False` for the uncorrected Pearson statistic (e.g. to match the
+  simulation-based `calculate(stat="Chisq")`).
 
 ## 0.1.0 (2026-06-20)
 

@@ -181,6 +181,7 @@ def chisq_test(
     response: str | None = None,
     explanatory: str | None = None,
     p: dict | None = None,
+    correct: bool = True,
 ) -> pl.DataFrame:
     """Tidy chi-squared test.
 
@@ -188,6 +189,13 @@ def chisq_test(
     response and a ``p={level: probability, ...}`` mapping, it is a **goodness-of-fit**
     test against those hypothesized proportions. Returns ``statistic``,
     ``chisq_df``, ``p_value``.
+
+    ``correct`` applies Yates' continuity correction to the test of independence,
+    matching R's ``chisq.test`` default (``correct=TRUE``) and ``prop_test``; like
+    R, the correction only affects 2x2 tables (one degree of freedom). Pass
+    ``correct=False`` for the uncorrected Pearson statistic (e.g. to match the
+    simulation-based ``calculate(stat="Chisq")``). It does not apply to the
+    goodness-of-fit case.
     """
     from scipy import stats
 
@@ -210,7 +218,7 @@ def chisq_test(
         )
     sub = data.select(resp, expl).drop_nulls()
     table = sub.to_pandas().pivot_table(index=resp, columns=expl, aggfunc="size", fill_value=0)
-    chi2, pval, dof, _ = stats.chi2_contingency(table.to_numpy(), correction=False)
+    chi2, pval, dof, _ = stats.chi2_contingency(table.to_numpy(), correction=correct)
     return pl.DataFrame(
         {"statistic": [float(chi2)], "chisq_df": [int(dof)], "p_value": [float(pval)]}
     )

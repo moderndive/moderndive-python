@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- `tidy_summary()` now computes `Q1`/`Q3` with **linear** quantile interpolation
+  by default (matching R's `quantile()` type 7, NumPy, and the quartiles drawn by
+  Plotly/ggplot2 boxplots) instead of polars' default `"nearest"`. A new
+  `interpolation=` parameter exposes the choice; pass `interpolation="nearest"`
+  to restore the previous behavior.
+
 ## 0.1.0 (2026-06-20)
 
 Initial release of the Python companion to **ModernDive: Statistical Inference

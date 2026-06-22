@@ -28,6 +28,11 @@ jobs:
           use-public-rspm: true
 
       - name: Install upstream R packages (latest from GitHub)
+        # GITHUB_PAT authenticates remotes::install_github; without it the GitHub
+        # API calls are anonymous and get rate-limited ("cannot open URL ...
+        # /contents/DESCRIPTION"), which fails the install.
+        env:
+          GITHUB_PAT: ${{ github.token }}
         run: |
           Rscript -e 'install.packages(c("remotes", "jsonlite"))'
           Rscript -e 'remotes::install_github(c("moderndive/moderndive", "tidymodels/infer"), upgrade = "never")'

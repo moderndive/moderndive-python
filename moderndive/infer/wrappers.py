@@ -181,7 +181,7 @@ def chisq_test(
     response: str | None = None,
     explanatory: str | None = None,
     p: dict | None = None,
-    correct: bool = True,
+    correct: bool = False,
 ) -> pl.DataFrame:
     """Tidy chi-squared test.
 
@@ -190,11 +190,11 @@ def chisq_test(
     test against those hypothesized proportions. Returns ``statistic``,
     ``chisq_df``, ``p_value``.
 
-    ``correct`` applies Yates' continuity correction to the test of independence,
-    matching R's ``chisq.test`` default (``correct=TRUE``) and ``prop_test``; like
-    R, the correction only affects 2x2 tables (one degree of freedom). Pass
-    ``correct=False`` for the uncorrected Pearson statistic (e.g. to match the
-    simulation-based ``calculate(stat="Chisq")``). It does not apply to the
+    ``correct`` applies Yates' continuity correction to the test of independence.
+    It defaults to ``False`` — the uncorrected Pearson statistic, matching
+    moderndive 0.1.0 and the simulation-based ``calculate(stat="Chisq")``. Pass
+    ``correct=True`` to match R's ``chisq.test``/``prop_test`` default; like R, the
+    correction only affects 2x2 tables (one degree of freedom) and never the
     goodness-of-fit case.
     """
     from scipy import stats

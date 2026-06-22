@@ -366,7 +366,7 @@ def tidy_summary(
     data,
     columns: list[str] | None = None,
     digits: int = 3,
-    interpolation: str = "linear",
+    interpolation: str = "nearest",
 ) -> pl.DataFrame:
     """Per-variable summary statistics for the selected columns.
 
@@ -376,9 +376,10 @@ def tidy_summary(
     report ``n`` and ``type`` with the numeric fields left null.
 
     ``interpolation`` selects how ``Q1``/``Q3`` are computed when a quartile falls
-    between two observations. The default ``"linear"`` matches R's ``quantile()``
-    (type 7), NumPy, and the quartiles drawn by Plotly/ggplot2 boxplots; pass any
-    other polars quantile method (e.g. ``"nearest"``) to override.
+    between two observations. The default ``"nearest"`` matches moderndive 0.1.0
+    (polars' default). Pass ``interpolation="linear"`` for R's ``quantile()`` type
+    7 — also NumPy's default and the quartiles drawn by Plotly/ggplot2 boxplots —
+    or any other polars quantile method.
     """
     df = data if isinstance(data, pl.DataFrame) else pl.from_pandas(data)
     columns = columns or df.columns

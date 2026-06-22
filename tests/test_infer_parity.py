@@ -127,15 +127,15 @@ def test_t_test_one_sample_tidy_columns():
 
 
 def test_chisq_test_df_and_stat():
-    # Default applies Yates' continuity correction (matches R's chisq.test and
-    # prop_test); on this weak 2x2 association the corrected statistic is ~0.
+    # Default is the uncorrected Pearson statistic (matches moderndive 0.1.0 and
+    # the simulation-based calculate(stat="Chisq")) — strictly positive here.
     out = chisq_test(_yawn(), formula="yawn ~ group")
     assert out["chisq_df"][0] == 1
-    assert out["statistic"][0] >= 0
-    # The uncorrected Pearson statistic is strictly positive and larger.
-    raw = chisq_test(_yawn(), formula="yawn ~ group", correct=False)
-    assert raw["statistic"][0] > 0
-    assert raw["statistic"][0] > out["statistic"][0]
+    assert out["statistic"][0] > 0
+    # Opt into Yates' continuity correction (R's chisq.test default); on this weak
+    # 2x2 association the corrected statistic is smaller.
+    corrected = chisq_test(_yawn(), formula="yawn ~ group", correct=True)
+    assert corrected["statistic"][0] < out["statistic"][0]
 
 
 # --- bias-corrected CI ----------------------------------------------------

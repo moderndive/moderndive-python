@@ -1,5 +1,29 @@
 # Changelog
 
+<!--
+Conventions: group entries under ### Added / ### Changed / ### Fixed.
+ANY behavior change that could alter existing users' results is a BREAKING change
+and MUST go in a dedicated, top-of-version "### ⚠️ Breaking changes" section that
+states (a) exactly what changed, (b) how to restore the previous behavior, and
+(c) why. Breaking changes require a minor/major version bump, never a patch.
+-->
+
+## Unreleased
+
+### Added
+
+- `tidy_summary()` gains an `interpolation=` parameter controlling how `Q1`/`Q3`
+  are computed. The default is unchanged from 0.1.0 (`"nearest"`); pass
+  `interpolation="linear"` for R's `quantile()` type 7 — also NumPy's default and
+  the quartiles drawn by Plotly/ggplot2 boxplots. **Non-breaking** (default
+  preserved).
+- `chisq_test()` gains a `correct=` parameter for Yates' continuity correction on
+  the test of independence. The default is unchanged from 0.1.0 (`correct=False`,
+  the uncorrected Pearson statistic, matching the simulation-based
+  `calculate(stat="Chisq")`); pass `correct=True` to match R's
+  `chisq.test`/`prop_test`. As in R, the correction only affects 2x2 tables.
+  **Non-breaking** (default preserved).
+
 ## 0.1.0 (2026-06-20)
 
 Initial release of the Python companion to **ModernDive: Statistical Inference

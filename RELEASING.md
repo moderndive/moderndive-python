@@ -46,6 +46,10 @@ unzip -l dist/*.whl | grep -c parquet   # sanity: bundled datasets are present
 ## Cutting a release
 
 1. **Pick the version** (PyPI versions are immutable — you can't re-upload one).
+   Any change that can alter existing users' results is **breaking**: it needs a
+   dedicated `### ⚠️ Breaking changes` section in `CHANGELOG.md` (what changed,
+   how to restore the old behavior, why) and a **minor/major** bump — never a
+   patch. Prefer adding an opt-in parameter with the old default to avoid breaking.
 2. **Bump `version`** in `pyproject.toml`.
 3. **Update `CHANGELOG.md`**: rename the `## Unreleased` section to
    `## <version> (YYYY-MM-DD)` and start a fresh empty `## Unreleased` above it.

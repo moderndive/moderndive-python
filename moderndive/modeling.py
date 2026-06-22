@@ -362,13 +362,24 @@ def get_regression_summaries(model, digits: int = 3) -> pl.DataFrame:
     return table.with_columns(pl.col(float_cols).round(digits))
 
 
-def tidy_summary(data, columns: list[str] | None = None, digits: int = 3) -> pl.DataFrame:
+def tidy_summary(
+    data,
+    columns: list[str] | None = None,
+    digits: int = 3,
+    interpolation: str = "nearest",
+) -> pl.DataFrame:
     """Per-variable summary statistics for the selected columns.
 
     Mirrors the R ``moderndive::tidy_summary`` column layout:
     ``column, n, group, type, min, Q1, mean, median, Q3, max, sd``.
     Numeric columns get the five-number summary + mean/sd; non-numeric columns
     report ``n`` and ``type`` with the numeric fields left null.
+
+    ``interpolation`` selects how ``Q1``/``Q3`` are computed when a quartile falls
+    between two observations. The default ``"nearest"`` matches moderndive 0.1.0
+    (polars' default). Pass ``interpolation="linear"`` for R's ``quantile()`` type
+    7 — also NumPy's default and the quartiles drawn by Plotly/ggplot2 boxplots —
+    or any other polars quantile method.
     """
     df = data if isinstance(data, pl.DataFrame) else pl.from_pandas(data)
     columns = columns or df.columns
@@ -395,10 +406,10 @@ def tidy_summary(data, columns: list[str] | None = None, digits: int = 3) -> pl.
             s = series.drop_nulls()
             row.update(
                 min=round(float(s.min()), digits),
-                Q1=round(float(s.quantile(0.25)), digits),
+                Q1=round(float(s.quantile(0.25, interpolation=interpolation)), digits),
                 mean=round(float(s.mean()), digits),
                 median=round(float(s.median()), digits),
-                Q3=round(float(s.quantile(0.75)), digits),
+                Q3=round(float(s.quantile(0.75, interpolation=interpolation)), digits),
                 max=round(float(s.max()), digits),
                 sd=round(float(s.std()), digits),
             )

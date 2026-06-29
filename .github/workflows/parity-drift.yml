@@ -5,7 +5,10 @@ name: Parity drift
 # a dataset whose dimensions/columns changed — and opens (or comments on) an issue.
 on:
   schedule:
-    - cron: "0 6 * * MON"
+    # Off the top-of-hour peak: the 0 6 * * * slot is the most congested on
+    # GitHub, where GITHUB_TOKEN API calls are most likely to hit transient
+    # rate-limit/5xx failures.
+    - cron: "23 7 * * MON"
   workflow_dispatch:
 
 permissions:
@@ -35,7 +38,26 @@ jobs:
           GITHUB_PAT: ${{ github.token }}
         run: |
           Rscript -e 'install.packages(c("remotes", "jsonlite"))'
-          Rscript -e 'remotes::install_github(c("moderndive/moderndive", "tidymodels/infer"), upgrade = "never")'
+          # remotes::install_github makes several best-effort GitHub API calls
+          # with no built-in retry, so a single transient failure (rate limit /
+          # 5xx, surfaced by R as "cannot open URL ...") aborts the whole job.
+          # Retry with backoff to ride out blips.
+          Rscript -e '
+            options(timeout = 300)
+            pkgs <- c("moderndive/moderndive", "tidymodels/infer")
+            for (attempt in 1:5) {
+              ok <- tryCatch({
+                remotes::install_github(pkgs, upgrade = "never")
+                TRUE
+              }, error = function(e) {
+                message("Attempt ", attempt, " failed: ", conditionMessage(e))
+                FALSE
+              })
+              if (ok) break
+              if (attempt == 5) stop("install_github failed after 5 attempts")
+              Sys.sleep(15 * attempt)
+            }
+          '
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7

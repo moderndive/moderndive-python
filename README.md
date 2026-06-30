@@ -16,7 +16,7 @@ It is intentionally **pure-Python** (no compiled extensions) so it installs unde
 ## Installation
 
 ``` bash
-pip install moderndive          # from PyPI (once published)
+pip install moderndive          # from PyPI
 # or, from source:
 pip install git+https://github.com/moderndive/moderndive-python
 ```

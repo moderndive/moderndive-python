@@ -31,10 +31,22 @@ _REGISTRY: dict[str, str] = {
     "drinks": "Alcohol servings per person by country (fivethirtyeight).",
     "airline_safety": "Airline safety records, 1985-2014 (fivethirtyeight).",
     "dem_score": "Democracy scores by country and year, wide format.",
-    # End-of-chapter exercises
-    "olympic_athletes": "Olympic athletes 1896-2016: one row per athlete-event (olympicAthletes).",
-    "medal_table": "Olympic medal counts per Games x NOC, 1896-2016 (olympicAthletes).",
-    "editions": "Metadata for every Olympic Games edition, 1896-2016 (olympicAthletes).",
+    # End-of-chapter exercises (olympicAthletes)
+    "olympic_athletes": "Olympic athletes 1896-2026: one row per athlete-event (olympicAthletes).",
+    "medal_table": "Olympic medal counts per Games x NOC, 1896-2026 (olympicAthletes).",
+    "editions": "Metadata for every Olympic Games edition, 1896-2026 (olympicAthletes).",
+    # olympicAthletes convenience subsets (sport/Games slices of olympic_athletes)
+    "athletics_athletes": "Athletics athlete-events (olympicAthletes subset).",
+    "gymnastics_athletes": "Gymnastics athlete-events (olympicAthletes subset).",
+    "basketball_athletes": "Basketball athlete-events (olympicAthletes subset).",
+    "volleyball_athletes": "Volleyball athlete-events (olympicAthletes subset).",
+    "curling_athletes": "Curling athlete-events (olympicAthletes subset).",
+    "art_competitions_athletes": "Art Competitions athlete-events, 1912-1948 (olympicAthletes subset).",
+    "team_sport_athletes": "Team-sport athlete-events (olympicAthletes subset).",
+    "olympic_athletes_2024": "Athlete-events at the Paris 2024 Summer Games (olympicAthletes subset).",
+    "usa_summer_medals": "USA medal counts by Summer Games (olympicAthletes).",
+    "paris_2024_top_medals": "Top medal-winning NOCs at Paris 2024, long format (olympicAthletes).",
+    "season_counts": "Athlete-event counts by Olympic season (olympicAthletes).",
     # Regression
     "un_member_states_2024": "UN member states (2024): demographics and economy.",
     "credit": "Credit-card holder data (ISLR2 Credit).",

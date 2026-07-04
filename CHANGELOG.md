@@ -23,6 +23,14 @@ added here as chapters are ported.
   (`olympicAthletes::medal_table`).
 - `load_editions()` — metadata for every Olympic Games edition
   (`olympicAthletes::editions`).
+- The `olympicAthletes` **convenience subsets** used by the exercises:
+  `load_athletics_athletes()`, `load_gymnastics_athletes()`,
+  `load_basketball_athletes()`, `load_volleyball_athletes()`,
+  `load_curling_athletes()`, `load_art_competitions_athletes()`,
+  `load_team_sport_athletes()`, `load_olympic_athletes_2024()` (Paris 2024),
+  `load_usa_summer_medals()`, `load_paris_2024_top_medals()`, and
+  `load_season_counts()` — exported verbatim from `olympicAthletes` 0.5.7 for
+  exact parity.
 
 ### Added
 

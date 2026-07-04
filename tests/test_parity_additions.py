@@ -266,6 +266,17 @@ _NEW_DATASETS = {
     "olympic_athletes": (315094, 16),
     "medal_table": (1929, 11),
     "editions": (62, 15),
+    "athletics_athletes": (43062, 16),
+    "gymnastics_athletes": (29413, 16),
+    "basketball_athletes": (5159, 16),
+    "volleyball_athletes": (4792, 16),
+    "curling_athletes": (961, 16),
+    "art_competitions_athletes": (3578, 16),
+    "team_sport_athletes": (10912, 16),
+    "olympic_athletes_2024": (13660, 16),
+    "usa_summer_medals": (30, 11),
+    "paris_2024_top_medals": (30, 4),
+    "season_counts": (2, 2),
 }
 
 

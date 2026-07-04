@@ -262,6 +262,10 @@ _NEW_DATASETS = {
     "spotify_52_original": (52, 6),
     "spotify_52_shuffled": (52, 6),
     "gss": (500, 11),
+    # R data-parity: end-of-chapter exercise datasets (olympicAthletes)
+    "olympic_athletes": (315094, 16),
+    "medal_table": (1929, 11),
+    "editions": (62, 15),
 }
 
 

@@ -8,7 +8,21 @@ states (a) exactly what changed, (b) how to restore the previous behavior, and
 (c) why. Breaking changes require a minor/major version bump, never a patch.
 -->
 
-## Unreleased
+## 0.2.0
+
+Ongoing **R data-parity** line: bundling the datasets the R `moderndive`
+ecosystem exposes (including the end-of-chapter exercise data) so the Python
+edition and its exercises can match the R book one-for-one. More datasets will be
+added here as chapters are ported.
+
+### Added — datasets
+
+- `load_olympic_athletes()` — Olympic athletes 1896-2016, one row per
+  athlete-event (~315k rows; the `olympicAthletes` R package's `olympic_athletes`).
+- `load_medal_table()` — Olympic medal counts per Games × NOC
+  (`olympicAthletes::medal_table`).
+- `load_editions()` — metadata for every Olympic Games edition
+  (`olympicAthletes::editions`).
 
 ### Added
 

@@ -31,6 +31,10 @@ _REGISTRY: dict[str, str] = {
     "drinks": "Alcohol servings per person by country (fivethirtyeight).",
     "airline_safety": "Airline safety records, 1985-2014 (fivethirtyeight).",
     "dem_score": "Democracy scores by country and year, wide format.",
+    # End-of-chapter exercises
+    "olympic_athletes": "Olympic athletes 1896-2016: one row per athlete-event (olympicAthletes).",
+    "medal_table": "Olympic medal counts per Games x NOC, 1896-2016 (olympicAthletes).",
+    "editions": "Metadata for every Olympic Games edition, 1896-2016 (olympicAthletes).",
     # Regression
     "un_member_states_2024": "UN member states (2024): demographics and economy.",
     "credit": "Credit-card holder data (ISLR2 Credit).",

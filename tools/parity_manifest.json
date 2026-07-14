@@ -1,4 +1,127 @@
 {
+  "exoplanetdata": {
+    "datasets": {
+      "planets": {
+        "cols": 28,
+        "columns": [
+          "planet_name",
+          "host_name",
+          "n_stars",
+          "n_planets",
+          "discovery_method",
+          "discovery_year",
+          "discovery_facility",
+          "orbital_period_days",
+          "semi_major_axis_au",
+          "eccentricity",
+          "inclination_deg",
+          "radius_earth",
+          "radius_jupiter",
+          "mass_earth",
+          "mass_jupiter",
+          "density_g_cm3",
+          "eq_temp_k",
+          "insolation_earth",
+          "star_spec_type",
+          "star_temp_k",
+          "star_radius_solar",
+          "star_mass_solar",
+          "star_metallicity_dex",
+          "star_log_g",
+          "star_age_gyr",
+          "ra_deg",
+          "dec_deg",
+          "distance_pc"
+        ],
+        "rows": 6278
+      }
+    },
+    "exports": [],
+    "version": "0.1.0"
+  },
+  "fivethirtyeight": {
+    "datasets": {
+      "bob_ross": {
+        "cols": 71,
+        "columns": [
+          "episode",
+          "season",
+          "episode_num",
+          "title",
+          "apple_frame",
+          "aurora_borealis",
+          "barn",
+          "beach",
+          "boat",
+          "bridge",
+          "building",
+          "bushes",
+          "cabin",
+          "cactus",
+          "circle_frame",
+          "cirrus",
+          "cliff",
+          "clouds",
+          "conifer",
+          "cumulus",
+          "deciduous",
+          "diane_andre",
+          "dock",
+          "double_oval_frame",
+          "farm",
+          "fence",
+          "fire",
+          "florida_frame",
+          "flowers",
+          "fog",
+          "framed",
+          "grass",
+          "guest",
+          "half_circle_frame",
+          "half_oval_frame",
+          "hills",
+          "lake",
+          "lakes",
+          "lighthouse",
+          "mill",
+          "moon",
+          "mountain",
+          "mountains",
+          "night",
+          "ocean",
+          "oval_frame",
+          "palm_trees",
+          "path",
+          "person",
+          "portrait",
+          "rectangle_3d_frame",
+          "rectangular_frame",
+          "river",
+          "rocks",
+          "seashell_frame",
+          "snow",
+          "snowy_mountain",
+          "split_frame",
+          "steve_ross",
+          "structure",
+          "sun",
+          "tomb_frame",
+          "tree",
+          "trees",
+          "triple_frame",
+          "waterfall",
+          "waves",
+          "windmill",
+          "window_frame",
+          "winter",
+          "wood_framed"
+        ],
+        "rows": 403
+      }
+    },
+    "exports": [],
+    "version": "0.6.2"
+  },
   "infer": {
     "datasets": {
       "gss": {
@@ -739,5 +862,56 @@
       "View"
     ],
     "version": "0.8.0.9000"
+  },
+  "volcanoes": {
+    "datasets": {
+      "eruptions": {
+        "cols": 14,
+        "columns": [
+          "volcano_number",
+          "volcano_name",
+          "eruption_number",
+          "eruption_category",
+          "vei",
+          "area_of_activity",
+          "activity_unit",
+          "evidence_method_dating",
+          "start_year",
+          "start_month",
+          "start_day",
+          "end_year",
+          "end_month",
+          "end_day"
+        ],
+        "rows": 11089
+      },
+      "volcanoes": {
+        "cols": 19,
+        "columns": [
+          "volcano_number",
+          "volcano_name",
+          "volcanic_landform",
+          "primary_volcano_type",
+          "last_eruption_year",
+          "country",
+          "region",
+          "subregion",
+          "geological_summary",
+          "latitude",
+          "longitude",
+          "elevation",
+          "tectonic_settings",
+          "geologic_epoch",
+          "evidence_category",
+          "primary_photo_link",
+          "primary_photo_caption",
+          "primary_photo_credit",
+          "dominant_rock_type"
+        ],
+        "rows": 1215
+      }
+    },
+    "exports": [],
+    "version": "0.1.1"
   }
 }

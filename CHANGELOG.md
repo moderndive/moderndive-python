@@ -8,6 +8,36 @@ states (a) exactly what changed, (b) how to restore the previous behavior, and
 (c) why. Breaking changes require a minor/major version bump, never a patch.
 -->
 
+## 0.3.0
+
+Continues the **R data-parity** line: the datasets the R edition's end-of-chapter
+exercises take from companion packages, so the Python exercises (all 11 chapters)
+match the R book one-for-one.
+
+### Added — datasets
+
+- `load_planets()` — confirmed exoplanets: mass, radius, orbit, discovery
+  (6,278 × 28; the `exoplanetdata` R package's `planets`). Used by the
+  Chapter 5, 6, 10, and 11 exercises.
+- `load_volcanoes()` — Holocene volcanoes of the world (1,215 × 19;
+  `volcanoes::volcanoes`). Used by the Chapter 7–11 exercises.
+- `load_eruptions()` — documented volcanic eruptions with VEI and dates
+  (11,089 × 14; `volcanoes::eruptions`).
+- `load_bob_ross()` — element tags for every *Joy of Painting* episode
+  (403 × 71; `fivethirtyeight::bob_ross`). Used by the Chapter 4, 9, and 11
+  exercises.
+- The upstream snapshots are recorded in `tools/parity_manifest.json`
+  (`exoplanetdata` 0.1.0, `volcanoes` 0.1.1, `fivethirtyeight` 0.6.2).
+
+### Fixed
+
+- `generate(type="draw")` with a **non-string success level** (e.g. a boolean
+  response with `success=True`) produced an all-zero null distribution: the
+  simulated draws were materialized with `np.where`, which unified the success
+  level with the internal string sentinel (turning `True` into `"True"`) before
+  the proportion was computed. Draws now preserve the success level's type;
+  string-labelled responses are unaffected (bit-identical results).
+
 ## 0.2.0
 
 Ongoing **R data-parity** line: bundling the datasets the R `moderndive`

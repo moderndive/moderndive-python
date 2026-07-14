@@ -332,7 +332,13 @@ def _generate(
             p0 = hypothesis.p
             for _ in range(reps):
                 draws = rng.random(n) < p0
-                plans.append(np.where(draws, success, nonsuccess).astype(object))
+                # Fill an object array directly: np.where would unify the
+                # success level with the string sentinel first (a boolean
+                # True becomes "True"), breaking the later == success match.
+                plan = np.empty(n, dtype=object)
+                plan[draws] = success
+                plan[~draws] = nonsuccess
+                plans.append(plan)
     else:  # bootstrap
         if hypothesis is not None and hypothesis.null == "point" and hypothesis.mu is not None:
             shifted = _resample.shift_for_point_null(

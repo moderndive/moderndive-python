@@ -1,6 +1,6 @@
 [project]
 name = "moderndive"
-version = "0.2.0"
+version = "0.3.0"
 description = "Python companion for ModernDive: a tidy simulation-inference grammar, regression helpers, datasets, and dual-engine plotly/plotnine plots"
 readme = "README.md"
 requires-python = ">=3.11"

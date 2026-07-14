@@ -122,6 +122,30 @@ def test_permute_requires_explanatory():
         specify(df, response="x").generate(reps=10, type="permute", seed=1)
 
 
+def test_draw_with_boolean_success_level():
+    # Regression: np.where used to unify a boolean success level with the
+    # string non-success sentinel, turning True into "True" and yielding an
+    # all-zero null distribution. The draw must respect a non-string level
+    # and match the string-labelled equivalent replicate-for-replicate.
+    flags = pl.DataFrame({"flag": [True] * 80 + [False] * 20})
+    labels = pl.DataFrame({"flag": ["yes"] * 80 + ["no"] * 20})
+    kw = dict(reps=200, type="draw", seed=1)
+    null_bool = (
+        specify(flags, response="flag", success=True)
+        .hypothesize(null="point", p=0.8)
+        .generate(**kw)
+        .calculate(stat="prop")
+    )
+    null_str = (
+        specify(labels, response="flag", success="yes")
+        .hypothesize(null="point", p=0.8)
+        .generate(**kw)
+        .calculate(stat="prop")
+    )
+    assert float(np.mean(null_bool.stats)) == pytest.approx(0.8, abs=0.02)
+    assert np.array_equal(null_bool.stats, null_str.stats)
+
+
 # --- intervals & p-values --------------------------------------------------
 
 

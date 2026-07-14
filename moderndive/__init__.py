@@ -62,7 +62,7 @@ from .plots import (
 from .sampling import rep_sample_n, rep_slice_sample
 from .view import View
 
-__version__ = "0.1.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "specify",

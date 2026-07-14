@@ -102,6 +102,11 @@ _REGISTRY: dict[str, str] = {
     "DD_vs_SB": "Dunkin' Donuts vs. Starbucks shop counts by US county.",
     "ma_traffic_2020_vs_2019": "Massachusetts traffic change, 2020 vs. 2019.",
     "mass_traffic_2020": "Massachusetts traffic-volume and crash counts, 2020.",
+    # End-of-chapter exercises (R companion packages)
+    "planets": "Confirmed exoplanets: mass, radius, orbit, discovery (exoplanetdata).",
+    "volcanoes": "Holocene volcanoes of the world (volcanoes).",
+    "eruptions": "Documented volcanic eruptions with VEI and dates (volcanoes).",
+    "bob_ross": "Element tags for every Joy of Painting episode (fivethirtyeight).",
 }
 
 # Derived datasets (computed from a bundled one rather than stored as Parquet).

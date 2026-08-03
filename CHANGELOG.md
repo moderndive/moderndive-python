@@ -8,7 +8,7 @@ states (a) exactly what changed, (b) how to restore the previous behavior, and
 (c) why. Breaking changes require a minor/major version bump, never a patch.
 -->
 
-## 0.3.0
+## 0.3.0 (2026-08-03)
 
 Continues the **R data-parity** line: the datasets the R edition's end-of-chapter
 exercises take from companion packages, so the Python exercises (all 11 chapters)
@@ -38,7 +38,7 @@ match the R book one-for-one.
   the proportion was computed. Draws now preserve the success level's type;
   string-labelled responses are unaffected (bit-identical results).
 
-## 0.2.0
+## 0.2.0 (not published separately; first released as part of 0.3.0)
 
 Ongoing **R data-parity** line: bundling the datasets the R `moderndive`
 ecosystem exposes (including the end-of-chapter exercise data) so the Python
